@@ -9,6 +9,7 @@ mod room_based_spawner;
 mod room_based_stairs;
 mod room_based_starting_position;
 mod room_corner_rounding;
+mod room_draw;
 mod room_exploder;
 mod room_sorter;
 mod rooms_corridors_bsp;
@@ -22,6 +23,7 @@ use room_based_spawner::RoomBasedSpawner;
 use room_based_stairs::RoomBasedStairs;
 use room_based_starting_position::RoomBasedStartingPosition;
 use room_corner_rounding::RoomCornerRounder;
+use room_draw::RoomDrawer;
 use room_exploder::RoomExploder;
 use room_sorter::{RoomSort, RoomSorter};
 use rooms_corridors_bsp::BspCorridors;
@@ -113,6 +115,7 @@ pub trait InitialMapBuilder {
 pub trait MetaMapBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap);
 }
+
 fn random_start_position(rng: &mut rltk::RandomNumberGenerator) -> (XStart, YStart) {
     let x = match rng.roll_dice(1, 3) {
         1 => XStart::Left,
@@ -148,6 +151,8 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Buil
             4 => builder.with(RoomSorter::new(RoomSort::Bottom)),
             _ => builder.with(RoomSorter::new(RoomSort::Central)),
         }
+
+        builder.with(RoomDrawer::new());
 
         let corridor_roll = rng.roll_dice(1, 2);
         match corridor_roll {
