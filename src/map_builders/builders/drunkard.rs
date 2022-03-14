@@ -1,4 +1,4 @@
-use super::{paint, BuilderMap, InitialMapBuilder, Position, Symmetry, TileType};
+use super::{paint, BuilderMap, InitialMapBuilder, MetaMapBuilder, Position, Symmetry, TileType};
 use rltk::RandomNumberGenerator;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -27,11 +27,16 @@ impl InitialMapBuilder for DrunkardsWalkBuilder {
     }
 }
 
+impl MetaMapBuilder for DrunkardsWalkBuilder {
+    #[allow(dead_code)]
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
+        self.build(rng, build_data);
+    }
+}
+
 impl DrunkardsWalkBuilder {
     #[allow(dead_code)]
-    pub fn new(settings: DrunkardSettings) -> DrunkardsWalkBuilder {
-        DrunkardsWalkBuilder { settings }
-    }
+    pub fn new(settings: DrunkardSettings) -> DrunkardsWalkBuilder { DrunkardsWalkBuilder { settings } }
 
     #[allow(dead_code)]
     pub fn open_area() -> Box<DrunkardsWalkBuilder> {
@@ -104,19 +109,12 @@ impl DrunkardsWalkBuilder {
             x: build_data.map.width / 2,
             y: build_data.map.height / 2,
         };
-        let start_idx = build_data
-            .map
-            .xy_idx(starting_position.x, starting_position.y);
+        let start_idx = build_data.map.xy_idx(starting_position.x, starting_position.y);
         build_data.map.tiles[start_idx] = TileType::Floor;
 
         let total_tiles = build_data.map.width * build_data.map.height;
         let desired_floor_tiles = (self.settings.floor_percent * total_tiles as f32) as usize;
-        let mut floor_tile_count = build_data
-            .map
-            .tiles
-            .iter()
-            .filter(|a| **a == TileType::Floor)
-            .count();
+        let mut floor_tile_count = build_data.map.tiles.iter().filter(|a| **a == TileType::Floor).count();
         let mut digger_count = 0;
         while floor_tile_count < desired_floor_tiles {
             let mut did_something = false;
@@ -126,7 +124,7 @@ impl DrunkardsWalkBuilder {
                 DrunkSpawnMode::StartingPoint => {
                     drunk_x = starting_position.x;
                     drunk_y = starting_position.y;
-                }
+                },
                 DrunkSpawnMode::Random => {
                     if digger_count == 0 {
                         drunk_x = starting_position.x;
@@ -135,7 +133,7 @@ impl DrunkardsWalkBuilder {
                         drunk_x = rng.roll_dice(1, build_data.map.width - 3) + 1;
                         drunk_y = rng.roll_dice(1, build_data.map.height - 3) + 1;
                     }
-                }
+                },
             }
             let mut drunk_life = self.settings.drunken_lifetime;
 
@@ -159,22 +157,22 @@ impl DrunkardsWalkBuilder {
                         if drunk_x > 2 {
                             drunk_x -= 1;
                         }
-                    }
+                    },
                     2 => {
                         if drunk_x < build_data.map.width - 2 {
                             drunk_x += 1;
                         }
-                    }
+                    },
                     3 => {
                         if drunk_y > 2 {
                             drunk_y -= 1;
                         }
-                    }
+                    },
                     _ => {
                         if drunk_y < build_data.map.height - 2 {
                             drunk_y += 1;
                         }
-                    }
+                    },
                 }
 
                 drunk_life -= 1;
@@ -189,12 +187,7 @@ impl DrunkardsWalkBuilder {
                     *t = TileType::Floor;
                 }
             }
-            floor_tile_count = build_data
-                .map
-                .tiles
-                .iter()
-                .filter(|a| **a == TileType::Floor)
-                .count();
+            floor_tile_count = build_data.map.tiles.iter().filter(|a| **a == TileType::Floor).count();
         }
     }
 }
