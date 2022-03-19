@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use rltk::{RandomNumberGenerator, RGB};
 
-use super::{components::*, map::MAPWIDTH, random_table::RandomTable, Map, Rect, TileType};
+use super::{components::*, random_table::RandomTable, Map, Rect, TileType};
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
@@ -125,8 +125,13 @@ pub fn spawn_region(
 
 /// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
 pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
-    let x = (*spawn.0 % MAPWIDTH) as i32;
-    let y = (*spawn.0 / MAPWIDTH) as i32;
+    let map = ecs.fetch::<Map>();
+
+    let width = map.width as usize;
+    let x = (*spawn.0 % width) as i32;
+    let y = (*spawn.0 / width) as i32;
+
+    std::mem::drop(map);
 
     match spawn.1.as_ref() {
         "Goblin" => goblin(ecs, x, y),

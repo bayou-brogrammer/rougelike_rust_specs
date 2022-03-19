@@ -1,12 +1,6 @@
 use specs::error::NoError;
 use specs::prelude::*;
-use specs::saveload::{
-    DeserializeComponents,
-    MarkedBuilder,
-    SerializeComponents,
-    SimpleMarker,
-    SimpleMarkerAllocator,
-};
+use specs::saveload::{DeserializeComponents, MarkedBuilder, SerializeComponents, SimpleMarker, SimpleMarkerAllocator};
 use std::fs;
 use std::fs::File;
 use std::path::Path;
@@ -183,12 +177,14 @@ pub fn load_game(ecs: &mut World) {
         let helper = ecs.read_storage::<SerializationHelper>();
         let player = ecs.read_storage::<Player>();
         let position = ecs.read_storage::<Position>();
+
         for (e, h) in (&entities, &helper).join() {
             let mut worldmap = ecs.write_resource::<crate::map::Map>();
             *worldmap = h.map.clone();
-            worldmap.tile_content = vec![Vec::new(); crate::map::MAPCOUNT];
+            worldmap.tile_content = vec![Vec::new(); (worldmap.height * worldmap.width) as usize];
             deleteme = Some(e);
         }
+
         for (e, _p, pos) in (&entities, &player, &position).join() {
             let mut ppos = ecs.write_resource::<rltk::Point>();
             *ppos = rltk::Point::new(pos.x, pos.y);
@@ -196,6 +192,7 @@ pub fn load_game(ecs: &mut World) {
             *player_resource = e;
         }
     }
+
     ecs.delete_entity(deleteme.unwrap()).expect("Unable to delete helper");
 }
 
