@@ -97,17 +97,21 @@ pub trait MetaMapBuilder {
 }
 
 fn random_start_position(rng: &mut rltk::RandomNumberGenerator) -> (XStart, YStart) {
-    let x = match rng.roll_dice(1, 3) {
-        1 => XStart::Left,
-        2 => XStart::Center,
-        _ => XStart::Right,
-    };
+    let x;
+    let xroll = rng.roll_dice(1, 3);
+    match xroll {
+        1 => x = XStart::Left,
+        2 => x = XStart::Center,
+        _ => x = XStart::Right,
+    }
 
-    let y = match rng.roll_dice(1, 3) {
-        1 => YStart::Bottom,
-        2 => YStart::Center,
-        _ => YStart::Top,
-    };
+    let y;
+    let yroll = rng.roll_dice(1, 3);
+    match yroll {
+        1 => y = YStart::Bottom,
+        2 => y = YStart::Center,
+        _ => y = YStart::Top,
+    }
 
     (x, y)
 }
@@ -140,6 +144,11 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Buil
             2 => builder.with(NearestCorridors::new()),
             3 => builder.with(StraightLineCorridors::new()),
             _ => builder.with(BspCorridors::new()),
+        }
+
+        let cspawn_roll = rng.roll_dice(1, 2);
+        if cspawn_roll == 1 {
+            builder.with(CorridorSpawner::new());
         }
 
         let modifier_roll = rng.roll_dice(1, 6);
@@ -214,6 +223,14 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> 
 
     if rng.roll_dice(1, 3) == 1 {
         builder.with(WaveformCollapseBuilder::new());
+
+        // Now set the start to a random starting area
+        let (start_x, start_y) = random_start_position(rng);
+        builder.with(AreaStartingPosition::new(start_x, start_y));
+
+        // Setup an exit and spawn mobs
+        builder.with(VoronoiSpawning::new());
+        builder.with(DistantExit::new());
     }
 
     if rng.roll_dice(1, 20) == 1 {
@@ -222,6 +239,7 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> 
         ));
     }
 
+    builder.with(DoorPlacement::new());
     builder.with(PrefabBuilder::vaults());
 
     builder

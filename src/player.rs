@@ -1,34 +1,25 @@
-use super::{
-    gamelog::GameLog,
-    CombatStats,
-    EntityMoved,
-    HungerClock,
-    HungerState,
-    Item,
-    Map,
-    Monster,
-    Player,
-    Position,
-    RunState,
-    State,
-    TileType,
-    Viewshed,
-    WantsToMelee,
-    WantsTopickupItem,
-};
-use rltk::{Point, Rltk, VirtualKeyCode};
 use specs::prelude::*;
 use std::cmp::{max, min};
 
+use super::{components::*, gamelog::GameLog, Map, RunState, State, TileType};
+use rltk::{Point, Rltk, VirtualKeyCode};
+
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
-    let mut positions = ecs.write_storage::<Position>();
-    let players = ecs.read_storage::<Player>();
-    let mut viewsheds = ecs.write_storage::<Viewshed>();
     let entities = ecs.entities();
-    let combat_stats = ecs.read_storage::<CombatStats>();
-    let map = ecs.fetch::<Map>();
-    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+
+    let mut blocks_movement = ecs.write_storage::<BlocksTile>();
+    let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
+    let mut doors = ecs.write_storage::<Door>();
     let mut entity_moved = ecs.write_storage::<EntityMoved>();
+    let mut positions = ecs.write_storage::<Position>();
+    let mut renderables = ecs.write_storage::<Renderable>();
+    let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+
+    let players = ecs.read_storage::<Player>();
+    let combat_stats = ecs.read_storage::<CombatStats>();
+
+    let map = ecs.fetch::<Map>();
 
     for (entity, _player, pos, viewshed) in (&entities, &players, &mut positions, &mut viewsheds).join() {
         if pos.x + delta_x < 1
@@ -42,6 +33,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
         for potential_target in map.tile_content[destination_idx].iter() {
             let target = combat_stats.get(*potential_target);
+            // Attack Target
             if let Some(_target) = target {
                 wants_to_melee
                     .insert(
@@ -52,6 +44,19 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                     )
                     .expect("Add target failed");
                 return;
+            }
+
+            // Check if Door
+            let door = doors.get_mut(*potential_target);
+            if let Some(door) = door {
+                door.open = true;
+                viewshed.dirty = true;
+
+                blocks_visibility.remove(*potential_target);
+                blocks_movement.remove(*potential_target);
+
+                let glyph = renderables.get_mut(*potential_target).unwrap();
+                glyph.glyph = rltk::to_cp437('/');
             }
         }
 
@@ -161,21 +166,13 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     match ctx.key {
         None => return RunState::AwaitingInput, // Nothing happened
         Some(key) => match key {
-            VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
-                try_move_player(-1, 0, &mut gs.ecs)
-            },
+            VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => try_move_player(-1, 0, &mut gs.ecs),
 
-            VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => {
-                try_move_player(1, 0, &mut gs.ecs)
-            },
+            VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => try_move_player(1, 0, &mut gs.ecs),
 
-            VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => {
-                try_move_player(0, -1, &mut gs.ecs)
-            },
+            VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => try_move_player(0, -1, &mut gs.ecs),
 
-            VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => {
-                try_move_player(0, 1, &mut gs.ecs)
-            },
+            VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => try_move_player(0, 1, &mut gs.ecs),
 
             // Diagonals
             VirtualKeyCode::Numpad9 | VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),

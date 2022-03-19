@@ -191,6 +191,14 @@ pub struct EntityMoved {}
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct SingleActivation {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct BlocksVisibility {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Door {
+    pub open: bool,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 
