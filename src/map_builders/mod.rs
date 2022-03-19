@@ -1,34 +1,12 @@
 // Externals
 use specs::prelude::*;
 
-// Builder Functionality
-mod area_starting_points;
-mod cull_unreachable;
-mod distant_exit;
-mod room_based_spawner;
-mod room_based_stairs;
-mod room_based_starting_position;
-mod room_corner_rounding;
-mod room_draw;
-mod room_exploder;
-mod room_sorter;
-mod rooms_corridors_bsp;
-mod rooms_corridors_dogleg;
-mod voronoi_spawning;
+mod common;
+use common::*;
 
-use area_starting_points::*;
-use cull_unreachable::CullUnreachable;
-use distant_exit::DistantExit;
-use room_based_spawner::RoomBasedSpawner;
-use room_based_stairs::RoomBasedStairs;
-use room_based_starting_position::RoomBasedStartingPosition;
-use room_corner_rounding::RoomCornerRounder;
-use room_draw::RoomDrawer;
-use room_exploder::RoomExploder;
-use room_sorter::{RoomSort, RoomSorter};
-use rooms_corridors_bsp::BspCorridors;
-use rooms_corridors_dogleg::DoglegCorridors;
-use voronoi_spawning::VoronoiSpawning;
+// Builder Functionality
+mod meta_map_builders;
+use self::meta_map_builders::*;
 
 // Map Types
 mod builders;
@@ -41,6 +19,7 @@ pub struct BuilderMap {
     pub map: Map,
     pub starting_position: Option<Position>,
     pub rooms: Option<Vec<Rect>>,
+    pub corridors: Option<Vec<Vec<usize>>>,
     pub history: Vec<Map>,
 }
 
@@ -72,6 +51,7 @@ impl BuilderChain {
                 map: Map::new(new_depth),
                 starting_position: None,
                 rooms: None,
+                corridors: None,
                 history: Vec::new(),
             },
         }
@@ -154,9 +134,11 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Buil
 
         builder.with(RoomDrawer::new());
 
-        let corridor_roll = rng.roll_dice(1, 2);
+        let corridor_roll = rng.roll_dice(1, 4);
         match corridor_roll {
             1 => builder.with(DoglegCorridors::new()),
+            2 => builder.with(NearestCorridors::new()),
+            3 => builder.with(StraightLineCorridors::new()),
             _ => builder.with(BspCorridors::new()),
         }
 
@@ -225,7 +207,6 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder: &mut Bui
 pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     let mut builder = BuilderChain::new(new_depth);
     let type_roll = rng.roll_dice(1, 2);
-
     match type_roll {
         1 => random_room_builder(rng, &mut builder),
         _ => random_shape_builder(rng, &mut builder),

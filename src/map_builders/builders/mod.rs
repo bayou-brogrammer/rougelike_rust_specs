@@ -1,8 +1,5 @@
 use crate::map_builders::*;
 
-mod common;
-pub use common::*;
-
 mod bsp_dungeon;
 mod bsp_interior;
 mod cellular_automata;
