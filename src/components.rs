@@ -1,9 +1,12 @@
 use rltk::RGB;
 use serde::{Deserialize, Serialize};
-use specs::error::NoError;
+use std::convert::Infallible;
+
 use specs::prelude::*;
 use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::*;
+
+pub type NoError = Infallible;
 
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Position {

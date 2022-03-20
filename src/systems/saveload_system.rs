@@ -1,11 +1,14 @@
-use specs::error::NoError;
-use specs::prelude::*;
-use specs::saveload::{DeserializeComponents, MarkedBuilder, SerializeComponents, SimpleMarker, SimpleMarkerAllocator};
+use std::convert::Infallible;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
 
+use specs::prelude::*;
+use specs::saveload::{DeserializeComponents, MarkedBuilder, SerializeComponents, SimpleMarker, SimpleMarkerAllocator};
+
 use crate::components::*;
+
+pub type NoError = Infallible;
 
 macro_rules! serialize_individually {
     ($ecs:expr, $ser:expr, $data:expr, $( $type:ty),*) => {

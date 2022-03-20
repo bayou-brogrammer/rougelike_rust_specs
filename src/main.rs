@@ -1,5 +1,8 @@
 #![feature(stmt_expr_attributes)]
 
+#[macro_use]
+extern crate lazy_static;
+
 extern crate serde;
 
 use rltk::{GameState, Point, Rltk};
@@ -21,6 +24,7 @@ use systems::*;
 pub mod camera;
 pub mod map_builders;
 pub mod random_table;
+pub mod raws;
 pub mod rex_assets;
 
 pub use components::*;
@@ -479,9 +483,17 @@ fn main() -> rltk::BError {
     gs.ecs.register::<SimpleMarker<SerializeMe>>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
+    // load raw data
+    raws::load_raws();
+
+    // Insert Map
+    gs.ecs.insert(Map::new(1, 64, 64));
+
+    // Insert Player
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
-    gs.ecs.insert(Map::new(1, 64, 64));
+
+    // Insert Game Misc Items
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     gs.ecs.insert(RunState::MapGeneration {});
