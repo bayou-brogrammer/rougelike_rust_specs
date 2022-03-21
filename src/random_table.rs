@@ -1,5 +1,6 @@
 use rltk::RandomNumberGenerator;
 
+#[derive(Debug)]
 pub struct RandomEntry {
     name: String,
     weight: i32,
@@ -14,7 +15,7 @@ impl RandomEntry {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct RandomTable {
     entries: Vec<RandomEntry>,
     total_weight: i32,
@@ -40,6 +41,7 @@ impl RandomTable {
         if self.total_weight == 0 {
             return "None".to_string();
         }
+
         let mut roll = rng.roll_dice(1, self.total_weight) - 1;
         let mut index: usize = 0;
 
