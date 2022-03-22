@@ -11,6 +11,7 @@ mod voronoi;
 mod waveform_collapse;
 
 pub mod prefab_builder;
+pub mod town;
 
 pub use bsp_dungeon::BspDungeonBuilder;
 pub use bsp_interior::BspInteriorBuilder;
@@ -22,3 +23,5 @@ pub use prefab_builder::PrefabBuilder;
 pub use simple_map::SimpleMapBuilder;
 pub use voronoi::VoronoiCellBuilder;
 pub use waveform_collapse::WaveformCollapseBuilder;
+
+pub use town::*;

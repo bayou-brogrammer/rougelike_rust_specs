@@ -1,0 +1,55 @@
+[
+  {
+    "name": "Orc",
+    "renderable": {
+      "glyph": "o",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 8
+  },
+
+  {
+    "name": "Goblin",
+    "renderable": {
+      "glyph": "g",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 8,
+      "hp": 8,
+      "defense": 1,
+      "power": 3
+    },
+    "vision_range": 8
+  },
+
+  {
+    "name": "Kobold",
+    "renderable": {
+      "glyph": "k",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 4,
+      "hp": 4,
+      "defense": 0,
+      "power": 2
+    },
+    "vision_range": 4
+  }
+]
