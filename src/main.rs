@@ -123,7 +123,7 @@ impl GameState for State {
                     }
 
                     self.mapgen_timer += ctx.frame_time_ms;
-                    if self.mapgen_timer > 200.0 {
+                    if self.mapgen_timer > 100.0 {
                         self.mapgen_timer = 0.0;
                         self.mapgen_index += 1;
                         if self.mapgen_index >= self.mapgen_history.len() {
@@ -446,6 +446,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<AreaOfEffect>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<BlocksVisibility>();
+    gs.ecs.register::<Bystander>();
     gs.ecs.register::<CombatStats>();
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<Consumable>();

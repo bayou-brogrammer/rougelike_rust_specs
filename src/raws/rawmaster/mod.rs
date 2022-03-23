@@ -184,7 +184,11 @@ fn spawn_named_mob(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: 
         Some(builder) => builder,
     };
 
-    eb = eb.with(Monster {});
+    match mob_template.ai.as_ref() {
+        "melee" => eb = eb.with(Monster {}),
+        "bystander" => eb = eb.with(Bystander {}),
+        _ => {},
+    }
 
     // BlocksTile
     if mob_template.blocks_tile {

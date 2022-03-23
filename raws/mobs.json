@@ -14,7 +14,8 @@
       "defense": 1,
       "power": 4
     },
-    "vision_range": 8
+    "vision_range": 8,
+    "ai": "melee"
   },
 
   {
@@ -32,7 +33,8 @@
       "defense": 1,
       "power": 3
     },
-    "vision_range": 8
+    "vision_range": 8,
+    "ai": "melee"
   },
 
   {
@@ -50,6 +52,216 @@
       "defense": 0,
       "power": 2
     },
-    "vision_range": 4
+    "vision_range": 4,
+    "ai": "melee"
+  },
+
+  {
+    "name": "Barkeep",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Shady Salesman",
+    "renderable": {
+      "glyph": "h",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Patron",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#AAAAAA",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Priest",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Parishioner",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#AAAAAA",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Blacksmith",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Clothier",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Alchemist",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#EE82EE",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Mom",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Peasant",
+    "renderable": {
+      "glyph": "☺",
+      "fg": "#999999",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 16,
+      "hp": 16,
+      "defense": 1,
+      "power": 4
+    },
+    "vision_range": 4,
+    "ai": "bystander"
+  },
+
+  {
+    "name": "Rat",
+    "renderable": {
+      "glyph": "r",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "stats": {
+      "max_hp": 2,
+      "hp": 2,
+      "defense": 1,
+      "power": 3
+    },
+    "vision_range": 8,
+    "ai": "melee"
   }
 ]
