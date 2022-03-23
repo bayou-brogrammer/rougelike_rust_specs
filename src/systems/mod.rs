@@ -1,5 +1,6 @@
 // System imports
 
+mod bystander_ai_system;
 pub mod damage_system;
 pub mod hunger_system;
 mod inventory_system;
@@ -11,6 +12,7 @@ pub mod saveload_system;
 mod trigger_system;
 mod visibility_system;
 
+pub use bystander_ai_system::BystanderAI;
 pub use damage_system::DamageSystem;
 pub use hunger_system::HungerSystem;
 pub use inventory_system::*;

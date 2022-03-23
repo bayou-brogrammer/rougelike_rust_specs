@@ -3,8 +3,9 @@ use std::collections::HashSet;
 use super::{BuilderChain, BuilderMap, InitialMapBuilder, Position, TileType};
 
 mod town_buildings;
+mod town_people;
 
-pub fn town_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
+pub fn town_builder(new_depth: i32, _rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     let mut chain = BuilderChain::new(new_depth, width, height);
     chain.start_with(TownBuilder::new());
     chain
@@ -54,6 +55,9 @@ impl TownBuilder {
         // Get Building sizes and grab largest
         let building_size = self.sort_buildings(&buildings);
         self.building_factory(rng, build_data, &buildings, &building_size);
+
+        self.spawn_dockers(build_data, rng);
+        self.spawn_townsfolk(build_data, rng, &mut available_building_tiles);
 
         // Make visible for screenshot
         for t in build_data.map.visible_tiles.iter_mut() {

@@ -1,31 +1,6 @@
 use specs::prelude::*;
 
-use crate::{
-    gamelog::GameLog,
-    particle_system::ParticleBuilder,
-    AreaOfEffect,
-    CombatStats,
-    Confusion,
-    Consumable,
-    Equippable,
-    Equipped,
-    HungerClock,
-    HungerState,
-    InBackpack,
-    InflictsDamage,
-    MagicMapper,
-    Map,
-    Name,
-    Position,
-    ProvidesFood,
-    ProvidesHealing,
-    RunState,
-    SufferDamage,
-    WantsToDropItem,
-    WantsToRemoveItem,
-    WantsToUseItem,
-    WantsTopickupItem,
-};
+use crate::{components::*, gamelog::GameLog, particle_system::ParticleBuilder, Map, RunState};
 
 pub struct ItemCollectionSystem {}
 
@@ -143,8 +118,7 @@ impl<'a> System<'a> for ItemUseSystem {
                         Some(area_effect) => {
                             // AoE
                             let mut blast_tiles = rltk::field_of_view(target, area_effect.radius, &*map);
-                            blast_tiles
-                                .retain(|p| p.x > 0 && p.x < map.width - 1 && p.y > 0 && p.y < map.height - 1);
+                            blast_tiles.retain(|p| p.x > 0 && p.x < map.width - 1 && p.y > 0 && p.y < map.height - 1);
                             for tile_idx in blast_tiles.iter() {
                                 let idx = map.xy_idx(tile_idx.x, tile_idx.y);
                                 for mob in map.tile_content[idx].iter() {

@@ -205,6 +205,14 @@ pub struct Door {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Bystander {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Vendor {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Quips {
+    pub available: Vec<String>,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 

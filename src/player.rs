@@ -17,8 +17,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
 
     let players = ecs.read_storage::<Player>();
-    let combat_stats = ecs.read_storage::<CombatStats>();
     let bystanders = ecs.read_storage::<Bystander>();
+    let vendors = ecs.read_storage::<Vendor>();
+    let combat_stats = ecs.read_storage::<CombatStats>();
 
     let map = ecs.fetch::<Map>();
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
@@ -35,8 +36,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
         for potential_target in map.tile_content[destination_idx].iter() {
             let bystander = bystanders.get(*potential_target);
+            let vendor = vendors.get(*potential_target);
 
-            if bystander.is_some() {
+            if bystander.is_some() || vendor.is_some() {
                 // Note that we want to move the bystander
                 swap_entities.push((*potential_target, pos.x, pos.y));
 

@@ -64,27 +64,41 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+
         let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
+
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
+
+        let mut bystander = BystanderAI {};
+        bystander.run_now(&self.ecs);
+
         let mut triggers = TriggerSystem {};
         triggers.run_now(&self.ecs);
+
         let mut melee = MeleeCombatSystem {};
         melee.run_now(&self.ecs);
+
         let mut damage = DamageSystem {};
         damage.run_now(&self.ecs);
+
         let mut pickup = ItemCollectionSystem {};
         pickup.run_now(&self.ecs);
+
         let mut itemuse = ItemUseSystem {};
         itemuse.run_now(&self.ecs);
+
         let mut drop_items = ItemDropSystem {};
         drop_items.run_now(&self.ecs);
+
         let mut item_remove = ItemRemoveSystem {};
         item_remove.run_now(&self.ecs);
-        let mut hunger = hunger_system::HungerSystem {};
+
+        let mut hunger = HungerSystem {};
         hunger.run_now(&self.ecs);
-        let mut particles = particle_system::ParticleSpawnSystem {};
+
+        let mut particles = ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
 
         self.ecs.maintain();
@@ -465,6 +479,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<MeleePowerBonus>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
+    gs.ecs.register::<Quips>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
     gs.ecs.register::<Position>();
@@ -474,6 +489,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<SufferDamage>();
+    gs.ecs.register::<Vendor>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<WantsToMelee>();
