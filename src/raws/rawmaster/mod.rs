@@ -64,17 +64,13 @@ impl RawMaster {
     }
 }
 
-fn spawn_base_ent<'a, T: BaseRawComponent>(
+fn base_entity<'a, T: BaseRawComponent + Clone>(
     new_entity: EntityBuilder<'a>,
     entity_list: &[T],
     indexes: &HashMap<String, usize>,
     key: &str,
     pos: SpawnType,
-) -> Option<(EntityBuilder<'a>, T)> {
-    if !indexes.contains_key(key) {
-        return None;
-    }
-
+) -> (EntityBuilder<'a>, T) {
     let entity_template = &entity_list[indexes[key]];
     let mut eb = new_entity;
 
@@ -91,23 +87,11 @@ fn spawn_base_ent<'a, T: BaseRawComponent>(
         name: entity_template.name(),
     });
 
-    // Individual Builders
-    // if raws.item_index.contains_key(key) {
-    //     eb = spawn_named_item(eb, entity_template.into());
-    // } else if raws.mob_index.contains_key(key) {
-    //     eb = spawn_named_mob(eb, entity_template.into());
-    // } else if raws.prop_index.contains_key(key) {
-    //     eb = spawn_named_prop(eb, entity_template.into());
-    // }
-
-    Some((eb, entity_template.clone()))
+    (eb, entity_template.clone())
 }
 
-fn spawn_named_item(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
-    let (mut eb, item_template) = match spawn_base_ent(new_entity, &raws.raws.items, &raws.item_index, key, pos) {
-        None => return None,
-        Some(builder) => builder,
-    };
+fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Option<Entity> {
+    let mut eb = new_entity;
 
     // Item Component
     eb = eb.with(crate::components::Item {});
@@ -178,11 +162,8 @@ fn spawn_named_item(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos:
     Some(eb.build())
 }
 
-fn spawn_named_mob(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
-    let (mut eb, mob_template) = match spawn_base_ent(new_entity, &raws.raws.mobs, &raws.mob_index, key, pos) {
-        None => return None,
-        Some(builder) => builder,
-    };
+fn spawn_named_mob(new_entity: EntityBuilder, mob_template: super::Mob) -> Option<Entity> {
+    let mut eb = new_entity;
 
     match mob_template.ai.as_ref() {
         "melee" => eb = eb.with(Monster {}),
@@ -221,11 +202,8 @@ fn spawn_named_mob(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: 
     Some(eb.build())
 }
 
-fn spawn_named_prop(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
-    let (mut eb, prop_template) = match spawn_base_ent(new_entity, &raws.raws.props, &raws.prop_index, key, pos) {
-        None => return None,
-        Some(builder) => builder,
-    };
+fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::Prop) -> Option<Entity> {
+    let mut eb = new_entity;
 
     // Hidden Trait
     if let Some(hidden) = prop_template.hidden {
@@ -293,11 +271,14 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
 
 pub fn spawn_named_entity(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
-        return spawn_named_item(raws, new_entity, key, pos);
+        let (eb, item) = base_entity(new_entity, &raws.raws.items, &raws.item_index, key, pos);
+        return spawn_named_item(eb, item);
     } else if raws.mob_index.contains_key(key) {
-        return spawn_named_mob(raws, new_entity, key, pos);
+        let (eb, mob) = base_entity(new_entity, &raws.raws.mobs, &raws.mob_index, key, pos);
+        return spawn_named_mob(eb, mob);
     } else if raws.prop_index.contains_key(key) {
-        return spawn_named_prop(raws, new_entity, key, pos);
+        let (eb, prop) = base_entity(new_entity, &raws.raws.props, &raws.prop_index, key, pos);
+        return spawn_named_prop(eb, prop);
     }
 
     None

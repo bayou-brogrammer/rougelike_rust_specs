@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use super::{BuilderMap, Position, TileType, TownBuilder};
+use super::{BuilderMap, TileType, TownBuilder};
 
 impl TownBuilder {
     pub fn spawn_dockers(&mut self, build_data: &mut BuilderMap, rng: &mut rltk::RandomNumberGenerator) {
