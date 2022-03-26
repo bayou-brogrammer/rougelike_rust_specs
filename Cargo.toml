@@ -7,6 +7,7 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+regex = "^1.5.5"
 rltk = {version = "^0.8.1", features = ["serde"]}
 
 lazy_static = "^1.4.0"

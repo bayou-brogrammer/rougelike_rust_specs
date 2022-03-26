@@ -462,7 +462,6 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Bystander>();
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<Consumable>();
-    gs.ecs.register::<DefenseBonus>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
@@ -474,9 +473,10 @@ fn main() -> rltk::BError {
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<Item>();
     gs.ecs.register::<MagicMapper>();
-    gs.ecs.register::<MeleePowerBonus>();
+    gs.ecs.register::<MeleeWeapon>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
+    gs.ecs.register::<NaturalAttackDefense>();
     gs.ecs.register::<Quips>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
@@ -496,6 +496,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToRemoveItem>();
     gs.ecs.register::<WantsToUseItem>();
+    gs.ecs.register::<Wearable>();
 
     gs.ecs.register::<SerializationHelper>();
     gs.ecs.register::<SimpleMarker<SerializeMe>>();

@@ -15,7 +15,8 @@
     },
     "skills": {
       "Melee": 2
-    }
+    },
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -29,7 +30,8 @@
     "blocks_tile": true,
     "vision_range": 4,
     "ai": "vendor",
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -48,7 +50,8 @@
       "Oh my, I drank too much.",
       "Still saving the world, eh?"
     ],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -62,7 +65,8 @@
     "blocks_tile": true,
     "vision_range": 4,
     "ai": "bystander",
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -81,7 +85,8 @@
       "I hear there's going to be a good sermon on tea",
       "Want some cake?"
     ],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -95,7 +100,8 @@
     "blocks_tile": true,
     "vision_range": 4,
     "ai": "vendor",
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -109,7 +115,8 @@
     "blocks_tile": true,
     "vision_range": 4,
     "ai": "vendor",
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -123,7 +130,8 @@
     "blocks_tile": true,
     "vision_range": 4,
     "ai": "vendor",
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -143,7 +151,8 @@
       "Be careful in the dungeon!",
       "Your father would be so proud, were he here."
     ],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -158,7 +167,8 @@
     "vision_range": 4,
     "ai": "bystander",
     "quips": ["Why are you in my house?"],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -173,7 +183,8 @@
     "vision_range": 4,
     "ai": "bystander",
     "quips": ["Lovely day, eh?", "Nice weather", "Hello"],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -192,7 +203,8 @@
       "I caught something, but it wasn't a fish!",
       "Looks like rain"
     ],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -207,7 +219,8 @@
     "vision_range": 4,
     "ai": "bystander",
     "quips": ["Arrr", "Grog!", "Booze!"],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -222,7 +235,8 @@
     "vision_range": 4,
     "ai": "bystander",
     "quips": ["Hic", "Need... more... booze!", "Spare a copper?"],
-    "attributes": {}
+    "attributes": {},
+    "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"]
   },
 
   {
@@ -243,6 +257,10 @@
     "skills": {
       "Melee": -1,
       "Defense": -1
+    },
+    "natural": {
+      "armor_class": 11,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
     }
   },
 

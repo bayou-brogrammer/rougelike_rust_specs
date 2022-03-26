@@ -1,3 +1,4 @@
+use regex::Regex;
 use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
@@ -10,8 +11,33 @@ use load_helpers::*;
 mod spawn_helpers;
 use spawn_helpers::*;
 
+pub fn parse_dice_string(dice: &str) -> (i32, i32, i32) {
+    lazy_static! {
+        static ref DICE_RE: Regex = Regex::new(r"(\d+)d(\d+)([\+\-]\d+)?").unwrap();
+    }
+
+    let mut n_dice = 1;
+    let mut die_type = 4;
+    let mut die_bonus = 0;
+    for cap in DICE_RE.captures_iter(dice) {
+        if let Some(group) = cap.get(1) {
+            n_dice = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(2) {
+            die_type = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(3) {
+            die_bonus = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+    }
+
+    (n_dice, die_type, die_bonus)
+}
+
 pub enum SpawnType {
     AtPosition { x: i32, y: i32 },
+    Equipped { by: Entity },
+    Carried { by: Entity },
 }
 
 pub struct RawMaster {
@@ -64,6 +90,7 @@ impl RawMaster {
     }
 }
 
+// pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : SpawnType) -> Option<Entity> {
 fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Option<Entity> {
     let mut eb = new_entity;
 
@@ -118,26 +145,40 @@ fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Op
         eb = eb.with(Equippable {
             slot: EquipmentSlot::Melee,
         });
-        eb = eb.with(MeleePowerBonus {
-            power: weapon.power_bonus,
-        });
+
+        let (n_dice, die_type, bonus) = parse_dice_string(&weapon.base_damage);
+        let mut wpn = MeleeWeapon {
+            attribute: WeaponAttribute::Might,
+            damage_n_dice: n_dice,
+            damage_die_type: die_type,
+            damage_bonus: bonus,
+            hit_bonus: weapon.hit_bonus,
+        };
+
+        match weapon.attribute.as_str() {
+            "Quickness" => wpn.attribute = WeaponAttribute::Quickness,
+            _ => wpn.attribute = WeaponAttribute::Might,
+        }
+        eb = eb.with(wpn);
     }
 
-    // Shield Component
-    if let Some(shield) = &item_template.shield {
-        eb = eb.with(Equippable {
-            slot: EquipmentSlot::Shield,
-        });
-        eb = eb.with(DefenseBonus {
-            defense: shield.defense_bonus,
+    // Wearable Component
+    if let Some(wearable) = &item_template.wearable {
+        let slot = string_to_slot(&wearable.slot);
+
+        eb = eb.with(Equippable { slot });
+
+        eb = eb.with(Wearable {
+            slot,
+            armor_class: wearable.armor_class,
         });
     }
 
     Some(eb.build())
 }
 
-fn spawn_named_mob(new_entity: EntityBuilder, mob_template: super::Mob) -> Option<Entity> {
-    let mut eb = new_entity;
+fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
+    let (mut eb, mob_template) = build_base_entity(raws, ecs, &raws.raws.mobs, &raws.mob_index, key, pos);
 
     match mob_template.ai.as_ref() {
         "melee" => eb = eb.with(Monster {}),
@@ -169,6 +210,32 @@ fn spawn_named_mob(new_entity: EntityBuilder, mob_template: super::Mob) -> Optio
         eb = eb.with(Quips {
             available: quips.clone(),
         });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Natural Attack
+    ///////////////////////////////////////////////////////////////////////////
+    if let Some(na) = &mob_template.natural {
+        let mut nature = NaturalAttackDefense {
+            armor_class: na.armor_class,
+            attacks: Vec::new(),
+        };
+
+        if let Some(attacks) = &na.attacks {
+            for nattack in attacks.iter() {
+                let (n, d, b) = parse_dice_string(&nattack.damage);
+                let attack = NaturalAttack {
+                    name: nattack.name.clone(),
+                    hit_bonus: nattack.hit_bonus,
+                    damage_n_dice: n,
+                    damage_die_type: d,
+                    damage_bonus: b,
+                };
+
+                nature.attacks.push(attack);
+            }
+        }
+        eb = eb.with(nature);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -274,7 +341,16 @@ fn spawn_named_mob(new_entity: EntityBuilder, mob_template: super::Mob) -> Optio
     eb = eb.with(skills);
 
     // Build a mob person thing
-    Some(eb.build())
+    let new_mob = eb.build();
+
+    // Are they wielding anyting?
+    if let Some(wielding) = &mob_template.equipped {
+        for tag in wielding.iter() {
+            spawn_named_entity(raws, ecs, tag, SpawnType::Equipped { by: new_mob });
+        }
+    }
+
+    Some(new_mob)
 }
 
 fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::Prop) -> Option<Entity> {
@@ -344,15 +420,14 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
     rt
 }
 
-pub fn spawn_named_entity(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
+pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
-        let (eb, item) = build_base_entity(new_entity, &raws.raws.items, &raws.item_index, key, pos);
+        let (eb, item) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
         return spawn_named_item(eb, item);
     } else if raws.mob_index.contains_key(key) {
-        let (eb, mob) = build_base_entity(new_entity, &raws.raws.mobs, &raws.mob_index, key, pos);
-        return spawn_named_mob(eb, mob);
+        return spawn_named_mob(raws, ecs, key, pos);
     } else if raws.prop_index.contains_key(key) {
-        let (eb, prop) = build_base_entity(new_entity, &raws.raws.props, &raws.prop_index, key, pos);
+        let (eb, prop) = build_base_entity(raws, ecs, &raws.raws.props, &raws.prop_index, key, pos);
         return spawn_named_prop(eb, prop);
     }
 

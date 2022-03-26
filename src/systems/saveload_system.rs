@@ -70,8 +70,8 @@ pub fn save_game(ecs: &mut World) {
             SerializationHelper,
             Equippable,
             Equipped,
-            MeleePowerBonus,
-            DefenseBonus,
+            MeleeWeapon,
+            Wearable,
             WantsToRemoveItem,
             ParticleLifetime,
             HungerClock,
@@ -88,7 +88,8 @@ pub fn save_game(ecs: &mut World) {
             Quips,
             Attributes,
             Skills,
-            Pools
+            Pools,
+            NaturalAttackDefense
         );
     }
 
@@ -162,8 +163,8 @@ pub fn load_game(ecs: &mut World) {
             SerializationHelper,
             Equippable,
             Equipped,
-            MeleePowerBonus,
-            DefenseBonus,
+            MeleeWeapon,
+            Wearable,
             WantsToRemoveItem,
             ParticleLifetime,
             HungerClock,
@@ -180,7 +181,8 @@ pub fn load_game(ecs: &mut World) {
             Quips,
             Attributes,
             Skills,
-            Pools
+            Pools,
+            NaturalAttackDefense
         );
     }
 

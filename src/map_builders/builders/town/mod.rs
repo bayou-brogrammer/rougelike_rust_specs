@@ -72,6 +72,7 @@ impl TownBuilder {
         for t in build_data.map.tiles.iter_mut() {
             *t = TileType::Grass;
         }
+
         build_data.take_snapshot();
     }
 
@@ -346,8 +347,6 @@ impl TownBuilder {
     ) {
         for (i, building) in buildings.iter().enumerate() {
             let build_type = &building_index[i].2;
-
-            rltk::console::log(format!("{:?} - {:?}", build_type, building_index[i].1));
 
             match build_type {
                 BuildingTag::Pub => self.build_pub(building, build_data, rng),

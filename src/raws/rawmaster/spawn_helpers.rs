@@ -1,21 +1,30 @@
 use std::collections::HashMap;
 
-use specs::prelude::*;
+use specs::{
+    prelude::*,
+    saveload::{MarkedBuilder, SimpleMarker},
+};
 
-use super::{Name, Position, SpawnType};
-use crate::raws::structs::*;
+use super::{Name, Position, RawMaster, SpawnType};
+use crate::{raws::structs::*, EquipmentSlot, Equipped, InBackpack, SerializeMe};
 
-pub fn spawn_position(pos: SpawnType, new_entity: EntityBuilder) -> EntityBuilder {
-    let mut eb = new_entity;
+pub fn spawn_position<'a>(
+    pos: SpawnType,
+    new_entity: EntityBuilder<'a>,
+    tag: &str,
+    raws: &RawMaster,
+) -> EntityBuilder<'a> {
+    let eb = new_entity;
 
     // Spawn in the specified location
     match pos {
-        SpawnType::AtPosition { x, y } => {
-            eb = eb.with(Position { x, y });
+        SpawnType::AtPosition { x, y } => eb.with(Position { x, y }),
+        SpawnType::Carried { by } => eb.with(InBackpack { owner: by }),
+        SpawnType::Equipped { by } => {
+            let slot = find_slot_for_equippable_item(tag, raws);
+            eb.with(Equipped { owner: by, slot })
         },
     }
-
-    eb
 }
 
 pub fn get_renderable_component(renderable: &item_structs::Renderable) -> crate::components::Renderable {
@@ -28,17 +37,18 @@ pub fn get_renderable_component(renderable: &item_structs::Renderable) -> crate:
 }
 
 pub fn build_base_entity<'a, T: BaseRawComponent + Clone>(
-    new_entity: EntityBuilder<'a>,
+    raws: &RawMaster,
+    ecs: &'a mut World,
     entity_list: &[T],
     indexes: &HashMap<String, usize>,
     key: &str,
     pos: SpawnType,
 ) -> (EntityBuilder<'a>, T) {
     let entity_template = &entity_list[indexes[key]];
-    let mut eb = new_entity;
+    let mut eb = ecs.create_entity().marked::<SimpleMarker<SerializeMe>>();
 
     // Spawn in the specified location
-    eb = spawn_position(pos, eb);
+    eb = spawn_position(pos, eb, key, raws);
 
     // Renderable
     if let Some(renderable) = &entity_template.renderable() {
@@ -51,4 +61,37 @@ pub fn build_base_entity<'a, T: BaseRawComponent + Clone>(
     });
 
     (eb, entity_template.clone())
+}
+
+pub fn string_to_slot(slot: &str) -> EquipmentSlot {
+    match slot {
+        "Shield" => EquipmentSlot::Shield,
+        "Head" => EquipmentSlot::Head,
+        "Torso" => EquipmentSlot::Torso,
+        "Legs" => EquipmentSlot::Legs,
+        "Feet" => EquipmentSlot::Feet,
+        "Hands" => EquipmentSlot::Hands,
+        "Melee" => EquipmentSlot::Melee,
+        _ => {
+            rltk::console::log(format!("Warning: unknown equipment slot type [{}])", slot));
+            EquipmentSlot::Melee
+        },
+    }
+}
+
+fn find_slot_for_equippable_item(tag: &str, raws: &RawMaster) -> EquipmentSlot {
+    if !raws.item_index.contains_key(tag) {
+        panic!("Trying to equip an unknown item: {}", tag);
+    }
+
+    let item_index = raws.item_index[tag];
+    let item = &raws.raws.items[item_index];
+
+    if let Some(_wpn) = &item.weapon {
+        return EquipmentSlot::Melee;
+    } else if let Some(wearable) = &item.wearable {
+        return string_to_slot(&wearable.slot);
+    }
+
+    panic!("Trying to equip {}, but it has no slot tag.", tag);
 }
