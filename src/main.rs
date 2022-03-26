@@ -11,6 +11,7 @@ use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 
 mod components;
 mod gamelog;
+mod gamesystem;
 mod gui;
 mod map;
 mod player;
@@ -29,6 +30,7 @@ pub mod rex_assets;
 
 pub use components::*;
 pub use gamelog::GameLog;
+pub use gamesystem::*;
 pub use map::*;
 pub use rect::Rect;
 
@@ -366,16 +368,10 @@ impl State {
         self.generate_world_map(current_depth + 1);
 
         // Notify the player and give them some health
-        let player_entity = self.ecs.fetch::<Entity>();
         let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
         gamelog
             .entries
             .push("You descend to the next level, and take a moment to heal.".to_string());
-        let mut player_health_store = self.ecs.write_storage::<CombatStats>();
-        let player_health = player_health_store.get_mut(*player_entity);
-        if let Some(player_health) = player_health {
-            player_health.hp = i32::max(player_health.hp, player_health.max_hp / 2);
-        }
     }
 
     fn game_over_cleanup(&mut self) {
@@ -426,9 +422,11 @@ impl State {
         let (player_x, player_y) = (player_start.x, player_start.y);
         let mut player_position = self.ecs.write_resource::<Point>();
         *player_position = Point::new(player_x, player_y);
+
         let mut position_components = self.ecs.write_storage::<Position>();
         let player_entity = self.ecs.fetch::<Entity>();
         let player_pos_comp = position_components.get_mut(*player_entity);
+
         if let Some(player_pos_comp) = player_pos_comp {
             player_pos_comp.x = player_x;
             player_pos_comp.y = player_y;
@@ -458,10 +456,10 @@ fn main() -> rltk::BError {
     };
 
     gs.ecs.register::<AreaOfEffect>();
+    gs.ecs.register::<Attributes>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<BlocksVisibility>();
     gs.ecs.register::<Bystander>();
-    gs.ecs.register::<CombatStats>();
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<Consumable>();
     gs.ecs.register::<DefenseBonus>();
@@ -482,18 +480,20 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Quips>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
+    gs.ecs.register::<Pools>();
     gs.ecs.register::<Position>();
     gs.ecs.register::<ProvidesFood>();
     gs.ecs.register::<ProvidesHealing>();
     gs.ecs.register::<Ranged>();
     gs.ecs.register::<Renderable>();
+    gs.ecs.register::<Skills>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Vendor>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<WantsToMelee>();
-    gs.ecs.register::<WantsTopickupItem>();
+    gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToRemoveItem>();
     gs.ecs.register::<WantsToUseItem>();
 

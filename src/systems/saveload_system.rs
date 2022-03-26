@@ -54,7 +54,6 @@ pub fn save_game(ecs: &mut World) {
             Monster,
             Name,
             BlocksTile,
-            CombatStats,
             SufferDamage,
             WantsToMelee,
             Item,
@@ -65,7 +64,7 @@ pub fn save_game(ecs: &mut World) {
             Confusion,
             ProvidesHealing,
             InBackpack,
-            WantsTopickupItem,
+            WantsToPickupItem,
             WantsToUseItem,
             WantsToDropItem,
             SerializationHelper,
@@ -86,7 +85,10 @@ pub fn save_game(ecs: &mut World) {
             BlocksVisibility,
             Bystander,
             Vendor,
-            Quips
+            Quips,
+            Attributes,
+            Skills,
+            Pools
         );
     }
 
@@ -144,7 +146,6 @@ pub fn load_game(ecs: &mut World) {
             Monster,
             Name,
             BlocksTile,
-            CombatStats,
             SufferDamage,
             WantsToMelee,
             Item,
@@ -155,7 +156,7 @@ pub fn load_game(ecs: &mut World) {
             Confusion,
             ProvidesHealing,
             InBackpack,
-            WantsTopickupItem,
+            WantsToPickupItem,
             WantsToUseItem,
             WantsToDropItem,
             SerializationHelper,
@@ -176,7 +177,10 @@ pub fn load_game(ecs: &mut World) {
             BlocksVisibility,
             Bystander,
             Vendor,
-            Quips
+            Quips,
+            Attributes,
+            Skills,
+            Pools
         );
     }
 

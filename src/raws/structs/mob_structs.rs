@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::any::Any;
+use std::{any::Any, collections::HashMap};
 
 use super::{BaseRawComponent, Renderable};
 
@@ -9,18 +9,22 @@ pub struct Mob {
     pub name: String,
     pub renderable: Option<Renderable>,
     pub blocks_tile: bool,
-    pub stats: MobStats,
     pub vision_range: i32,
     pub ai: String,
     pub quips: Option<Vec<String>>,
+    pub attributes: MobAttributes,
+    pub skills: Option<HashMap<String, i32>>,
+    pub level: Option<i32>,
+    pub hp: Option<i32>,
+    pub mana: Option<i32>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct MobStats {
-    pub max_hp: i32,
-    pub hp: i32,
-    pub power: i32,
-    pub defense: i32,
+pub struct MobAttributes {
+    pub might: Option<i32>,
+    pub fitness: Option<i32>,
+    pub quickness: Option<i32>,
+    pub intelligence: Option<i32>,
 }
 
 // Trait Implementations

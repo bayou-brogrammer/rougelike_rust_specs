@@ -19,7 +19,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let players = ecs.read_storage::<Player>();
     let bystanders = ecs.read_storage::<Bystander>();
     let vendors = ecs.read_storage::<Vendor>();
-    let combat_stats = ecs.read_storage::<CombatStats>();
+    let combat_stats = ecs.read_storage::<Pools>();
 
     let map = ecs.fetch::<Map>();
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
@@ -139,11 +139,11 @@ fn get_item(ecs: &mut World) {
     match target_item {
         None => gamelog.entries.push("There is nothing here to pick up.".to_string()),
         Some(item) => {
-            let mut pickup = ecs.write_storage::<WantsTopickupItem>();
+            let mut pickup = ecs.write_storage::<WantsToPickupItem>();
             pickup
                 .insert(
                     *player_entity,
-                    WantsTopickupItem {
+                    WantsToPickupItem {
                         collected_by: *player_entity,
                         item,
                     },
@@ -186,9 +186,9 @@ fn skip_turn(ecs: &mut World) -> RunState {
     }
 
     if can_heal {
-        let mut health_components = ecs.write_storage::<CombatStats>();
-        let player_hp = health_components.get_mut(*player_entity).unwrap();
-        player_hp.hp = i32::min(player_hp.hp + 1, player_hp.max_hp);
+        let mut health_components = ecs.write_storage::<Pools>();
+        let pools = health_components.get_mut(*player_entity).unwrap();
+        pools.hit_points.current = i32::min(pools.hit_points.current + 1, pools.hit_points.max);
     }
 
     RunState::PlayerTurn

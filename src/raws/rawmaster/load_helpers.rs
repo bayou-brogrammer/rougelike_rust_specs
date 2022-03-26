@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use super::BaseRawComponent;
 
-pub fn load_entity_data<'a, T: 'static + BaseRawComponent>(
+pub fn load_entity_data<T: 'static + BaseRawComponent>(
     raws: &[T],
     indexes: &mut HashMap<String, usize>,
     used_names: &mut HashSet<String>,

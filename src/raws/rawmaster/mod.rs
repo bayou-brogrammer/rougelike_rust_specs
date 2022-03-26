@@ -2,7 +2,7 @@ use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
 pub use super::{structs::BaseRawComponent, Raws};
-use crate::{components::*, random_table::RandomTable};
+use crate::{components::*, gamesystem::*, random_table::RandomTable};
 
 mod load_helpers;
 use load_helpers::*;
@@ -62,32 +62,6 @@ impl RawMaster {
             }
         }
     }
-}
-
-fn base_entity<'a, T: BaseRawComponent + Clone>(
-    new_entity: EntityBuilder<'a>,
-    entity_list: &[T],
-    indexes: &HashMap<String, usize>,
-    key: &str,
-    pos: SpawnType,
-) -> (EntityBuilder<'a>, T) {
-    let entity_template = &entity_list[indexes[key]];
-    let mut eb = new_entity;
-
-    // Spawn in the specified location
-    eb = spawn_position(pos, eb);
-
-    // Renderable
-    if let Some(renderable) = &entity_template.renderable() {
-        eb = eb.with(get_renderable_component(renderable));
-    }
-
-    // // Name Component
-    eb = eb.with(Name {
-        name: entity_template.name(),
-    });
-
-    (eb, entity_template.clone())
 }
 
 fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Option<Entity> {
@@ -172,33 +146,134 @@ fn spawn_named_mob(new_entity: EntityBuilder, mob_template: super::Mob) -> Optio
         _ => {},
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // BlocksTile
+    ///////////////////////////////////////////////////////////////////////////
     if mob_template.blocks_tile {
         eb = eb.with(BlocksTile {});
     }
 
-    // Combat
-    eb = eb.with(CombatStats {
-        max_hp: mob_template.stats.max_hp,
-        hp: mob_template.stats.hp,
-        power: mob_template.stats.power,
-        defense: mob_template.stats.defense,
-    });
-
+    ///////////////////////////////////////////////////////////////////////////
     // Viewshed
+    ///////////////////////////////////////////////////////////////////////////
     eb = eb.with(Viewshed {
         visible_tiles: Vec::new(),
         range: mob_template.vision_range,
         dirty: true,
     });
 
+    ///////////////////////////////////////////////////////////////////////////
     // Quips
+    ///////////////////////////////////////////////////////////////////////////
     if let Some(quips) = &mob_template.quips {
         eb = eb.with(Quips {
             available: quips.clone(),
         });
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Atrributes
+    ///////////////////////////////////////////////////////////////////////////
+    let mut mob_fitness = 11;
+    let mut mob_int = 11;
+
+    #[rustfmt::skip]
+    let mut attr = Attributes{
+        might: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+        fitness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+        quickness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+        intelligence: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+    };
+
+    // might
+    if let Some(might) = mob_template.attributes.might {
+        attr.might = Attribute {
+            base: might,
+            modifiers: 0,
+            bonus: attr_bonus(might),
+        };
+    }
+
+    // fitness
+    if let Some(fitness) = mob_template.attributes.fitness {
+        attr.fitness = Attribute {
+            base: fitness,
+            modifiers: 0,
+            bonus: attr_bonus(fitness),
+        };
+        mob_fitness = fitness;
+    }
+
+    // quickness
+    if let Some(quickness) = mob_template.attributes.quickness {
+        attr.quickness = Attribute {
+            base: quickness,
+            modifiers: 0,
+            bonus: attr_bonus(quickness),
+        };
+    }
+
+    // intelligence
+    if let Some(intelligence) = mob_template.attributes.intelligence {
+        attr.intelligence = Attribute {
+            base: intelligence,
+            modifiers: 0,
+            bonus: attr_bonus(intelligence),
+        };
+        mob_int = intelligence;
+    }
+    eb = eb.with(attr);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Pools
+    ///////////////////////////////////////////////////////////////////////////
+    let mob_level = if mob_template.level.is_some() { mob_template.level.unwrap() } else { 1 };
+    let mob_hp = npc_hp(mob_fitness, mob_level);
+    let mob_mana = mana_at_level(mob_int, mob_level);
+
+    let pools = Pools {
+        level: mob_level,
+        xp: 0,
+        hit_points: Pool {
+            current: mob_hp,
+            max: mob_hp,
+        },
+        mana: Pool {
+            current: mob_mana,
+            max: mob_mana,
+        },
+    };
+    eb = eb.with(pools);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Skills
+    ///////////////////////////////////////////////////////////////////////////
+    let mut skills = Skills { skills: HashMap::new() };
+    skills.skills.insert(Skill::Melee, 1);
+    skills.skills.insert(Skill::Defense, 1);
+    skills.skills.insert(Skill::Magic, 1);
+
+    if let Some(mobskills) = &mob_template.skills {
+        for sk in mobskills.iter() {
+            match sk.0.as_str() {
+                "Melee" => {
+                    skills.skills.insert(Skill::Melee, *sk.1);
+                },
+                "Defense" => {
+                    skills.skills.insert(Skill::Defense, *sk.1);
+                },
+                "Magic" => {
+                    skills.skills.insert(Skill::Magic, *sk.1);
+                },
+                _ => {
+                    rltk::console::log(format!("Unknown skill referenced: [{}]", sk.0));
+                },
+            }
+        }
+    }
+    eb = eb.with(skills);
+
+    // Build a mob person thing
     Some(eb.build())
 }
 
@@ -271,13 +346,13 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
 
 pub fn spawn_named_entity(raws: &RawMaster, new_entity: EntityBuilder, key: &str, pos: SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
-        let (eb, item) = base_entity(new_entity, &raws.raws.items, &raws.item_index, key, pos);
+        let (eb, item) = build_base_entity(new_entity, &raws.raws.items, &raws.item_index, key, pos);
         return spawn_named_item(eb, item);
     } else if raws.mob_index.contains_key(key) {
-        let (eb, mob) = base_entity(new_entity, &raws.raws.mobs, &raws.mob_index, key, pos);
+        let (eb, mob) = build_base_entity(new_entity, &raws.raws.mobs, &raws.mob_index, key, pos);
         return spawn_named_mob(eb, mob);
     } else if raws.prop_index.contains_key(key) {
-        let (eb, prop) = base_entity(new_entity, &raws.raws.props, &raws.prop_index, key, pos);
+        let (eb, prop) = build_base_entity(new_entity, &raws.raws.props, &raws.prop_index, key, pos);
         return spawn_named_prop(eb, prop);
     }
 
