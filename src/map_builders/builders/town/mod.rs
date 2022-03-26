@@ -6,7 +6,7 @@ mod town_buildings;
 mod town_people;
 
 pub fn town_builder(new_depth: i32, _rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
-    let mut chain = BuilderChain::new(new_depth, width, height);
+    let mut chain = BuilderChain::new(new_depth, width, height, "The Town of Bracketon");
     chain.start_with(TownBuilder::new());
     chain
 }

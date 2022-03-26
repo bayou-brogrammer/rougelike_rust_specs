@@ -1,7 +1,32 @@
 use specs::prelude::*;
 use std::cmp::{max, min};
 
-use super::{components::*, gamelog::GameLog, Map, RunState, State, TileType};
+use super::{
+    gamelog::GameLog,
+    Attributes,
+    BlocksTile,
+    BlocksVisibility,
+    Bystander,
+    Door,
+    EntityMoved,
+    HungerClock,
+    HungerState,
+    Item,
+    Map,
+    Monster,
+    Player,
+    Pools,
+    Position,
+    Renderable,
+    RunState,
+    State,
+    TileType,
+    Vendor,
+    Viewshed,
+    WantsToMelee,
+    WantsToPickupItem,
+};
+
 use rltk::{Point, Rltk, VirtualKeyCode};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -19,7 +44,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let players = ecs.read_storage::<Player>();
     let bystanders = ecs.read_storage::<Bystander>();
     let vendors = ecs.read_storage::<Vendor>();
-    let combat_stats = ecs.read_storage::<Pools>();
+    let combat_stats = ecs.read_storage::<Attributes>();
 
     let map = ecs.fetch::<Map>();
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
@@ -195,25 +220,38 @@ fn skip_turn(ecs: &mut World) -> RunState {
 }
 
 pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
+    // Hotkeys
+    if ctx.shift && ctx.key.is_some() {
+        let key: Option<i32> = match ctx.key.unwrap() {
+            VirtualKeyCode::Key1 => Some(1),
+            VirtualKeyCode::Key2 => Some(2),
+            VirtualKeyCode::Key3 => Some(3),
+            VirtualKeyCode::Key4 => Some(4),
+            VirtualKeyCode::Key5 => Some(5),
+            VirtualKeyCode::Key6 => Some(6),
+            VirtualKeyCode::Key7 => Some(7),
+            VirtualKeyCode::Key8 => Some(8),
+            VirtualKeyCode::Key9 => Some(9),
+            _ => None,
+        };
+        if let Some(key) = key {
+            return use_consumable_hotkey(gs, key - 1);
+        }
+    }
+
     // Player movement
     match ctx.key {
         None => return RunState::AwaitingInput, // Nothing happened
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => try_move_player(-1, 0, &mut gs.ecs),
-
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 | VirtualKeyCode::L => try_move_player(1, 0, &mut gs.ecs),
-
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 | VirtualKeyCode::K => try_move_player(0, -1, &mut gs.ecs),
-
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 | VirtualKeyCode::J => try_move_player(0, 1, &mut gs.ecs),
 
             // Diagonals
             VirtualKeyCode::Numpad9 | VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
-
             VirtualKeyCode::Numpad7 | VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
-
             VirtualKeyCode::Numpad3 | VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
-
             VirtualKeyCode::Numpad1 | VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
 
             // Skip Turn
@@ -238,5 +276,47 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             _ => return RunState::AwaitingInput,
         },
     }
+    RunState::PlayerTurn
+}
+
+fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
+    use super::{Consumable, InBackpack, WantsToUseItem};
+
+    let consumables = gs.ecs.read_storage::<Consumable>();
+    let backpack = gs.ecs.read_storage::<InBackpack>();
+    let player_entity = gs.ecs.fetch::<Entity>();
+    let entities = gs.ecs.entities();
+    let mut carried_consumables = Vec::new();
+
+    for (entity, carried_by, _consumable) in (&entities, &backpack, &consumables).join() {
+        if carried_by.owner == *player_entity {
+            carried_consumables.push(entity);
+        }
+    }
+
+    if (key as usize) < carried_consumables.len() {
+        use crate::components::Ranged;
+
+        if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(carried_consumables[key as usize]) {
+            return RunState::ShowTargeting {
+                range: ranged.range,
+                item: carried_consumables[key as usize],
+            };
+        }
+
+        let mut intent = gs.ecs.write_storage::<WantsToUseItem>();
+        intent
+            .insert(
+                *player_entity,
+                WantsToUseItem {
+                    item: carried_consumables[key as usize],
+                    target: None,
+                },
+            )
+            .expect("Unable to insert intent");
+
+        return RunState::PlayerTurn;
+    }
+
     RunState::PlayerTurn
 }
