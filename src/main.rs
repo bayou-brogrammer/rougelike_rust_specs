@@ -34,7 +34,7 @@ pub use gamesystem::*;
 pub use map::*;
 pub use rect::Rect;
 
-const SHOW_MAPGEN_VISUALIZER: bool = true;
+const SHOW_MAPGEN_VISUALIZER: bool = false;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
