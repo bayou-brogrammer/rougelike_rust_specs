@@ -49,8 +49,10 @@ impl TownBuilder {
         self.add_paths(build_data, &doors);
 
         // Exit
-        let exit_idx = build_data.map.xy_idx(build_data.width - 5, wall_gap_y);
-        build_data.map.tiles[exit_idx] = TileType::DownStairs;
+        for y in wall_gap_y - 3..wall_gap_y + 4 {
+            let exit_idx = build_data.map.xy_idx(build_data.width - 2, y);
+            build_data.map.tiles[exit_idx] = TileType::DownStairs;
+        }
 
         // Get Building sizes and grab largest
         let building_size = self.sort_buildings(&buildings);

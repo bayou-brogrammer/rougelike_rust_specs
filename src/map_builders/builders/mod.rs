@@ -5,6 +5,7 @@ mod bsp_interior;
 mod cellular_automata;
 mod dla;
 mod drunkard;
+mod forest;
 mod maze;
 mod simple_map;
 mod voronoi;
@@ -24,4 +25,5 @@ pub use simple_map::SimpleMapBuilder;
 pub use voronoi::VoronoiCellBuilder;
 pub use waveform_collapse::WaveformCollapseBuilder;
 
+pub use forest::*;
 pub use town::*;

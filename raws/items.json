@@ -93,6 +93,31 @@
   },
 
   {
+    "name": "Meat",
+    "renderable": {
+      "glyph": "%",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "food": ""
+      }
+    }
+  },
+
+  {
+    "name": "Hide",
+    "renderable": {
+      "glyph": "ß",
+      "fg": "#A52A2A",
+      "bg": "#000000",
+      "order": 2
+    }
+  },
+
+  {
     "name": "Dried Sausage",
     "renderable": {
       "glyph": "%",
@@ -148,6 +173,22 @@
       "range": "melee",
       "attribute": "Quickness",
       "base_damage": "1d4",
+      "hit_bonus": 0
+    }
+  },
+
+  {
+    "name": "Shortsword",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "Might",
+      "base_damage": "1d6",
       "hit_bonus": 0
     }
   },
@@ -307,8 +348,61 @@
       "order": 2
     },
     "wearable": {
-      "slot": "Legs",
+      "slot": "Feet",
       "armor_class": 0.1
+    }
+  },
+
+  {
+    "name": "Leather Armor",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Torso",
+      "armor_class": 1.0
+    }
+  },
+
+  {
+    "name": "Leather Boots",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Feet",
+      "armor_class": 0.2
+    }
+  },
+
+  {
+    "name": "Meat",
+    "renderable": {
+      "glyph": "%",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "food": ""
+      }
+    }
+  },
+
+  {
+    "name": "Hide",
+    "renderable": {
+      "glyph": "ß",
+      "fg": "#A52A2A",
+      "bg": "#000000",
+      "order": 2
     }
   }
 ]

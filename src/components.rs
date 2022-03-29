@@ -279,6 +279,17 @@ pub struct NaturalAttackDefense {
     pub attacks: Vec<NaturalAttack>,
 }
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct LootTable {
+    pub table: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Carnivore {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Herbivore {}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 

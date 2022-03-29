@@ -11,6 +11,7 @@ rltk::embedded_resource!(RAW_ITEMS_FILE, "../../raws/items.json");
 rltk::embedded_resource!(RAW_MOBS_FILE, "../../raws/mobs.json");
 rltk::embedded_resource!(RAW_PROPS_FILE, "../../raws/props.json");
 rltk::embedded_resource!(RAW_SPAWN_TABLE_FILE, "../../raws/spawn_table.json");
+rltk::embedded_resource!(RAW_LOOT_TABLES_FILE, "../../raws/loot_tables.json");
 
 lazy_static! {
     pub static ref RAWS: Mutex<RawMaster> = Mutex::new(RawMaster::empty());
@@ -22,6 +23,7 @@ pub struct Raws {
     pub mobs: Vec<Mob>,
     pub props: Vec<Prop>,
     pub spawn_table: Vec<SpawnTableEntry>,
+    pub loot_tables: Vec<LootTable>,
 }
 
 fn load_file<'a, T: serde::Deserialize<'a>>(file_path: &str) -> T {
@@ -41,16 +43,19 @@ pub fn load_raws() {
     rltk::link_resource!(RAW_MOBS_FILE, "../../raws/mobs.json");
     rltk::link_resource!(RAW_PROPS_FILE, "../../raws/props.json");
     rltk::link_resource!(RAW_SPAWN_TABLE_FILE, "../../raws/spawn_table.json");
+    rltk::link_resource!(RAW_LOOT_TABLES_FILE, "../../raws/loot_tables.json");
 
     let items = load_file::<Vec<Item>>("../../raws/items.json");
     let mobs = load_file::<Vec<Mob>>("../../raws/mobs.json");
     let props = load_file::<Vec<Prop>>("../../raws/props.json");
     let spawn_table = load_file::<Vec<SpawnTableEntry>>("../../raws/spawn_table.json");
+    let loot_tables = load_file::<Vec<LootTable>>("../../raws/loot_tables.json");
 
     RAWS.lock().unwrap().load(Raws {
         items,
         mobs,
         props,
         spawn_table,
+        loot_tables,
     })
 }

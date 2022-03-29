@@ -9,7 +9,7 @@ mod load_helpers;
 use load_helpers::*;
 
 mod spawn_helpers;
-use spawn_helpers::*;
+pub use spawn_helpers::*;
 
 pub fn parse_dice_string(dice: &str) -> (i32, i32, i32) {
     lazy_static! {
@@ -45,6 +45,7 @@ pub struct RawMaster {
     item_index: HashMap<String, usize>,
     mob_index: HashMap<String, usize>,
     prop_index: HashMap<String, usize>,
+    loot_index: HashMap<String, usize>,
 }
 
 impl RawMaster {
@@ -55,10 +56,12 @@ impl RawMaster {
                 mobs: Vec::new(),
                 props: Vec::new(),
                 spawn_table: Vec::new(),
+                loot_tables: Vec::new(),
             },
             item_index: HashMap::new(),
             mob_index: HashMap::new(),
             prop_index: HashMap::new(),
+            loot_index: HashMap::new(),
         }
     }
 
@@ -68,6 +71,7 @@ impl RawMaster {
         self.item_index = HashMap::new();
         self.mob_index = HashMap::new();
         self.prop_index = HashMap::new();
+        self.loot_index = HashMap::new();
 
         let mut used_names: HashSet<String> = HashSet::new();
 
@@ -87,12 +91,17 @@ impl RawMaster {
                 ));
             }
         }
+
+        // Loot Table
+        for (i, loot) in self.raws.loot_tables.iter().enumerate() {
+            self.loot_index.insert(loot.name.clone(), i);
+        }
     }
 }
 
 // pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : SpawnType) -> Option<Entity> {
-fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Option<Entity> {
-    let mut eb = new_entity;
+pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
+    let (mut eb, item_template) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
 
     // Item Component
     eb = eb.with(crate::components::Item {});
@@ -177,13 +186,15 @@ fn spawn_named_item(new_entity: EntityBuilder, item_template: super::Item) -> Op
     Some(eb.build())
 }
 
-fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
+pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
     let (mut eb, mob_template) = build_base_entity(raws, ecs, &raws.raws.mobs, &raws.mob_index, key, pos);
 
     match mob_template.ai.as_ref() {
         "melee" => eb = eb.with(Monster {}),
         "bystander" => eb = eb.with(Bystander {}),
         "vendor" => eb = eb.with(Vendor {}),
+        "carnivore" => eb = eb.with(Carnivore {}),
+        "herbivore" => eb = eb.with(Herbivore {}),
         _ => {},
     }
 
@@ -340,6 +351,13 @@ fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType)
     }
     eb = eb.with(skills);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Loot Table
+    ///////////////////////////////////////////////////////////////////////////
+    if let Some(loot) = &mob_template.loot_table {
+        eb = eb.with(LootTable { table: loot.clone() });
+    }
+
     // Build a mob person thing
     let new_mob = eb.build();
 
@@ -353,7 +371,7 @@ fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType)
     Some(new_mob)
 }
 
-fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::Prop) -> Option<Entity> {
+pub fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::Prop) -> Option<Entity> {
     let mut eb = new_entity;
 
     // Hidden Trait
@@ -422,8 +440,7 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
 
 pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
-        let (eb, item) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
-        return spawn_named_item(eb, item);
+        return spawn_named_item(raws, ecs, key, pos);
     } else if raws.mob_index.contains_key(key) {
         return spawn_named_mob(raws, ecs, key, pos);
     } else if raws.prop_index.contains_key(key) {

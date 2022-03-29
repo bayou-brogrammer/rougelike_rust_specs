@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::{any::Any, collections::HashMap};
+use std::collections::HashMap;
 
 use super::BaseRawComponent;
 
@@ -43,7 +43,7 @@ pub struct Wearable {
 impl BaseRawComponent for Item {
     fn name(&self) -> String { self.name.clone() }
     fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    fn as_any(&self) -> &dyn Any { self }
+    // fn as_any(&self) -> &dyn Any { self }
 }
 
 impl<T: BaseRawComponent> From<&T> for Item {

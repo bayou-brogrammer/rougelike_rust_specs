@@ -23,7 +23,7 @@ pub struct EntryTrigger {
 impl BaseRawComponent for Prop {
     fn name(&self) -> String { self.name.clone() }
     fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    fn as_any(&self) -> &dyn std::any::Any { todo!() }
+    // fn as_any(&self) -> &dyn std::any::Any { todo!() }
 }
 
 impl<T: BaseRawComponent> From<&T> for Prop {

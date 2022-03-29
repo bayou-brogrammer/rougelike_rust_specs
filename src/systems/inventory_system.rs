@@ -3,7 +3,6 @@ use specs::prelude::*;
 use crate::{components::*, gamelog::GameLog, particle_system::ParticleBuilder, Map, RunState};
 
 pub struct ItemCollectionSystem {}
-
 impl<'a> System<'a> for ItemCollectionSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
@@ -222,7 +221,6 @@ impl<'a> System<'a> for ItemUseSystem {
                         if let Some(stats) = stats {
                             stats.hit_points.current =
                                 i32::min(stats.hit_points.max, stats.hit_points.current + healer.heal_amount);
-
                             if entity == *player_entity {
                                 gamelog.entries.push(format!(
                                     "You use the {}, healing {} hp.",

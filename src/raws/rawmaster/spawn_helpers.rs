@@ -5,8 +5,17 @@ use specs::{
     saveload::{MarkedBuilder, SimpleMarker},
 };
 
-use super::{Name, Position, RawMaster, SpawnType};
-use crate::{raws::structs::*, EquipmentSlot, Equipped, InBackpack, SerializeMe};
+use super::{RawMaster, SpawnType};
+use crate::{
+    random_table::RandomTable,
+    raws::structs::*,
+    EquipmentSlot,
+    Equipped,
+    InBackpack,
+    Name,
+    Position,
+    SerializeMe,
+};
 
 pub fn spawn_position<'a>(
     pos: SpawnType,
@@ -94,4 +103,19 @@ fn find_slot_for_equippable_item(tag: &str, raws: &RawMaster) -> EquipmentSlot {
     }
 
     panic!("Trying to equip {}, but it has no slot tag.", tag);
+}
+
+pub fn get_item_drop(raws: &RawMaster, rng: &mut rltk::RandomNumberGenerator, table: &str) -> Option<String> {
+    if raws.loot_index.contains_key(table) {
+        let mut rt = RandomTable::new();
+        let available_options = &raws.raws.loot_tables[raws.loot_index[table]];
+
+        for item in available_options.drops.iter() {
+            rt = rt.add(item.name.clone(), item.weight);
+        }
+
+        return Some(rt.roll(rng));
+    }
+
+    None
 }

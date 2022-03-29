@@ -35,7 +35,6 @@ pub use map::*;
 pub use rect::Rect;
 
 const SHOW_MAPGEN_VISUALIZER: bool = false;
-
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
     AwaitingInput,
@@ -73,6 +72,9 @@ impl State {
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
 
+        // let mut animal = animal_ai_system::AnimalAI {};
+        // animal.run_now(&self.ecs);
+
         let mut bystander = BystanderAI {};
         bystander.run_now(&self.ecs);
 
@@ -97,10 +99,10 @@ impl State {
         let mut item_remove = ItemRemoveSystem {};
         item_remove.run_now(&self.ecs);
 
-        let mut hunger = HungerSystem {};
+        let mut hunger = hunger_system::HungerSystem {};
         hunger.run_now(&self.ecs);
 
-        let mut particles = ParticleSpawnSystem {};
+        let mut particles = particle_system::ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
 
         self.ecs.maintain();
@@ -133,13 +135,12 @@ impl GameState for State {
                     newrunstate = self.mapgen_next_state.unwrap();
                 } else {
                     ctx.cls();
-
                     if self.mapgen_index < self.mapgen_history.len() {
                         camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
                     }
 
                     self.mapgen_timer += ctx.frame_time_ms;
-                    if self.mapgen_timer > 100.0 {
+                    if self.mapgen_timer > 500.0 {
                         self.mapgen_timer = 0.0;
                         self.mapgen_index += 1;
                         if self.mapgen_index >= self.mapgen_history.len() {
@@ -295,7 +296,7 @@ impl GameState for State {
                     let idx = map.xy_idx(x as i32, row);
                     map.revealed_tiles[idx] = true;
                 }
-                if row == (map.height - 1) {
+                if row == map.height - 1 {
                     newrunstate = RunState::MonsterTurn;
                 } else {
                     newrunstate = RunState::MagicMapReveal { row: row + 1 };
@@ -369,9 +370,7 @@ impl State {
 
         // Notify the player and give them some health
         let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog
-            .entries
-            .push("You descend to the next level, and take a moment to heal.".to_string());
+        gamelog.entries.push("You descend to the next level.".to_string());
     }
 
     fn game_over_cleanup(&mut self) {
@@ -399,14 +398,10 @@ impl State {
         self.mapgen_index = 0;
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
-
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        // let mut builder = map_builders::random_builder(new_depth, &mut rng, 80, 50);
         let mut builder = map_builders::level_builder(new_depth, &mut rng, 80, 50);
-
         builder.build_map(&mut rng);
         self.mapgen_history = builder.build_data.history.clone();
-
         let player_start;
         {
             let mut worldmap_resource = self.ecs.write_resource::<Map>();
@@ -422,11 +417,9 @@ impl State {
         let (player_x, player_y) = (player_start.x, player_start.y);
         let mut player_position = self.ecs.write_resource::<Point>();
         *player_position = Point::new(player_x, player_y);
-
         let mut position_components = self.ecs.write_storage::<Position>();
         let player_entity = self.ecs.fetch::<Entity>();
         let player_pos_comp = position_components.get_mut(*player_entity);
-
         if let Some(player_pos_comp) = player_pos_comp {
             player_pos_comp.x = player_x;
             player_pos_comp.y = player_y;
@@ -443,14 +436,11 @@ impl State {
 
 fn main() -> rltk::BError {
     use rltk::RltkBuilder;
-
     let mut context = RltkBuilder::simple(80, 60)
         .unwrap()
-        .with_title("Roguelike Tutorialllll")
+        .with_title("Roguelike Tutorial")
         .build()?;
-
     context.with_post_scanlines(true);
-
     let mut gs = State {
         ecs: World::new(),
         mapgen_next_state: Some(RunState::MainMenu {
@@ -460,67 +450,65 @@ fn main() -> rltk::BError {
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0,
     };
-
-    gs.ecs.register::<AreaOfEffect>();
-    gs.ecs.register::<Attributes>();
-    gs.ecs.register::<BlocksTile>();
-    gs.ecs.register::<BlocksVisibility>();
-    gs.ecs.register::<Bystander>();
-    gs.ecs.register::<Confusion>();
-    gs.ecs.register::<Consumable>();
-    gs.ecs.register::<Door>();
-    gs.ecs.register::<EntryTrigger>();
-    gs.ecs.register::<EntityMoved>();
-    gs.ecs.register::<Equippable>();
-    gs.ecs.register::<Equipped>();
-    gs.ecs.register::<Hidden>();
-    gs.ecs.register::<HungerClock>();
-    gs.ecs.register::<InBackpack>();
-    gs.ecs.register::<InflictsDamage>();
-    gs.ecs.register::<Item>();
-    gs.ecs.register::<MagicMapper>();
-    gs.ecs.register::<MeleeWeapon>();
+    gs.ecs.register::<Position>();
+    gs.ecs.register::<Renderable>();
+    gs.ecs.register::<Player>();
+    gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
-    gs.ecs.register::<NaturalAttackDefense>();
-    gs.ecs.register::<Quips>();
-    gs.ecs.register::<ParticleLifetime>();
-    gs.ecs.register::<Player>();
-    gs.ecs.register::<Pools>();
-    gs.ecs.register::<Position>();
-    gs.ecs.register::<ProvidesFood>();
-    gs.ecs.register::<ProvidesHealing>();
-    gs.ecs.register::<Ranged>();
-    gs.ecs.register::<Renderable>();
-    gs.ecs.register::<Skills>();
-    gs.ecs.register::<SingleActivation>();
-    gs.ecs.register::<SufferDamage>();
-    gs.ecs.register::<Vendor>();
-    gs.ecs.register::<Viewshed>();
-    gs.ecs.register::<WantsToDropItem>();
+    gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<WantsToMelee>();
+    gs.ecs.register::<SufferDamage>();
+    gs.ecs.register::<Item>();
+    gs.ecs.register::<ProvidesHealing>();
+    gs.ecs.register::<InflictsDamage>();
+    gs.ecs.register::<AreaOfEffect>();
+    gs.ecs.register::<Consumable>();
+    gs.ecs.register::<Ranged>();
+    gs.ecs.register::<InBackpack>();
     gs.ecs.register::<WantsToPickupItem>();
-    gs.ecs.register::<WantsToRemoveItem>();
     gs.ecs.register::<WantsToUseItem>();
-    gs.ecs.register::<Wearable>();
-
+    gs.ecs.register::<WantsToDropItem>();
+    gs.ecs.register::<Confusion>();
     gs.ecs.register::<SerializationHelper>();
+    gs.ecs.register::<Equippable>();
+    gs.ecs.register::<Equipped>();
+    gs.ecs.register::<MeleeWeapon>();
+    gs.ecs.register::<Wearable>();
+    gs.ecs.register::<WantsToRemoveItem>();
+    gs.ecs.register::<ParticleLifetime>();
+    gs.ecs.register::<HungerClock>();
+    gs.ecs.register::<ProvidesFood>();
+    gs.ecs.register::<MagicMapper>();
+    gs.ecs.register::<Hidden>();
+    gs.ecs.register::<EntryTrigger>();
+    gs.ecs.register::<EntityMoved>();
+    gs.ecs.register::<SingleActivation>();
+    gs.ecs.register::<BlocksVisibility>();
+    gs.ecs.register::<Door>();
+    gs.ecs.register::<Bystander>();
+    gs.ecs.register::<Vendor>();
+    gs.ecs.register::<Quips>();
+    gs.ecs.register::<Attributes>();
+    gs.ecs.register::<Skills>();
+    gs.ecs.register::<Pools>();
+    gs.ecs.register::<NaturalAttackDefense>();
+    gs.ecs.register::<LootTable>();
+    gs.ecs.register::<Carnivore>();
+    gs.ecs.register::<Herbivore>();
+
     gs.ecs.register::<SimpleMarker<SerializeMe>>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
-    // load raw data
     raws::load_raws();
 
-    // Insert Map
     gs.ecs.insert(Map::new(1, 64, 64, "New Map"));
+    gs.ecs.insert(Point::new(0, 0));
+    gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
-    // Insert Player
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
 
-    // Insert Game Misc Items
-    gs.ecs.insert(Point::new(0, 0));
-    gs.ecs.insert(rltk::RandomNumberGenerator::new());
     gs.ecs.insert(RunState::MapGeneration {});
     gs.ecs.insert(gamelog::GameLog {
         entries: vec!["Welcome to Rusty Roguelike".to_string()],
@@ -529,6 +517,5 @@ fn main() -> rltk::BError {
     gs.ecs.insert(rex_assets::RexAssets::new());
 
     gs.generate_world_map(1);
-
     rltk::main_loop(context, gs)
 }

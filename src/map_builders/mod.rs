@@ -254,6 +254,7 @@ pub fn level_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, widt
 
     match new_depth {
         1 => town_builder(new_depth, rng, width, height),
+        2 => forest_builder(new_depth, rng, width, height),
         _ => random_builder(new_depth, rng, width, height),
     }
 }

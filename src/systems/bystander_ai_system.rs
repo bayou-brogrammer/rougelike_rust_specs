@@ -1,6 +1,7 @@
 use specs::prelude::*;
 
-use crate::{components::*, GameLog, Map, Point, RunState};
+use crate::{gamelog::GameLog, Bystander, EntityMoved, Map, Name, Position, Quips, RunState, Viewshed};
+use rltk::Point;
 
 pub struct BystanderAI {}
 
@@ -22,9 +23,20 @@ impl<'a> System<'a> for BystanderAI {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        #[rustfmt::skip]
-        let (mut map, runstate, entities, mut viewshed, bystander, mut position,
-            mut entity_moved, mut rng, player_pos, mut gamelog, mut quips, names) = data;
+        let (
+            mut map,
+            runstate,
+            entities,
+            mut viewshed,
+            bystander,
+            mut position,
+            mut entity_moved,
+            mut rng,
+            player_pos,
+            mut gamelog,
+            mut quips,
+            names,
+        ) = data;
 
         if *runstate != RunState::MonsterTurn {
             return;
@@ -45,13 +57,11 @@ impl<'a> System<'a> for BystanderAI {
                     } else {
                         (rng.roll_dice(1, quip.available.len() as i32) - 1) as usize
                     };
-
                     gamelog.entries.push(format!(
                         "{} says \"{}\"",
                         name.unwrap().name,
                         quip.available[quip_index]
                     ));
-
                     quip.available.remove(quip_index);
                 }
             }
@@ -60,7 +70,6 @@ impl<'a> System<'a> for BystanderAI {
             let mut x = pos.x;
             let mut y = pos.y;
             let move_roll = rng.roll_dice(1, 5);
-
             match move_roll {
                 1 => x -= 1,
                 2 => x += 1,
@@ -73,15 +82,12 @@ impl<'a> System<'a> for BystanderAI {
                 let dest_idx = map.xy_idx(x, y);
                 if !map.blocked[dest_idx] {
                     let idx = map.xy_idx(pos.x, pos.y);
-
                     map.blocked[idx] = false;
                     pos.x = x;
                     pos.y = y;
-
                     entity_moved
                         .insert(entity, EntityMoved {})
                         .expect("Unable to insert marker");
-
                     map.blocked[dest_idx] = true;
                     viewshed.dirty = true;
                 }

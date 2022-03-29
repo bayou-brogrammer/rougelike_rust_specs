@@ -2,7 +2,7 @@
   {
     "name": "Barkeep",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#EE82EE",
       "bg": "#000000",
       "order": 1
@@ -37,7 +37,7 @@
   {
     "name": "Patron",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#AAAAAA",
       "bg": "#000000",
       "order": 1
@@ -57,7 +57,7 @@
   {
     "name": "Priest",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#EE82EE",
       "bg": "#000000",
       "order": 1
@@ -72,7 +72,7 @@
   {
     "name": "Parishioner",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#AAAAAA",
       "bg": "#000000",
       "order": 1
@@ -92,7 +92,7 @@
   {
     "name": "Blacksmith",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#EE82EE",
       "bg": "#000000",
       "order": 1
@@ -107,7 +107,7 @@
   {
     "name": "Clothier",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#EE82EE",
       "bg": "#000000",
       "order": 1
@@ -122,7 +122,7 @@
   {
     "name": "Alchemist",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#EE82EE",
       "bg": "#000000",
       "order": 1
@@ -137,7 +137,7 @@
   {
     "name": "Mom",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#FFAAAA",
       "bg": "#000000",
       "order": 1
@@ -158,7 +158,7 @@
   {
     "name": "Peasant",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#999999",
       "bg": "#000000",
       "order": 1
@@ -174,7 +174,7 @@
   {
     "name": "Dock Worker",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#999999",
       "bg": "#000000",
       "order": 1
@@ -190,7 +190,7 @@
   {
     "name": "Fisher",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#999999",
       "bg": "#000000",
       "order": 1
@@ -210,7 +210,7 @@
   {
     "name": "Wannabe Pirate",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#aa9999",
       "bg": "#000000",
       "order": 1
@@ -226,7 +226,7 @@
   {
     "name": "Drunk",
     "renderable": {
-      "glyph": "☺",
+      "glyph": "☻",
       "fg": "#aa9999",
       "bg": "#000000",
       "order": 1
@@ -262,6 +262,100 @@
       "armor_class": 11,
       "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
     }
+  },
+
+  {
+    "name": "Mangy Wolf",
+    "renderable": {
+      "glyph": "w",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "ai": "carnivore",
+    "attributes": {
+      "Might": 3,
+      "Fitness": 3
+    },
+    "skills": {
+      "Melee": -1,
+      "Defense": -1
+    },
+    "natural": {
+      "armor_class": 12,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d6" }]
+    },
+    "loot_table": "Animal"
+  },
+
+  {
+    "name": "Fox",
+    "renderable": {
+      "glyph": "f",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "ai": "carnivore",
+    "attributes": {
+      "Might": 3,
+      "Fitness": 3
+    },
+    "skills": {
+      "Melee": -1,
+      "Defense": -1
+    },
+    "natural": {
+      "armor_class": 11,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
+    },
+    "loot_table": "Animal"
+  },
+
+  {
+    "name": "Deer",
+    "renderable": {
+      "glyph": "d",
+      "fg": "#FFFF00",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "ai": "herbivore",
+    "attributes": {
+      "Might": 3,
+      "Fitness": 3
+    },
+    "skills": {
+      "Melee": -1,
+      "Defense": -1
+    },
+    "natural": {
+      "armor_class": 11,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
+    },
+    "loot_table": "Animal"
+  },
+
+  {
+    "name": "Bandit",
+    "renderable": {
+      "glyph": "☻",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 4,
+    "ai": "melee",
+    "quips": ["Stand and deliver!", "Alright, hand it over"],
+    "attributes": {},
+    "equipped": ["Dagger", "Shield", "Leather Armor", "Leather Boots"]
   },
 
   {

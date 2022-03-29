@@ -89,7 +89,10 @@ pub fn save_game(ecs: &mut World) {
             Attributes,
             Skills,
             Pools,
-            NaturalAttackDefense
+            NaturalAttackDefense,
+            LootTable,
+            Carnivore,
+            Herbivore
         );
     }
 
@@ -182,7 +185,10 @@ pub fn load_game(ecs: &mut World) {
             Attributes,
             Skills,
             Pools,
-            NaturalAttackDefense
+            NaturalAttackDefense,
+            LootTable,
+            Carnivore,
+            Herbivore
         );
     }
 

@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::{any::Any, collections::HashMap};
+use std::collections::HashMap;
 
 use super::{BaseRawComponent, Renderable};
 
@@ -19,6 +19,7 @@ pub struct Mob {
     pub mana: Option<i32>,
     pub equipped: Option<Vec<String>>,
     pub natural: Option<MobNatural>,
+    pub loot_table: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -46,7 +47,7 @@ pub struct NaturalAttack {
 impl BaseRawComponent for Mob {
     fn name(&self) -> String { self.name.clone() }
     fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    fn as_any(&self) -> &dyn Any { self }
+    // fn as_any(&self) -> &dyn Any { self }
 }
 
 impl<T: BaseRawComponent> From<&T> for Mob {

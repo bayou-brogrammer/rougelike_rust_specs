@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use specs::prelude::*;
+use std::cmp::Ordering;
 
 use super::{camera, components::*, gamelog::GameLog, rex_assets::RexAssets, Map, RunState, State};
 use rltk::{Point, Rltk, VirtualKeyCode, RGB};
@@ -46,6 +45,7 @@ fn draw_attribute(name: &str, attribute: &Attribute, y: i32, ctx: &mut Rltk) {
         black,
         &format!("{}", attribute.base + attribute.modifiers),
     );
+
     ctx.print_color(73, y, color, black, &format!("{}", attribute.bonus));
 
     if attribute.bonus > 0 {
@@ -53,10 +53,8 @@ fn draw_attribute(name: &str, attribute: &Attribute, y: i32, ctx: &mut Rltk) {
     }
 }
 
-#[rustfmt::skip]
 pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     use rltk::to_cp437;
-
     let box_gray: RGB = RGB::from_hex("#999999").expect("Oops");
     let black = RGB::named(rltk::BLACK);
     let white = RGB::named(rltk::WHITE);
@@ -79,7 +77,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     let name_length = map.name.len() + 2;
     let x_pos = (22 - (name_length / 2)) as i32;
     ctx.set(x_pos, 0, box_gray, black, to_cp437('┤'));
-    ctx.set(x_pos + name_length as i32, 0, box_gray, black, to_cp437('├'));
+    ctx.set(x_pos + name_length as i32 - 1, 0, box_gray, black, to_cp437('├'));
     ctx.print_color(x_pos + 1, 0, white, black, &map.name);
     std::mem::drop(map);
 
@@ -87,13 +85,31 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     let player_entity = ecs.fetch::<Entity>();
     let pools = ecs.read_storage::<Pools>();
     let player_pools = pools.get(*player_entity).unwrap();
-    let health = format!("Health: {}/{}", player_pools.hit_points.current, player_pools.hit_points.max);
-    let mana =   format!("Mana:   {}/{}", player_pools.mana.current, player_pools.mana.max);
+    let health = format!(
+        "Health: {}/{}",
+        player_pools.hit_points.current, player_pools.hit_points.max
+    );
+    let mana = format!("Mana:   {}/{}", player_pools.mana.current, player_pools.mana.max);
     ctx.print_color(50, 1, white, black, &health);
     ctx.print_color(50, 2, white, black, &mana);
-    ctx.draw_bar_horizontal(64, 1, 14, player_pools.hit_points.current, player_pools.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
-    ctx.draw_bar_horizontal(64, 2, 14, player_pools.mana.current, player_pools.mana.max, RGB::named(rltk::BLUE), RGB::named(rltk::BLACK));
-    std::mem::drop(pools);
+    ctx.draw_bar_horizontal(
+        64,
+        1,
+        14,
+        player_pools.hit_points.current,
+        player_pools.hit_points.max,
+        RGB::named(rltk::RED),
+        RGB::named(rltk::BLACK),
+    );
+    ctx.draw_bar_horizontal(
+        64,
+        2,
+        14,
+        player_pools.mana.current,
+        player_pools.mana.max,
+        RGB::named(rltk::BLUE),
+        RGB::named(rltk::BLACK),
+    );
 
     // Attributes
     let attributes = ecs.read_storage::<Attributes>();
@@ -102,7 +118,6 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     draw_attribute("Quickness:", &attr.quickness, 5, ctx);
     draw_attribute("Fitness:", &attr.fitness, 6, ctx);
     draw_attribute("Intelligence:", &attr.intelligence, 7, ctx);
-    std::mem::drop(attributes);
 
     // Equipped
     let mut y = 9;
@@ -114,7 +129,6 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
             y += 1;
         }
     }
-    std::mem::drop(equipped);
 
     // Consumables
     y += 1;
@@ -131,27 +145,24 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
             index += 1;
         }
     }
-    std::mem::drop(consumables);
-    std::mem::drop(backpack);
-
 
     // Status
     let hunger = ecs.read_storage::<HungerClock>();
     let hc = hunger.get(*player_entity).unwrap();
     match hc.state {
         HungerState::WellFed => ctx.print_color(50, 44, RGB::named(rltk::GREEN), RGB::named(rltk::BLACK), "Well Fed"),
-        HungerState::Normal => {}
+        HungerState::Normal => {},
         HungerState::Hungry => ctx.print_color(50, 44, RGB::named(rltk::ORANGE), RGB::named(rltk::BLACK), "Hungry"),
         HungerState::Starving => ctx.print_color(50, 44, RGB::named(rltk::RED), RGB::named(rltk::BLACK), "Starving"),
     }
-    std::mem::drop(hunger);
-
 
     // Draw the log
     let log = ecs.fetch::<GameLog>();
     let mut y = 46;
     for s in log.entries.iter().rev() {
-        if y < 59 { ctx.print(2, y, s); }
+        if y < 59 {
+            ctx.print(2, y, s);
+        }
         y += 1;
     }
 
@@ -410,7 +421,6 @@ pub fn remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Opti
 
 pub fn ranged_target(gs: &mut State, ctx: &mut Rltk, range: i32) -> (ItemMenuResult, Option<Point>) {
     let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(&gs.ecs, ctx);
-
     let player_entity = gs.ecs.fetch::<Entity>();
     let player_pos = gs.ecs.fetch::<Point>();
     let viewsheds = gs.ecs.read_storage::<Viewshed>();
@@ -433,7 +443,6 @@ pub fn ranged_target(gs: &mut State, ctx: &mut Rltk, range: i32) -> (ItemMenuRes
             if distance <= range as f32 {
                 let screen_x = idx.x - min_x;
                 let screen_y = idx.y - min_y;
-
                 if screen_x > 1 && screen_x < (max_x - min_x) - 1 && screen_y > 1 && screen_y < (max_y - min_y) - 1 {
                     ctx.set_bg(screen_x, screen_y, RGB::named(rltk::BLUE));
                     available_cells.push(idx);
@@ -447,8 +456,9 @@ pub fn ranged_target(gs: &mut State, ctx: &mut Rltk, range: i32) -> (ItemMenuRes
     // Draw mouse cursor
     let mouse_pos = ctx.mouse_pos();
     let mut mouse_map_pos = mouse_pos;
-    mouse_map_pos.0 += min_x;
-    mouse_map_pos.1 += min_y;
+
+    mouse_map_pos.0 += min_x - 1;
+    mouse_map_pos.1 += min_y - 1;
 
     let mut valid_target = false;
     for idx in available_cells.iter() {

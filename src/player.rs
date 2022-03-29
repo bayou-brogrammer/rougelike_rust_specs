@@ -1,6 +1,3 @@
-use specs::prelude::*;
-use std::cmp::{max, min};
-
 use super::{
     gamelog::GameLog,
     Attributes,
@@ -26,27 +23,26 @@ use super::{
     WantsToMelee,
     WantsToPickupItem,
 };
-
 use rltk::{Point, Rltk, VirtualKeyCode};
+use specs::prelude::*;
+use std::cmp::{max, min};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
-    let entities = ecs.entities();
-
-    let mut blocks_movement = ecs.write_storage::<BlocksTile>();
-    let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
-    let mut doors = ecs.write_storage::<Door>();
-    let mut entity_moved = ecs.write_storage::<EntityMoved>();
     let mut positions = ecs.write_storage::<Position>();
-    let mut renderables = ecs.write_storage::<Renderable>();
-    let mut viewsheds = ecs.write_storage::<Viewshed>();
-    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
-
     let players = ecs.read_storage::<Player>();
+    let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let entities = ecs.entities();
+    let combat_stats = ecs.read_storage::<Attributes>();
+    let map = ecs.fetch::<Map>();
+    let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+    let mut entity_moved = ecs.write_storage::<EntityMoved>();
+    let mut doors = ecs.write_storage::<Door>();
+    let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
+    let mut blocks_movement = ecs.write_storage::<BlocksTile>();
+    let mut renderables = ecs.write_storage::<Renderable>();
     let bystanders = ecs.read_storage::<Bystander>();
     let vendors = ecs.read_storage::<Vendor>();
-    let combat_stats = ecs.read_storage::<Attributes>();
 
-    let map = ecs.fetch::<Map>();
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
 
     for (entity, _player, pos, viewshed) in (&entities, &players, &mut positions, &mut viewsheds).join() {
@@ -62,7 +58,6 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         for potential_target in map.tile_content[destination_idx].iter() {
             let bystander = bystanders.get(*potential_target);
             let vendor = vendors.get(*potential_target);
-
             if bystander.is_some() || vendor.is_some() {
                 // Note that we want to move the bystander
                 swap_entities.push((*potential_target, pos.x, pos.y));
@@ -80,7 +75,6 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 ppos.y = pos.y;
             } else {
                 let target = combat_stats.get(*potential_target);
-                // Attack Target
                 if let Some(_target) = target {
                     wants_to_melee
                         .insert(
@@ -93,31 +87,25 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                     return;
                 }
             }
-
-            // Check if Door
             let door = doors.get_mut(*potential_target);
             if let Some(door) = door {
                 door.open = true;
-                viewshed.dirty = true;
-
                 blocks_visibility.remove(*potential_target);
                 blocks_movement.remove(*potential_target);
-
                 let glyph = renderables.get_mut(*potential_target).unwrap();
                 glyph.glyph = rltk::to_cp437('/');
+                viewshed.dirty = true;
             }
         }
 
         if !map.blocked[destination_idx] {
             pos.x = min(map.width - 1, max(0, pos.x + delta_x));
             pos.y = min(map.height - 1, max(0, pos.y + delta_y));
-
             entity_moved
                 .insert(entity, EntityMoved {})
                 .expect("Unable to insert marker");
 
             viewshed.dirty = true;
-
             let mut ppos = ecs.write_resource::<Point>();
             ppos.x = pos.x;
             ppos.y = pos.y;
@@ -219,6 +207,46 @@ fn skip_turn(ecs: &mut World) -> RunState {
     RunState::PlayerTurn
 }
 
+fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
+    use super::{Consumable, InBackpack, WantsToUseItem};
+
+    let consumables = gs.ecs.read_storage::<Consumable>();
+    let backpack = gs.ecs.read_storage::<InBackpack>();
+    let player_entity = gs.ecs.fetch::<Entity>();
+    let entities = gs.ecs.entities();
+    let mut carried_consumables = Vec::new();
+    for (entity, carried_by, _consumable) in (&entities, &backpack, &consumables).join() {
+        if carried_by.owner == *player_entity {
+            carried_consumables.push(entity);
+        }
+    }
+
+    if (key as usize) < carried_consumables.len() {
+        use crate::components::Ranged;
+
+        if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(carried_consumables[key as usize]) {
+            return RunState::ShowTargeting {
+                range: ranged.range,
+                item: carried_consumables[key as usize],
+            };
+        }
+
+        let mut intent = gs.ecs.write_storage::<WantsToUseItem>();
+        intent
+            .insert(
+                *player_entity,
+                WantsToUseItem {
+                    item: carried_consumables[key as usize],
+                    target: None,
+                },
+            )
+            .expect("Unable to insert intent");
+        return RunState::PlayerTurn;
+    }
+
+    RunState::PlayerTurn
+}
+
 pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // Hotkeys
     if ctx.shift && ctx.key.is_some() {
@@ -234,6 +262,7 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::Key9 => Some(9),
             _ => None,
         };
+
         if let Some(key) = key {
             return use_consumable_hotkey(gs, key - 1);
         }
@@ -276,47 +305,5 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             _ => return RunState::AwaitingInput,
         },
     }
-    RunState::PlayerTurn
-}
-
-fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
-    use super::{Consumable, InBackpack, WantsToUseItem};
-
-    let consumables = gs.ecs.read_storage::<Consumable>();
-    let backpack = gs.ecs.read_storage::<InBackpack>();
-    let player_entity = gs.ecs.fetch::<Entity>();
-    let entities = gs.ecs.entities();
-    let mut carried_consumables = Vec::new();
-
-    for (entity, carried_by, _consumable) in (&entities, &backpack, &consumables).join() {
-        if carried_by.owner == *player_entity {
-            carried_consumables.push(entity);
-        }
-    }
-
-    if (key as usize) < carried_consumables.len() {
-        use crate::components::Ranged;
-
-        if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(carried_consumables[key as usize]) {
-            return RunState::ShowTargeting {
-                range: ranged.range,
-                item: carried_consumables[key as usize],
-            };
-        }
-
-        let mut intent = gs.ecs.write_storage::<WantsToUseItem>();
-        intent
-            .insert(
-                *player_entity,
-                WantsToUseItem {
-                    item: carried_consumables[key as usize],
-                    target: None,
-                },
-            )
-            .expect("Unable to insert intent");
-
-        return RunState::PlayerTurn;
-    }
-
     RunState::PlayerTurn
 }
