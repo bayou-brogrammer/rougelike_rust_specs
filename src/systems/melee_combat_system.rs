@@ -1,9 +1,7 @@
-use specs::prelude::*;
-
 use crate::{
     gamelog::GameLog,
-    gamesystem::*,
     particle_system::ParticleBuilder,
+    skill_bonus,
     Attributes,
     EquipmentSlot,
     Equipped,
@@ -21,6 +19,7 @@ use crate::{
     WeaponAttribute,
     Wearable,
 };
+use specs::prelude::*;
 
 pub struct MeleeCombatSystem {}
 
@@ -43,6 +42,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
         ReadStorage<'a, MeleeWeapon>,
         ReadStorage<'a, Wearable>,
         ReadStorage<'a, NaturalAttackDefense>,
+        ReadExpect<'a, Entity>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -63,6 +63,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
             meleeweapons,
             wearables,
             natural,
+            player_entity,
         ) = data;
 
         for (entity, wants_melee, name, attacker_attributes, attacker_skills, attacker_pools) in
@@ -72,7 +73,6 @@ impl<'a> System<'a> for MeleeCombatSystem {
             let target_pools = pools.get(wants_melee.target).unwrap();
             let target_attributes = attributes.get(wants_melee.target).unwrap();
             let target_skills = skills.get(wants_melee.target).unwrap();
-
             if attacker_pools.hit_points.current > 0 && target_pools.hit_points.current > 0 {
                 let target_name = names.get(wants_melee.target).unwrap();
 
@@ -84,7 +84,6 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     damage_bonus: 0,
                 };
 
-                // Natural Weapon Info
                 if let Some(nat) = natural.get(entity) {
                     if !nat.attacks.is_empty() {
                         let attack_index = if nat.attacks.len() == 1 {
@@ -112,6 +111,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
                 } else {
                     attacker_attributes.quickness.bonus
                 };
+
                 let skill_hit_bonus = skill_bonus(Skill::Melee, &*attacker_skills);
                 let weapon_hit_bonus = weapon_info.hit_bonus;
                 let mut status_hit_bonus = 0;
@@ -126,7 +126,6 @@ impl<'a> System<'a> for MeleeCombatSystem {
                 let modified_hit_roll =
                     natural_roll + attribute_hit_bonus + skill_hit_bonus + weapon_hit_bonus + status_hit_bonus;
 
-                // Armor Bonus
                 let mut armor_item_bonus_f = 0.0;
                 for (wielded, armor) in (&equipped_items, &wearables).join() {
                     if wielded.owner == wants_melee.target {
@@ -134,7 +133,6 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     }
                 }
 
-                // Base Armor + Attributes
                 let base_armor_class = match natural.get(wants_melee.target) {
                     None => 10,
                     Some(nat) => nat.armor_class.unwrap_or(10),
@@ -155,7 +153,14 @@ impl<'a> System<'a> for MeleeCombatSystem {
                         0,
                         base_damage + attr_damage_bonus + skill_hit_bonus + skill_damage_bonus + weapon_damage_bonus,
                     );
-                    SufferDamage::new_damage(&mut inflict_damage, wants_melee.target, damage);
+
+                    SufferDamage::new_damage(
+                        &mut inflict_damage,
+                        wants_melee.target,
+                        damage,
+                        entity == *player_entity,
+                    );
+
                     log.entries
                         .push(format!("{} hits {}, for {} hp.", &name.name, &target_name.name, damage));
 

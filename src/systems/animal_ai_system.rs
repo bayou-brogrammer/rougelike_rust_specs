@@ -1,18 +1,6 @@
 use specs::prelude::*;
 
-use super::{
-    particle_system::ParticleBuilder,
-    Carnivore,
-    Confusion,
-    EntityMoved,
-    Herbivore,
-    Item,
-    Map,
-    Position,
-    RunState,
-    Viewshed,
-    WantsToMelee,
-};
+use crate::{Carnivore, EntityMoved, Herbivore, Item, Map, Position, RunState, Viewshed, WantsToMelee};
 use rltk::Point;
 
 pub struct AnimalAI {}

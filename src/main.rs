@@ -72,8 +72,8 @@ impl State {
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
 
-        // let mut animal = animal_ai_system::AnimalAI {};
-        // animal.run_now(&self.ecs);
+        let mut animal = AnimalAI {};
+        animal.run_now(&self.ecs);
 
         let mut bystander = BystanderAI {};
         bystander.run_now(&self.ecs);
@@ -450,6 +450,7 @@ fn main() -> rltk::BError {
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0,
     };
+
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
@@ -470,6 +471,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<WantsToUseItem>();
     gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<Confusion>();
+    gs.ecs.register::<SimpleMarker<SerializeMe>>();
     gs.ecs.register::<SerializationHelper>();
     gs.ecs.register::<Equippable>();
     gs.ecs.register::<Equipped>();
@@ -496,8 +498,6 @@ fn main() -> rltk::BError {
     gs.ecs.register::<LootTable>();
     gs.ecs.register::<Carnivore>();
     gs.ecs.register::<Herbivore>();
-
-    gs.ecs.register::<SimpleMarker<SerializeMe>>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();

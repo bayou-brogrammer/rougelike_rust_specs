@@ -11,7 +11,7 @@
     "entry_trigger": {
       "effects": {
         "damage": "6",
-        "single_activation": "true"
+        "single_activation": "1"
       }
     }
   },

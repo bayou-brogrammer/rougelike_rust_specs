@@ -41,10 +41,9 @@
   },
   { "name": "Bear Trap", "weight": 5, "min_depth": 0, "max_depth": 100 },
   { "name": "Battleaxe", "weight": 1, "min_depth": 2, "max_depth": 100 },
-  { "name": "Kobold", "weight": 15, "min_depth": 3, "max_depth": 3 },
+  { "name": "Kobold", "weight": 15, "min_depth": 3, "max_depth": 5 },
   { "name": "Rat", "weight": 15, "min_depth": 2, "max_depth": 3 },
   { "name": "Mangy Wolf", "weight": 13, "min_depth": 2, "max_depth": 3 },
-  { "name": "Fox", "weight": 15, "min_depth": 2, "max_depth": 3 },
   { "name": "Deer", "weight": 14, "min_depth": 2, "max_depth": 3 },
   { "name": "Bandit", "weight": 9, "min_depth": 2, "max_depth": 3 }
 ]

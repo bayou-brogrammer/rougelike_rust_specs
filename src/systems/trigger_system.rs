@@ -79,7 +79,7 @@ impl<'a> System<'a> for TriggerSystem {
                                     rltk::to_cp437('‼'),
                                     200.0,
                                 );
-                                SufferDamage::new_damage(&mut inflict_damage, entity, damage.damage);
+                                SufferDamage::new_damage(&mut inflict_damage, entity, damage.damage, false);
                             }
 
                             // If it is single activation, it needs to be removed
