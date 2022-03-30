@@ -5,12 +5,14 @@ use std::collections::HashSet;
 
 use rltk::{Algorithm2D, BaseMap, Point};
 
+mod dungeon;
+pub use dungeon::{freeze_level_entities, level_transition, thaw_level_entities, MasterDungeonMap};
+
 mod tiletype;
 pub use tiletype::{tile_cost, tile_opaque, tile_walkable, TileType};
 
 mod themes;
 pub use themes::*;
-
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Map {
     pub tiles: Vec<TileType>,

@@ -16,6 +16,13 @@ pub struct Position {
     pub y: i32,
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct OtherLevelPosition {
+    pub x: i32,
+    pub y: i32,
+    pub depth: i32,
+}
+
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Renderable {
     pub glyph: rltk::FontCharType,
@@ -97,7 +104,7 @@ pub struct WantsToMelee {
     pub target: Entity,
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct SufferDamage {
     pub amount: Vec<(i32, bool)>,
 }
@@ -114,6 +121,17 @@ impl SufferDamage {
         }
     }
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct LootTable {
+    pub table: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Carnivore {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Herbivore {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Item {}
@@ -224,6 +242,21 @@ pub struct Wearable {
     pub slot: EquipmentSlot,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct NaturalAttack {
+    pub name: String,
+    pub damage_n_dice: i32,
+    pub damage_die_type: i32,
+    pub damage_bonus: i32,
+    pub hit_bonus: i32,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct NaturalAttackDefense {
+    pub armor_class: Option<i32>,
+    pub attacks: Vec<NaturalAttack>,
+}
+
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
     pub lifetime_ms: f32,
@@ -266,32 +299,6 @@ pub struct Quips {
     pub available: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct NaturalAttack {
-    pub name: String,
-    pub damage_n_dice: i32,
-    pub damage_die_type: i32,
-    pub damage_bonus: i32,
-    pub hit_bonus: i32,
-}
-
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct NaturalAttackDefense {
-    pub armor_class: Option<i32>,
-    pub attacks: Vec<NaturalAttack>,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct LootTable {
-    pub table: String,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Carnivore {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Herbivore {}
-
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 
@@ -301,4 +308,8 @@ pub struct SerializeMe;
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct SerializationHelper {
     pub map: super::map::Map,
+}
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct DMSerializationHelper {
+    pub map: super::map::MasterDungeonMap,
 }
