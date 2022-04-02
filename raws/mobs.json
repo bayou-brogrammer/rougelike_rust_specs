@@ -351,11 +351,15 @@
       "order": 1
     },
     "blocks_tile": true,
-    "vision_range": 4,
+    "vision_range": 6,
     "ai": "melee",
     "quips": ["Stand and deliver!", "Alright, hand it over"],
     "attributes": {},
-    "equipped": ["Dagger", "Shield", "Leather Armor", "Leather Boots"]
+    "equipped": ["Dagger", "Shield", "Leather Armor", "Leather Boots"],
+    "light": {
+      "range": 6,
+      "color": "#FFFF55"
+    }
   },
 
   {
@@ -398,5 +402,72 @@
     "vision_range": 4,
     "ai": "melee",
     "attributes": {}
+  },
+
+  {
+    "name": "Bat",
+    "renderable": {
+      "glyph": "b",
+      "fg": "#995555",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 6,
+    "ai": "herbivore",
+    "attributes": {
+      "Might": 3,
+      "Fitness": 3
+    },
+    "skills": {
+      "Melee": -1,
+      "Defense": -1
+    },
+    "natural": {
+      "armor_class": 11,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
+    }
+  },
+
+  {
+    "name": "Large Spider",
+    "level": 2,
+    "attributes": {},
+    "renderable": {
+      "glyph": "s",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 6,
+    "ai": "carnivore",
+    "natural": {
+      "armor_class": 12,
+      "attacks": [{ "name": "bite", "hit_bonus": 1, "damage": "1d12" }]
+    }
+  },
+
+  {
+    "name": "Gelatinous Cube",
+    "level": 2,
+    "attributes": {},
+    "renderable": {
+      "glyph": "▄",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 4,
+    "ai": "carnivore",
+    "natural": {
+      "armor_class": 12,
+      "attacks": [{ "name": "engulf", "hit_bonus": 0, "damage": "1d8" }]
+    },
+    "light": {
+      "range": 4,
+      "color": "#550000"
+    }
   }
 ]

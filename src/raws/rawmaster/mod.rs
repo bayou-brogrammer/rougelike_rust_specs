@@ -358,6 +358,16 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
         eb = eb.with(LootTable { table: loot.clone() });
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Lighting
+    ///////////////////////////////////////////////////////////////////////////
+    if let Some(light) = &mob_template.light {
+        eb = eb.with(LightSource {
+            range: light.range,
+            color: rltk::RGB::from_hex(&light.color).expect("Bad color"),
+        });
+    }
+
     // Build a mob person thing
     let new_mob = eb.build();
 

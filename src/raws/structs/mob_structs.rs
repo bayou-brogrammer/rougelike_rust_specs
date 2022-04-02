@@ -20,6 +20,7 @@ pub struct Mob {
     pub equipped: Option<Vec<String>>,
     pub natural: Option<MobNatural>,
     pub loot_table: Option<String>,
+    pub light: Option<MobLight>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -41,6 +42,12 @@ pub struct NaturalAttack {
     pub name: String,
     pub hit_bonus: i32,
     pub damage: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct MobLight {
+    pub range: i32,
+    pub color: String,
 }
 
 // Trait Implementations

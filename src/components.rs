@@ -299,6 +299,12 @@ pub struct Quips {
     pub available: Vec<String>,
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct LightSource {
+    pub color: RGB,
+    pub range: i32,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 

@@ -102,7 +102,8 @@ pub fn save_game(ecs: &mut World) {
             Carnivore,
             Herbivore,
             OtherLevelPosition,
-            DMSerializationHelper
+            DMSerializationHelper,
+            LightSource
         );
     }
 
@@ -201,7 +202,8 @@ pub fn load_game(ecs: &mut World) {
             Carnivore,
             Herbivore,
             OtherLevelPosition,
-            DMSerializationHelper
+            DMSerializationHelper,
+            LightSource
         );
     }
 
@@ -209,10 +211,13 @@ pub fn load_game(ecs: &mut World) {
     let mut deleteme2: Option<Entity> = None;
     {
         let entities = ecs.entities();
+
         let helper = ecs.read_storage::<SerializationHelper>();
         let helper2 = ecs.read_storage::<DMSerializationHelper>();
+
         let player = ecs.read_storage::<Player>();
         let position = ecs.read_storage::<Position>();
+
         for (e, h) in (&entities, &helper).join() {
             let mut worldmap = ecs.write_resource::<crate::map::Map>();
             *worldmap = h.map.clone();

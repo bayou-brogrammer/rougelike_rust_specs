@@ -52,6 +52,7 @@ pub enum RunState {
     GameOver,
     MagicMapReveal { row: i32 },
     MapGeneration,
+    ShowCheatMenu,
 }
 
 pub struct State {
@@ -66,32 +67,48 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+
         let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
+
         let mut mapindex = MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
+
         let mut animal = AnimalAI {};
         animal.run_now(&self.ecs);
+
         let mut bystander = BystanderAI {};
         bystander.run_now(&self.ecs);
+
         let mut triggers = TriggerSystem {};
         triggers.run_now(&self.ecs);
+
         let mut melee = MeleeCombatSystem {};
         melee.run_now(&self.ecs);
+
         let mut damage = DamageSystem {};
         damage.run_now(&self.ecs);
+
         let mut pickup = ItemCollectionSystem {};
         pickup.run_now(&self.ecs);
+
         let mut itemuse = ItemUseSystem {};
         itemuse.run_now(&self.ecs);
+
         let mut drop_items = ItemDropSystem {};
         drop_items.run_now(&self.ecs);
+
         let mut item_remove = ItemRemoveSystem {};
         item_remove.run_now(&self.ecs);
+
         let mut hunger = hunger_system::HungerSystem {};
         hunger.run_now(&self.ecs);
+
         let mut particles = particle_system::ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
+
+        let mut lighting = LightingSystem {};
+        lighting.run_now(&self.ecs);
 
         self.ecs.maintain();
     }
@@ -230,6 +247,18 @@ impl GameState for State {
                             .insert(*self.ecs.fetch::<Entity>(), WantsToUseItem { item, target: result.1 })
                             .expect("Unable to insert intent");
                         newrunstate = RunState::PlayerTurn;
+                    },
+                }
+            },
+            RunState::ShowCheatMenu => {
+                let result = gui::show_cheat_mode(self, ctx);
+                match result {
+                    gui::CheatMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::CheatMenuResult::NoResponse => {},
+                    gui::CheatMenuResult::TeleportToExit => {
+                        self.goto_level(1);
+                        self.mapgen_next_state = Some(RunState::PreRun);
+                        newrunstate = RunState::MapGeneration;
                     },
                 }
             },
@@ -411,55 +440,58 @@ fn main() -> rltk::BError {
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0,
     };
-    gs.ecs.register::<Position>();
-    gs.ecs.register::<Renderable>();
-    gs.ecs.register::<Player>();
-    gs.ecs.register::<Viewshed>();
+
+    gs.ecs.register::<AreaOfEffect>();
+    gs.ecs.register::<Attributes>();
+    gs.ecs.register::<BlocksTile>();
+    gs.ecs.register::<BlocksVisibility>();
+    gs.ecs.register::<Bystander>();
+    gs.ecs.register::<Carnivore>();
+    gs.ecs.register::<Confusion>();
+    gs.ecs.register::<Consumable>();
+    gs.ecs.register::<Door>();
+    gs.ecs.register::<EntryTrigger>();
+    gs.ecs.register::<EntityMoved>();
+    gs.ecs.register::<Equippable>();
+    gs.ecs.register::<Equipped>();
+    gs.ecs.register::<Herbivore>();
+    gs.ecs.register::<Hidden>();
+    gs.ecs.register::<HungerClock>();
+    gs.ecs.register::<InBackpack>();
+    gs.ecs.register::<InflictsDamage>();
+    gs.ecs.register::<Item>();
+    gs.ecs.register::<LightSource>();
+    gs.ecs.register::<LootTable>();
+    gs.ecs.register::<MagicMapper>();
+    gs.ecs.register::<MeleeWeapon>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
-    gs.ecs.register::<BlocksTile>();
-    gs.ecs.register::<WantsToMelee>();
-    gs.ecs.register::<SufferDamage>();
-    gs.ecs.register::<Item>();
+    gs.ecs.register::<NaturalAttackDefense>();
+    gs.ecs.register::<OtherLevelPosition>();
+    gs.ecs.register::<ParticleLifetime>();
+    gs.ecs.register::<Player>();
+    gs.ecs.register::<Pools>();
+    gs.ecs.register::<Position>();
+    gs.ecs.register::<ProvidesFood>();
     gs.ecs.register::<ProvidesHealing>();
-    gs.ecs.register::<InflictsDamage>();
-    gs.ecs.register::<AreaOfEffect>();
-    gs.ecs.register::<Consumable>();
+    gs.ecs.register::<Quips>();
     gs.ecs.register::<Ranged>();
-    gs.ecs.register::<InBackpack>();
-    gs.ecs.register::<WantsToPickupItem>();
-    gs.ecs.register::<WantsToUseItem>();
+    gs.ecs.register::<Renderable>();
+    gs.ecs.register::<Skills>();
+    gs.ecs.register::<SingleActivation>();
+    gs.ecs.register::<SufferDamage>();
+    gs.ecs.register::<Vendor>();
+    gs.ecs.register::<Viewshed>();
     gs.ecs.register::<WantsToDropItem>();
-    gs.ecs.register::<Confusion>();
+    gs.ecs.register::<WantsToMelee>();
+    gs.ecs.register::<WantsToPickupItem>();
+    gs.ecs.register::<WantsToRemoveItem>();
+    gs.ecs.register::<WantsToUseItem>();
+    gs.ecs.register::<Wearable>();
+
     gs.ecs.register::<SimpleMarker<SerializeMe>>();
     gs.ecs.register::<SerializationHelper>();
     gs.ecs.register::<DMSerializationHelper>();
-    gs.ecs.register::<Equippable>();
-    gs.ecs.register::<Equipped>();
-    gs.ecs.register::<MeleeWeapon>();
-    gs.ecs.register::<Wearable>();
-    gs.ecs.register::<WantsToRemoveItem>();
-    gs.ecs.register::<ParticleLifetime>();
-    gs.ecs.register::<HungerClock>();
-    gs.ecs.register::<ProvidesFood>();
-    gs.ecs.register::<MagicMapper>();
-    gs.ecs.register::<Hidden>();
-    gs.ecs.register::<EntryTrigger>();
-    gs.ecs.register::<EntityMoved>();
-    gs.ecs.register::<SingleActivation>();
-    gs.ecs.register::<BlocksVisibility>();
-    gs.ecs.register::<Door>();
-    gs.ecs.register::<Bystander>();
-    gs.ecs.register::<Vendor>();
-    gs.ecs.register::<Quips>();
-    gs.ecs.register::<Attributes>();
-    gs.ecs.register::<Skills>();
-    gs.ecs.register::<Pools>();
-    gs.ecs.register::<NaturalAttackDefense>();
-    gs.ecs.register::<LootTable>();
-    gs.ecs.register::<Carnivore>();
-    gs.ecs.register::<Herbivore>();
-    gs.ecs.register::<OtherLevelPosition>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();

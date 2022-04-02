@@ -6,6 +6,7 @@ mod cellular_automata;
 mod dla;
 mod drunkard;
 mod forest;
+mod limestone_cavern;
 mod maze;
 mod simple_map;
 mod voronoi;
@@ -26,4 +27,5 @@ pub use voronoi::VoronoiCellBuilder;
 pub use waveform_collapse::WaveformCollapseBuilder;
 
 pub use forest::*;
+pub use limestone_cavern::*;
 pub use town::*;

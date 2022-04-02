@@ -4,6 +4,9 @@ use std::cmp::Ordering;
 use super::{camera, components::*, gamelog::GameLog, rex_assets::RexAssets, Map, RunState, State};
 use rltk::{Point, Rltk, VirtualKeyCode, RGB};
 
+mod cheat_menu;
+pub use cheat_menu::*;
+
 mod tooltip;
 use tooltip::*;
 
