@@ -16,12 +16,14 @@ use rltk::RandomNumberGenerator;
 
 pub fn forest_builder(new_depth: i32, _rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     let mut chain = BuilderChain::new(new_depth, width, height, "Into the Woods");
+
     chain.start_with(CellularAutomataBuilder::new());
     chain.with(AreaStartingPosition::new(XStart::Center, YStart::Center));
     chain.with(CullUnreachable::new());
     chain.with(AreaStartingPosition::new(XStart::Left, YStart::Center));
     chain.with(VoronoiSpawning::new());
     chain.with(YellowBrickRoad::new());
+
     chain
 }
 
@@ -114,7 +116,7 @@ impl YellowBrickRoad {
 
         let (stream_x, stream_y) = self.find_exit(build_data, stream_startx, stream_starty);
         let stream_idx = build_data.map.xy_idx(stream_x, stream_y) as usize;
-        let stream = rltk::a_star_search(stairs_idx, stream_idx, &mut build_data.map);
+        let stream = rltk::a_star_search(stairs_idx, stream_idx, &build_data.map);
         for tile in stream.steps.iter() {
             if build_data.map.tiles[*tile as usize] == TileType::Floor {
                 build_data.map.tiles[*tile as usize] = TileType::ShallowWater;

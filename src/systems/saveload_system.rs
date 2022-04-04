@@ -51,59 +51,17 @@ pub fn save_game(ecs: &mut World) {
 
         let writer = File::create("./savegame.json").unwrap();
         let mut serializer = serde_json::Serializer::new(writer);
-        serialize_individually!(
-            ecs,
-            serializer,
-            data,
-            Position,
-            Renderable,
-            Player,
-            Viewshed,
-            Monster,
-            Name,
-            BlocksTile,
-            SufferDamage,
-            WantsToMelee,
-            Item,
-            Consumable,
-            Ranged,
-            InflictsDamage,
-            AreaOfEffect,
-            Confusion,
-            ProvidesHealing,
-            InBackpack,
-            WantsToPickupItem,
-            WantsToUseItem,
-            WantsToDropItem,
-            SerializationHelper,
-            Equippable,
-            Equipped,
-            MeleeWeapon,
-            Wearable,
-            WantsToRemoveItem,
-            ParticleLifetime,
-            HungerClock,
-            ProvidesFood,
-            MagicMapper,
-            Hidden,
-            EntryTrigger,
-            EntityMoved,
-            SingleActivation,
-            BlocksVisibility,
-            Door,
-            Bystander,
-            Vendor,
-            Quips,
-            Attributes,
-            Skills,
-            Pools,
-            NaturalAttackDefense,
-            LootTable,
-            Carnivore,
-            Herbivore,
-            OtherLevelPosition,
-            DMSerializationHelper,
-            LightSource
+
+        #[rustfmt::skip]
+        serialize_individually!(ecs, serializer, data, Position, Renderable, Player, Viewshed,
+            Name, BlocksTile, SufferDamage, WantsToMelee, Item, Consumable, Ranged, InflictsDamage,
+            AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
+            WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleeWeapon, Wearable,
+            WantsToRemoveItem, ParticleLifetime, HungerClock, ProvidesFood, MagicMapper, Hidden,
+            EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
+            Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
+            OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
+            WantsToApproach, WantsToFlee, MoveMode, Chasing
         );
     }
 
@@ -151,59 +109,16 @@ pub fn load_game(ecs: &mut World) {
             &mut ecs.write_resource::<SimpleMarkerAllocator<SerializeMe>>(),
         );
 
-        deserialize_individually!(
-            ecs,
-            de,
-            d,
-            Position,
-            Renderable,
-            Player,
-            Viewshed,
-            Monster,
-            Name,
-            BlocksTile,
-            SufferDamage,
-            WantsToMelee,
-            Item,
-            Consumable,
-            Ranged,
-            InflictsDamage,
-            AreaOfEffect,
-            Confusion,
-            ProvidesHealing,
-            InBackpack,
-            WantsToPickupItem,
-            WantsToUseItem,
-            WantsToDropItem,
-            SerializationHelper,
-            Equippable,
-            Equipped,
-            MeleeWeapon,
-            Wearable,
-            WantsToRemoveItem,
-            ParticleLifetime,
-            HungerClock,
-            ProvidesFood,
-            MagicMapper,
-            Hidden,
-            EntryTrigger,
-            EntityMoved,
-            SingleActivation,
-            BlocksVisibility,
-            Door,
-            Bystander,
-            Vendor,
-            Quips,
-            Attributes,
-            Skills,
-            Pools,
-            NaturalAttackDefense,
-            LootTable,
-            Carnivore,
-            Herbivore,
-            OtherLevelPosition,
-            DMSerializationHelper,
-            LightSource
+        #[rustfmt::skip]
+        deserialize_individually!(ecs, de, d, Position, Renderable, Player, Viewshed,
+            Name, BlocksTile, SufferDamage, WantsToMelee, Item, Consumable, Ranged, InflictsDamage,
+            AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
+            WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleeWeapon, Wearable,
+            WantsToRemoveItem, ParticleLifetime, HungerClock, ProvidesFood, MagicMapper, Hidden,
+            EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
+            Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
+            OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
+            WantsToApproach, WantsToFlee, MoveMode, Chasing
         );
     }
 
@@ -211,12 +126,11 @@ pub fn load_game(ecs: &mut World) {
     let mut deleteme2: Option<Entity> = None;
     {
         let entities = ecs.entities();
+        let player = ecs.read_storage::<Player>();
+        let position = ecs.read_storage::<Position>();
 
         let helper = ecs.read_storage::<SerializationHelper>();
         let helper2 = ecs.read_storage::<DMSerializationHelper>();
-
-        let player = ecs.read_storage::<Player>();
-        let position = ecs.read_storage::<Position>();
 
         for (e, h) in (&entities, &helper).join() {
             let mut worldmap = ecs.write_resource::<crate::map::Map>();
@@ -238,6 +152,7 @@ pub fn load_game(ecs: &mut World) {
             *player_resource = e;
         }
     }
+
     ecs.delete_entity(deleteme.unwrap()).expect("Unable to delete helper");
     ecs.delete_entity(deleteme2.unwrap()).expect("Unable to delete helper");
 }

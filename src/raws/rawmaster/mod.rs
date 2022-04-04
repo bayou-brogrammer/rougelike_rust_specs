@@ -2,7 +2,10 @@ use regex::Regex;
 use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
-pub use super::{structs::BaseRawComponent, Raws};
+pub use super::{
+    structs::{BaseRawComponent, Reaction},
+    Raws,
+};
 use crate::{components::*, gamesystem::*, random_table::RandomTable};
 
 mod load_helpers;
@@ -46,6 +49,7 @@ pub struct RawMaster {
     mob_index: HashMap<String, usize>,
     prop_index: HashMap<String, usize>,
     loot_index: HashMap<String, usize>,
+    faction_index: HashMap<String, HashMap<String, Reaction>>,
 }
 
 impl RawMaster {
@@ -57,22 +61,19 @@ impl RawMaster {
                 props: Vec::new(),
                 spawn_table: Vec::new(),
                 loot_tables: Vec::new(),
+                faction_table: Vec::new(),
             },
             item_index: HashMap::new(),
             mob_index: HashMap::new(),
             prop_index: HashMap::new(),
             loot_index: HashMap::new(),
+            faction_index: HashMap::new(),
         }
     }
 
     pub fn load(&mut self, raws: Raws) {
         self.raws = raws;
-
         self.item_index = HashMap::new();
-        self.mob_index = HashMap::new();
-        self.prop_index = HashMap::new();
-        self.loot_index = HashMap::new();
-
         let mut used_names: HashSet<String> = HashSet::new();
 
         // Items
@@ -95,6 +96,24 @@ impl RawMaster {
         // Loot Table
         for (i, loot) in self.raws.loot_tables.iter().enumerate() {
             self.loot_index.insert(loot.name.clone(), i);
+        }
+
+        // Faction Table
+        for faction in self.raws.faction_table.iter() {
+            let mut reactions: HashMap<String, Reaction> = HashMap::new();
+
+            for other in faction.responses.iter() {
+                reactions.insert(
+                    other.0.clone(),
+                    match other.1.as_str() {
+                        "ignore" => Reaction::Ignore,
+                        "flee" => Reaction::Flee,
+                        _ => Reaction::Attack,
+                    },
+                );
+            }
+
+            self.faction_index.insert(faction.name.clone(), reactions);
         }
     }
 }
@@ -189,43 +208,36 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
 pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
     let (mut eb, mob_template) = build_base_entity(raws, ecs, &raws.raws.mobs, &raws.mob_index, key, pos);
 
-    match mob_template.ai.as_ref() {
-        "melee" => eb = eb.with(Monster {}),
-        "bystander" => eb = eb.with(Bystander {}),
-        "vendor" => eb = eb.with(Vendor {}),
-        "carnivore" => eb = eb.with(Carnivore {}),
-        "herbivore" => eb = eb.with(Herbivore {}),
-        _ => {},
+    match mob_template.movement.as_ref() {
+        "random" => eb = eb.with(MoveMode { mode: Movement::Random }),
+        "random_waypoint" => {
+            eb = eb.with(MoveMode {
+                mode: Movement::RandomWaypoint { path: None },
+            })
+        },
+        _ => eb = eb.with(MoveMode { mode: Movement::Static }),
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // BlocksTile
-    ///////////////////////////////////////////////////////////////////////////
     if mob_template.blocks_tile {
         eb = eb.with(BlocksTile {});
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // Viewshed
-    ///////////////////////////////////////////////////////////////////////////
     eb = eb.with(Viewshed {
         visible_tiles: Vec::new(),
         range: mob_template.vision_range,
         dirty: true,
     });
 
-    ///////////////////////////////////////////////////////////////////////////
     // Quips
-    ///////////////////////////////////////////////////////////////////////////
     if let Some(quips) = &mob_template.quips {
         eb = eb.with(Quips {
             available: quips.clone(),
         });
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // Natural Attack
-    ///////////////////////////////////////////////////////////////////////////
     if let Some(na) = &mob_template.natural {
         let mut nature = NaturalAttackDefense {
             armor_class: na.armor_class,
@@ -351,21 +363,29 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
     }
     eb = eb.with(skills);
 
-    ///////////////////////////////////////////////////////////////////////////
     // Loot Table
-    ///////////////////////////////////////////////////////////////////////////
     if let Some(loot) = &mob_template.loot_table {
         eb = eb.with(LootTable { table: loot.clone() });
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // Lighting
-    ///////////////////////////////////////////////////////////////////////////
     if let Some(light) = &mob_template.light {
         eb = eb.with(LightSource {
             range: light.range,
             color: rltk::RGB::from_hex(&light.color).expect("Bad color"),
         });
+    }
+
+    // Initiative of 2
+    eb = eb.with(Initiative { current: 2 });
+
+    // Faction
+    if let Some(faction) = &mob_template.faction {
+        eb = eb.with(Faction { name: faction.clone() });
+    } else {
+        eb = eb.with(Faction {
+            name: "Mindless".to_string(),
+        })
     }
 
     // Build a mob person thing
@@ -446,6 +466,22 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
     }
 
     rt
+}
+
+pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster) -> Reaction {
+    if raws.faction_index.contains_key(my_faction) {
+        let mf = &raws.faction_index[my_faction];
+
+        if mf.contains_key(their_faction) {
+            return mf[their_faction];
+        } else if mf.contains_key("Default") {
+            return mf["Default"];
+        } else {
+            return Reaction::Ignore;
+        }
+    }
+
+    Reaction::Ignore
 }
 
 pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {

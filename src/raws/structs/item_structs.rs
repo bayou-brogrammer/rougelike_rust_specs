@@ -3,6 +3,17 @@ use std::collections::HashMap;
 
 use super::BaseRawComponent;
 
+// Trait Implementations
+impl BaseRawComponent for Item {
+    fn name(&self) -> String { self.name.clone() }
+    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
+    // fn as_any(&self) -> &dyn Any { self }
+}
+
+impl<T: BaseRawComponent> From<&T> for Item {
+    fn from(base: &T) -> Self { base.into() }
+}
+
 #[derive(Deserialize, Debug, Clone)]
 pub struct Item {
     pub name: String,
@@ -37,15 +48,4 @@ pub struct Weapon {
 pub struct Wearable {
     pub armor_class: f32,
     pub slot: String,
-}
-
-// Trait Implementations
-impl BaseRawComponent for Item {
-    fn name(&self) -> String { self.name.clone() }
-    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    // fn as_any(&self) -> &dyn Any { self }
-}
-
-impl<T: BaseRawComponent> From<&T> for Item {
-    fn from(base: &T) -> Self { base.into() }
 }

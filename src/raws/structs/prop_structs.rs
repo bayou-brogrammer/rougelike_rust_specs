@@ -3,6 +3,16 @@ use std::collections::HashMap;
 
 use super::{BaseRawComponent, Renderable};
 
+// Trait Implementations
+impl BaseRawComponent for Prop {
+    fn name(&self) -> String { self.name.clone() }
+    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
+}
+
+impl<T: BaseRawComponent> From<&T> for Prop {
+    fn from(base: &T) -> Self { base.into() }
+}
+
 #[derive(Deserialize, Debug, Clone)]
 pub struct Prop {
     pub name: String,
@@ -17,15 +27,4 @@ pub struct Prop {
 #[derive(Deserialize, Debug, Clone)]
 pub struct EntryTrigger {
     pub effects: HashMap<String, String>,
-}
-
-// Trait Implementations
-impl BaseRawComponent for Prop {
-    fn name(&self) -> String { self.name.clone() }
-    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    // fn as_any(&self) -> &dyn std::any::Any { todo!() }
-}
-
-impl<T: BaseRawComponent> From<&T> for Prop {
-    fn from(base: &T) -> Self { base.into() }
 }
