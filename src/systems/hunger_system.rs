@@ -17,7 +17,7 @@ impl<'a> System<'a> for HungerSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut hunger_clock, player_entity, runstate, mut inflict_damage, mut log, turns) = data;
+        let (entities, mut hunger_clock, player_entity, _runstate, mut inflict_damage, mut log, turns) = data;
 
         for (entity, mut clock, _myturn) in (&entities, &mut hunger_clock, &turns).join() {
             clock.duration -= 1;
@@ -50,7 +50,6 @@ impl<'a> System<'a> for HungerSystem {
                             log.entries
                                 .push("Your hunger pangs are getting painful! You suffer 1 hp damage.".to_string());
                         }
-
                         SufferDamage::new_damage(&mut inflict_damage, entity, 1, false);
                     },
                 }

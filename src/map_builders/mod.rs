@@ -101,21 +101,19 @@ pub trait MetaMapBuilder {
 }
 
 fn random_start_position(rng: &mut rltk::RandomNumberGenerator) -> (XStart, YStart) {
-    let x;
     let xroll = rng.roll_dice(1, 3);
-    match xroll {
-        1 => x = XStart::Left,
-        2 => x = XStart::Center,
-        _ => x = XStart::Right,
-    }
+    let x = match xroll {
+        1 => XStart::Left,
+        2 => XStart::Center,
+        _ => XStart::Right,
+    };
 
-    let y;
     let yroll = rng.roll_dice(1, 3);
-    match yroll {
-        1 => y = YStart::Bottom,
-        2 => y = YStart::Center,
-        _ => y = YStart::Top,
-    }
+    let y = match yroll {
+        1 => YStart::Bottom,
+        2 => YStart::Center,
+        _ => YStart::Top,
+    };
 
     (x, y)
 }

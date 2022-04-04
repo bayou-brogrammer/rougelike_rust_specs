@@ -135,7 +135,7 @@ pub fn load_game(ecs: &mut World) {
         for (e, h) in (&entities, &helper).join() {
             let mut worldmap = ecs.write_resource::<crate::map::Map>();
             *worldmap = h.map.clone();
-            worldmap.tile_content = vec![Vec::new(); (worldmap.height * worldmap.width) as usize];
+            crate::spatial::set_size((worldmap.height * worldmap.width) as usize);
             deleteme = Some(e);
         }
 

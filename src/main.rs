@@ -17,6 +17,7 @@ mod gui;
 mod map;
 mod player;
 mod rect;
+mod spatial;
 mod spawner;
 mod systems;
 
