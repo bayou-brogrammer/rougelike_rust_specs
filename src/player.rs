@@ -1,8 +1,6 @@
 use specs::prelude::*;
 use std::cmp::{max, min};
 
-use crate::{raws::faction_structs::Reaction, Faction};
-
 use super::{
     gamelog::GameLog,
     Attributes,
@@ -10,6 +8,7 @@ use super::{
     BlocksVisibility,
     Door,
     EntityMoved,
+    Faction,
     HungerClock,
     HungerState,
     Item,
@@ -21,19 +20,19 @@ use super::{
     RunState,
     State,
     TileType,
+    Vendor,
+    VendorMode,
     Viewshed,
     WantsToMelee,
     WantsToPickupItem,
 };
+use crate::raws::faction_structs::Reaction;
+
 use rltk::{Point, Rltk, VirtualKeyCode};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState {
     let entities = ecs.entities();
     let map = ecs.fetch::<Map>();
-
-    let combat_stats = ecs.read_storage::<Attributes>();
-    let factions = ecs.read_storage::<Faction>();
-    let players = ecs.read_storage::<Player>();
 
     let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
     let mut blocks_movement = ecs.write_storage::<BlocksTile>();
@@ -43,6 +42,11 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     let mut renderables = ecs.write_storage::<Renderable>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+
+    let combat_stats = ecs.read_storage::<Attributes>();
+    let factions = ecs.read_storage::<Faction>();
+    let players = ecs.read_storage::<Player>();
+    let vendors = ecs.read_storage::<Vendor>();
 
     let mut result = RunState::AwaitingInput;
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
@@ -58,6 +62,13 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
         result = crate::spatial::for_each_tile_content_with_gamemode(destination_idx, |potential_target| {
+            if let Some(_vendor) = vendors.get(potential_target) {
+                return Some(RunState::ShowVendor {
+                    vendor: potential_target,
+                    mode: VendorMode::Sell,
+                });
+            }
+
             let mut hostile = true;
 
             // Check if not hostile

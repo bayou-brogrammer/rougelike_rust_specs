@@ -17,7 +17,9 @@
       "Melee": 2
     },
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6",
+    "vendor": ["food"]
   },
 
   {
@@ -33,7 +35,9 @@
     "movement": "static",
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6",
+    "vendor": ["junk"]
   },
 
   {
@@ -54,7 +58,8 @@
     ],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d4"
   },
 
   {
@@ -70,7 +75,8 @@
     "movement": "static",
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6"
   },
 
   {
@@ -91,7 +97,8 @@
     ],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d4"
   },
 
   {
@@ -107,7 +114,9 @@
     "movement": "static",
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6",
+    "vendor": ["armor", "weapon"]
   },
 
   {
@@ -123,7 +132,9 @@
     "movement": "static",
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6",
+    "vendor": ["clothes"]
   },
 
   {
@@ -139,7 +150,9 @@
     "movement": "static",
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6",
+    "vendor": ["alchemy"]
   },
 
   {
@@ -161,7 +174,8 @@
     ],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6"
   },
 
   {
@@ -178,7 +192,8 @@
     "quips": ["Why are you in my house?"],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d2"
   },
 
   {
@@ -195,7 +210,8 @@
     "quips": ["Lovely day, eh?", "Nice weather", "Hello"],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d2"
   },
 
   {
@@ -216,7 +232,8 @@
     ],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d2"
   },
 
   {
@@ -233,7 +250,8 @@
     "quips": ["Arrr", "Grog!", "Booze!"],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "2d6"
   },
 
   {
@@ -250,7 +268,8 @@
     "quips": ["Hic", "Need... more... booze!", "Spare a copper?"],
     "attributes": {},
     "equipped": ["Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers"],
-    "faction": "Townsfolk"
+    "faction": "Townsfolk",
+    "gold": "1d2"
   },
 
   {
@@ -378,7 +397,8 @@
       "range": 6,
       "color": "#FFFF55"
     },
-    "faction": "Bandits"
+    "faction": "Bandits",
+    "gold": "1d6"
   },
 
   {
@@ -393,7 +413,8 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {},
-    "faction": "Cave Goblins"
+    "faction": "Cave Goblins",
+    "gold": "1d8"
   },
 
   {
@@ -408,7 +429,8 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {},
-    "faction": "Cave Goblins"
+    "faction": "Cave Goblins",
+    "gold": "1d6"
   },
 
   {
@@ -423,7 +445,8 @@
     "vision_range": 4,
     "movement": "static",
     "attributes": {},
-    "faction": "Cave Goblins"
+    "faction": "Cave Goblins",
+    "gold": "1d4"
   },
 
   {

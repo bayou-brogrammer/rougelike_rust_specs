@@ -123,7 +123,11 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
     let (mut eb, item_template) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
 
     // Item Component
-    eb = eb.with(crate::components::Item {});
+    eb = eb.with(crate::components::Item {
+        initiative_penalty: item_template.initiative_penalty.unwrap_or(0.0),
+        weight_lbs: item_template.weight_lbs.unwrap_or(0.0),
+        base_value: item_template.base_value.unwrap_or(0.0),
+    });
 
     // Consumable Component
     if let Some(consumable) = &item_template.consumable {
@@ -332,6 +336,15 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
             current: mob_mana,
             max: mob_mana,
         },
+        total_weight: 0.0,
+        total_initiative_penalty: 0.0,
+        gold: if let Some(gold) = &mob_template.gold {
+            let mut rng = rltk::RandomNumberGenerator::new();
+            let (n, d, b) = parse_dice_string(gold);
+            (rng.roll_dice(n, d) + b) as f32
+        } else {
+            0.0
+        },
     };
     eb = eb.with(pools);
 
@@ -386,6 +399,16 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
         eb = eb.with(Faction {
             name: "Mindless".to_string(),
         })
+    }
+
+    // Start With EquipmentChanged
+    eb = eb.with(EquipmentChanged {});
+
+    // Vendor
+    if let Some(vendor) = &mob_template.vendor {
+        eb = eb.with(Vendor {
+            categories: vendor.clone(),
+        });
     }
 
     // Build a mob person thing

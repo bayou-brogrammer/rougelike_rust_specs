@@ -46,11 +46,15 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
                 max: mana_at_level(11, 1)
             },
             xp: 0,
-            level: 1
+            level: 1,
+            total_weight : 0.0,
+            total_initiative_penalty : 0.0,
+            gold : 0.0
         })
         .with(LightSource{ color: rltk::RGB::from_f32(1.0, 1.0, 0.5), range: 8 })
         .with(Initiative{current: 0})
         .with(Faction{name : "Player".to_string() })
+        .with(EquipmentChanged{})
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 

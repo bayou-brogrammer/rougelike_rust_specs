@@ -61,7 +61,7 @@ pub fn save_game(ecs: &mut World) {
             EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
             OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
-            WantsToApproach, WantsToFlee, MoveMode, Chasing
+            WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor
         );
     }
 
@@ -118,7 +118,7 @@ pub fn load_game(ecs: &mut World) {
             EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
             OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
-            WantsToApproach, WantsToFlee, MoveMode, Chasing
+            WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor
         );
     }
 

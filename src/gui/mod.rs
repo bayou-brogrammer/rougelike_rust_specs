@@ -10,6 +10,9 @@ pub use cheat_menu::*;
 mod tooltip;
 use tooltip::*;
 
+mod vendor;
+pub use vendor::*;
+
 pub fn draw_hollow_box(console: &mut Rltk, sx: i32, sy: i32, width: i32, height: i32, fg: RGB, bg: RGB) {
     use rltk::to_cp437;
 
@@ -137,8 +140,35 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     draw_attribute("Fitness:", &attr.fitness, 6, ctx);
     draw_attribute("Intelligence:", &attr.intelligence, 7, ctx);
 
+    // Initiative and weight
+    ctx.print_color(
+        50,
+        9,
+        white,
+        black,
+        &format!(
+            "{:.0} lbs ({} lbs max)",
+            player_pools.total_weight,
+            (attr.might.base + attr.might.modifiers) * 15
+        ),
+    );
+    ctx.print_color(
+        50,
+        10,
+        white,
+        black,
+        &format!("Initiative Penalty: {:.0}", player_pools.total_initiative_penalty),
+    );
+    ctx.print_color(
+        50,
+        11,
+        rltk::RGB::named(rltk::GOLD),
+        black,
+        &format!("Gold: {:.1}", player_pools.gold),
+    );
+
     // Equipped
-    let mut y = 9;
+    let mut y = 13;
     let equipped = ecs.read_storage::<Equipped>();
     let name = ecs.read_storage::<Name>();
     for (equipped_by, item_name) in (&equipped, &name).join() {

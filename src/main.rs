@@ -22,21 +22,29 @@ mod spawner;
 mod systems;
 
 use player::*;
-use systems::*;
+use systems::{damage_system, particle_system, saveload_system};
 
 pub mod camera;
 pub mod map_builders;
 pub mod random_table;
 pub mod raws;
 pub mod rex_assets;
+pub mod state;
 
 pub use components::*;
 pub use gamelog::GameLog;
 pub use gamesystem::*;
 pub use map::*;
 pub use rect::Rect;
+pub use state::*;
 
 const SHOW_MAPGEN_VISUALIZER: bool = false;
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum VendorMode {
+    Buy,
+    Sell,
+}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -55,83 +63,7 @@ pub enum RunState {
     MagicMapReveal { row: i32 },
     MapGeneration,
     ShowCheatMenu,
-}
-
-pub struct State {
-    pub ecs: World,
-    mapgen_next_state: Option<RunState>,
-    mapgen_history: Vec<Map>,
-    mapgen_index: usize,
-    mapgen_timer: f32,
-}
-
-impl State {
-    fn run_systems(&mut self) {
-        let mut mapindex = MapIndexingSystem {};
-        mapindex.run_now(&self.ecs);
-
-        let mut vis = VisibilitySystem {};
-        vis.run_now(&self.ecs);
-
-        let mut initiative = ai::InitiativeSystem {};
-        initiative.run_now(&self.ecs);
-
-        let mut turnstatus = ai::TurnStatusSystem {};
-        turnstatus.run_now(&self.ecs);
-
-        let mut quipper = ai::QuipSystem {};
-        quipper.run_now(&self.ecs);
-
-        let mut adjacent = ai::AdjacentAI {};
-        adjacent.run_now(&self.ecs);
-
-        let mut visible = ai::VisibleAI {};
-        visible.run_now(&self.ecs);
-
-        let mut approach = ai::ApproachAI {};
-        approach.run_now(&self.ecs);
-
-        let mut flee = ai::FleeAI {};
-        flee.run_now(&self.ecs);
-
-        let mut chase = ai::ChaseAI {};
-        chase.run_now(&self.ecs);
-
-        let mut defaultmove = ai::DefaultMoveAI {};
-        defaultmove.run_now(&self.ecs);
-
-        let mut triggers = TriggerSystem {};
-        triggers.run_now(&self.ecs);
-
-        let mut melee = MeleeCombatSystem {};
-        melee.run_now(&self.ecs);
-
-        let mut damage = DamageSystem {};
-        damage.run_now(&self.ecs);
-
-        let mut pickup = ItemCollectionSystem {};
-        pickup.run_now(&self.ecs);
-
-        let mut itemuse = ItemUseSystem {};
-        itemuse.run_now(&self.ecs);
-
-        let mut drop_items = ItemDropSystem {};
-        drop_items.run_now(&self.ecs);
-
-        let mut item_remove = ItemRemoveSystem {};
-        item_remove.run_now(&self.ecs);
-
-        let mut hunger = hunger_system::HungerSystem {};
-        hunger.run_now(&self.ecs);
-
-        let mut particles = particle_system::ParticleSpawnSystem {};
-        particles.run_now(&self.ecs);
-
-        let mut lighting = LightingSystem {};
-        lighting.run_now(&self.ecs);
-
-        self.ecs.maintain();
-    }
+    ShowVendor { vendor: Entity, mode: VendorMode },
 }
 
 impl GameState for State {
@@ -272,6 +204,28 @@ impl GameState for State {
                     },
                 }
             },
+            RunState::ShowVendor { vendor, mode } => {
+                let result = gui::show_vendor_menu(self, ctx, vendor, mode);
+
+                match result.0 {
+                    gui::VendorResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::VendorResult::NoResponse => {},
+                    gui::VendorResult::BuyMode => {
+                        newrunstate = RunState::ShowVendor {
+                            vendor,
+                            mode: VendorMode::Buy,
+                        }
+                    },
+                    gui::VendorResult::SellMode => {
+                        newrunstate = RunState::ShowVendor {
+                            vendor,
+                            mode: VendorMode::Sell,
+                        }
+                    },
+                    gui::VendorResult::Buy => self.buy_items(result.2, result.3),
+                    gui::VendorResult::Sell => self.sell_items(result.1),
+                }
+            },
             RunState::ShowCheatMenu => {
                 let result = gui::show_cheat_mode(self, ctx);
                 match result {
@@ -357,71 +311,24 @@ impl GameState for State {
     }
 }
 
-impl State {
-    fn goto_level(&mut self, offset: i32) {
-        freeze_level_entities(&mut self.ecs);
-
-        // Build a new map and place the player
-        let current_depth = self.ecs.fetch::<Map>().depth;
-        self.generate_world_map(current_depth + offset, offset);
-
-        // Notify the player
-        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.entries.push("You change level.".to_string());
-    }
-
-    fn game_over_cleanup(&mut self) {
-        // Delete everything
-        let mut to_delete = Vec::new();
-        for e in self.ecs.entities().join() {
-            to_delete.push(e);
-        }
-        for del in to_delete.iter() {
-            self.ecs.delete_entity(*del).expect("Deletion failed");
-        }
-
-        // Spawn a new player
-        {
-            let player_entity = spawner::player(&mut self.ecs, 0, 0);
-            let mut player_entity_writer = self.ecs.write_resource::<Entity>();
-            *player_entity_writer = player_entity;
-        }
-
-        // Replace the world maps
-        self.ecs.insert(map::MasterDungeonMap::new());
-
-        // Build a new map and place the player
-        self.generate_world_map(1, 0);
-    }
-
-    fn generate_world_map(&mut self, new_depth: i32, offset: i32) {
-        self.mapgen_index = 0;
-        self.mapgen_timer = 0.0;
-        self.mapgen_history.clear();
-        let map_building_info = map::level_transition(&mut self.ecs, new_depth, offset);
-        if let Some(history) = map_building_info {
-            self.mapgen_history = history;
-        } else {
-            map::thaw_level_entities(&mut self.ecs);
-        }
-    }
-}
-
 fn main() -> rltk::BError {
     use rltk::RltkBuilder;
+
     let mut context = RltkBuilder::simple(80, 60)
         .unwrap()
         .with_title("Roguelike Tutorial")
         .build()?;
+
     context.with_post_scanlines(true);
+
     let mut gs = State {
         ecs: World::new(),
-        mapgen_next_state: Some(RunState::MainMenu {
-            menu_selection: gui::MainMenuSelection::NewGame,
-        }),
         mapgen_index: 0,
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0,
+        mapgen_next_state: Some(RunState::MainMenu {
+            menu_selection: gui::MainMenuSelection::NewGame,
+        }),
     };
 
     gs.ecs.register::<AreaOfEffect>();
@@ -434,6 +341,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Door>();
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
+    gs.ecs.register::<EquipmentChanged>();
     gs.ecs.register::<Equippable>();
     gs.ecs.register::<Equipped>();
     gs.ecs.register::<Faction>();
@@ -464,6 +372,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Skills>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<SufferDamage>();
+    gs.ecs.register::<Vendor>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<WantsToApproach>();
     gs.ecs.register::<WantsToDropItem>();

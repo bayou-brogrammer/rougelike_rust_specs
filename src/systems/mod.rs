@@ -2,12 +2,13 @@
 
 pub mod damage_system;
 pub mod hunger_system;
+pub mod particle_system;
+pub mod saveload_system;
+
 mod inventory_system;
 mod lighting_system;
 mod map_indexing_system;
 mod melee_combat_system;
-pub mod particle_system;
-pub mod saveload_system;
 mod trigger_system;
 mod visibility_system;
 
