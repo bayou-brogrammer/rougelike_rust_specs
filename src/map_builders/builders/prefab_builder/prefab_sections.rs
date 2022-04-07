@@ -26,47 +26,72 @@ pub const UNDERGROUND_FORT : PrefabSection = PrefabSection{
 #[allow(dead_code)]
 // The padding needs to be here!
 const RIGHT_FORT : &str = "
-     #         
-  #######      
-  #     #      
-  #     #######
-  #  g        #
-  #     #######
-  #     #      
-  ### ###      
-    # #        
-    # #        
-    # ##       
-    ^          
-    ^          
-    # ##       
-    # #        
-    # #        
-    # #        
-    # #        
-  ### ###      
-  #     #      
-  #     #      
-  #  g  #      
-  #     #      
-  #     #      
-  ### ###      
-    # #        
-    # #        
-    # #        
-    # ##       
-    ^          
-    ^          
-    # ##       
-    # #        
-    # #        
-    # #        
-  ### ###      
-  #     #      
-  #     #######
-  #  g        #
-  #     #######
-  #     #      
-  #######      
-     #         
+     #         
+  #######      
+  #     #      
+  #     #######
+  #  g        #
+  #     #######
+  #     #      
+  ### ###      
+    # #        
+    # #        
+    # ##       
+    ^          
+    ^          
+    # ##       
+    # #        
+    # #        
+    # #        
+    # #        
+  ### ###      
+  #     #      
+  #     #      
+  #  g  #      
+  #     #      
+  #     #      
+  ### ###      
+    # #        
+    # #        
+    # #        
+    # ##       
+    ^          
+    ^          
+    # ##       
+    # #        
+    # #        
+    # #        
+  ### ###      
+  #     #      
+  #     #######
+  #  g        #
+  #     #######
+  #     #      
+  #######      
+     #         
+";
+
+#[allow(dead_code)]
+pub const ORC_CAMP : PrefabSection = PrefabSection{
+    template : ORC_CAMP_TXT,
+    width: 12,
+    height: 12,
+    placement: ( HorizontalPlacement::Center, VerticalPlacement::Center )
+};
+
+#[allow(dead_code)]
+const ORC_CAMP_TXT : &str = "
+            
+ ########## 
+ ≈☼      ☼≈ 
+ ≈ g      ≈ 
+ ≈        ≈ 
+ ≈    g   ≈ 
+ o   O    o 
+ ≈        ≈ 
+ ≈ g      ≈ 
+ ≈    g   ≈ 
+ ≈☼      ☼≈ 
+ ≈≈≈≈o≈≈≈≈≈ 
+            
 ";

@@ -345,6 +345,7 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
         } else {
             0.0
         },
+        god_mode: false,
     };
     eb = eb.with(pools);
 
@@ -461,6 +462,20 @@ pub fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::Prop) -
                 _ => {},
             }
         }
+    }
+
+    // Light Source
+    if let Some(light) = &prop_template.light {
+        eb = eb.with(LightSource {
+            range: light.range,
+            color: rltk::RGB::from_hex(&light.color).expect("Bad color"),
+        });
+
+        eb = eb.with(Viewshed {
+            range: light.range,
+            dirty: true,
+            visible_tiles: Vec::new(),
+        });
     }
 
     Some(eb.build())

@@ -182,5 +182,25 @@
       "order": 2
     },
     "hidden": false
+  },
+
+  {
+    "name": "Watch Fire",
+    "renderable": {
+      "glyph": "☼",
+      "fg": "#FFFF55",
+      "bg": "#000000",
+      "order": 2
+    },
+    "hidden": false,
+    "light": {
+      "range": 6,
+      "color": "#FFFF55"
+    },
+    "entry_trigger": {
+      "effects": {
+        "damage": "6"
+      }
+    }
   }
 ]

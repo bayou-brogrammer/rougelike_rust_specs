@@ -114,6 +114,15 @@ impl PrefabBuilder {
                 build_data.map.tiles[idx] = TileType::Floor;
                 build_data.spawn_list.push((idx, "Health Potion".to_string()));
             },
+            '≈' => build_data.map.tiles[idx] = TileType::DeepWater,
+            'O' => {
+                build_data.map.tiles[idx] = TileType::Floor;
+                build_data.spawn_list.push((idx, "Orc Leader".to_string()));
+            },
+            '☼' => {
+                build_data.map.tiles[idx] = TileType::Floor;
+                build_data.spawn_list.push((idx, "Watch Fire".to_string()));
+            },
             _ => {
                 rltk::console::log(format!("Unknown glyph loading map: {}", (ch as u8) as char));
             },
@@ -222,10 +231,7 @@ impl PrefabBuilder {
         let mut i = 0;
         for ty in 0..section.height {
             for tx in 0..section.width {
-                if tx > 0
-                    && tx < build_data.map.width as usize - 1
-                    && ty < build_data.map.height as usize - 1
-                    && ty > 0
+                if tx > 0 && tx < build_data.map.width as usize - 1 && ty < build_data.map.height as usize - 1 && ty > 0
                 {
                     let idx = build_data.map.xy_idx(tx as i32 + chunk_x, ty as i32 + chunk_y);
                     if i < string_vec.len() {
@@ -330,10 +336,7 @@ impl PrefabBuilder {
                     let idx = e.0 as i32;
                     let x = idx % width;
                     let y = idx / height;
-                    x < chunk_x
-                        || x > chunk_x + vault.width as i32
-                        || y < chunk_y
-                        || y > chunk_y + vault.height as i32
+                    x < chunk_x || x > chunk_x + vault.width as i32 || y < chunk_y || y > chunk_y + vault.height as i32
                 });
 
                 let string_vec = PrefabBuilder::read_ascii_to_vec(vault.template);

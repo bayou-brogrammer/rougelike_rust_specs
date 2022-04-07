@@ -516,5 +516,23 @@
       "range": 4,
       "color": "#550000"
     }
+  },
+
+  {
+    "name": "Orc Leader",
+    "renderable": {
+      "glyph": "O",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "movement": "static",
+    "attributes": {},
+    "faction": "Cave Goblins",
+    "gold": "3d8",
+    "equipped": ["Battleaxe", "Tower Shield", "Leather Armor", "Leather Boots"],
+    "level": 2
   }
 ]

@@ -2,7 +2,10 @@ use specs::prelude::*;
 
 use crate::{ai, gamelog, map, spawner, systems::*, Map, RunState};
 
+pub mod cheat_actions;
+
 pub mod vendor_actions;
+pub use vendor_actions::VendorMode;
 
 pub struct State {
     pub ecs: World,

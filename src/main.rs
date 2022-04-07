@@ -41,12 +41,6 @@ pub use state::*;
 const SHOW_MAPGEN_VISUALIZER: bool = false;
 
 #[derive(PartialEq, Copy, Clone)]
-pub enum VendorMode {
-    Buy,
-    Sell,
-}
-
-#[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
     AwaitingInput,
     PreRun,
@@ -228,15 +222,7 @@ impl GameState for State {
             },
             RunState::ShowCheatMenu => {
                 let result = gui::show_cheat_mode(self, ctx);
-                match result {
-                    gui::CheatMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
-                    gui::CheatMenuResult::NoResponse => {},
-                    gui::CheatMenuResult::TeleportToExit => {
-                        self.goto_level(1);
-                        self.mapgen_next_state = Some(RunState::PreRun);
-                        newrunstate = RunState::MapGeneration;
-                    },
-                }
+                newrunstate = self.handle_cheat_action(result);
             },
             RunState::MainMenu { .. } => {
                 let result = gui::main_menu(self, ctx);
