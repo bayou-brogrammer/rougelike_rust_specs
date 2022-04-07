@@ -534,5 +534,84 @@
     "gold": "3d8",
     "equipped": ["Battleaxe", "Tower Shield", "Leather Armor", "Leather Boots"],
     "level": 2
+  },
+
+  {
+    "name": "Dragon Wyrmling",
+    "renderable": {
+      "glyph": "d",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 12,
+    "movement": "random_waypoint",
+    "attributes": {
+      "might": 3,
+      "fitness": 3
+    },
+    "skills": {
+      "Melee": 15,
+      "Defense": 14
+    },
+    "natural": {
+      "armor_class": 15,
+      "attacks": [{ "name": "bite", "hit_bonus": 4, "damage": "1d10+2" }]
+    },
+    "loot_table": "Wyrms",
+    "faction": "Wyrm",
+    "level": 3,
+    "gold": "3d6"
+  },
+
+  {
+    "name": "Lizardman",
+    "renderable": {
+      "glyph": "l",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 4,
+    "movement": "random_waypoint",
+    "attributes": {},
+    "faction": "Wyrm",
+    "gold": "1d12",
+    "level": 2
+  },
+
+  {
+    "name": "Giant Lizard",
+    "renderable": {
+      "glyph": "l",
+      "fg": "#FFFF00",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 4,
+    "movement": "random",
+    "attributes": {},
+    "faction": "Wyrm",
+    "level": 2,
+    "loot_table": "Animal"
+  },
+
+  {
+    "name": "Rock Golem",
+    "renderable": {
+      "glyph": "g",
+      "fg": "#AAAAAA",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 6,
+    "movement": "random_waypoint",
+    "attributes": {},
+    "faction": "Dwarven Remnant",
+    "level": 3
   }
 ]

@@ -46,5 +46,14 @@
   { "name": "Leather Armor", "weight": 1, "min_depth": 2, "max_depth": 100 },
   { "name": "Leather Boots", "weight": 1, "min_depth": 2, "max_depth": 100 },
   { "name": "Chainmail Armor", "weight": 1, "min_depth": 4, "max_depth": 100 },
-  { "name": "Chain Coif", "weight": 1, "min_depth": 4, "max_depth": 100 }
+  { "name": "Chain Coif", "weight": 1, "min_depth": 4, "max_depth": 100 },
+  { "name": "Dragon Wyrmling", "weight": 1, "min_depth": 5, "max_depth": 7 },
+  { "name": "Lizardman", "weight": 10, "min_depth": 5, "max_depth": 7 },
+  { "name": "Giant Lizard", "weight": 4, "min_depth": 5, "max_depth": 7 },
+  { "name": "Rock Golem", "weight": 4, "min_depth": 5, "max_depth": 7 },
+  { "name": "Stonefall Trap", "weight": 4, "min_depth": 5, "max_depth": 7 },
+  { "name": "Landmine", "weight": 1, "min_depth": 5, "max_depth": 7 },
+  { "name": "Breastplate", "weight": 7, "min_depth": 5, "max_depth": 7 },
+  { "name": "War Axe", "weight": 7, "min_depth": 5, "max_depth": 7 },
+  { "name": "Dwarf-Steel Shirt", "weight": 1, "min_depth": 5, "max_depth": 7 }
 ]

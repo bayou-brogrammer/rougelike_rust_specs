@@ -506,5 +506,73 @@
     "base_value": 20.0,
     "initiative_penalty": 0.5,
     "vendor_category": "armor"
+  },
+
+  {
+    "name": "Dragon Scale",
+    "renderable": {
+      "glyph": "ß",
+      "fg": "#FFD700",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weight_lbs": 2.0,
+    "base_value": 75.0
+  },
+
+  {
+    "name": "Breastplate",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Torso",
+      "armor_class": 3.0
+    },
+    "weight_lbs": 25.0,
+    "base_value": 100.0,
+    "initiative_penalty": 2.0,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Dwarf-Steel Shirt",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Torso",
+      "armor_class": 3.0
+    },
+    "weight_lbs": 5.0,
+    "base_value": 500.0,
+    "initiative_penalty": 0.0,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "War Axe",
+    "renderable": {
+      "glyph": "¶",
+      "fg": "#FF55FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "might",
+      "base_damage": "1d12",
+      "hit_bonus": 0
+    },
+    "weight_lbs": 4.0,
+    "base_value": 100.0,
+    "initiative_penalty": 2,
+    "vendor_category": "weapon"
   }
 ]

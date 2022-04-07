@@ -5,5 +5,12 @@
       { "name": "Hide", "weight": 10 },
       { "name": "Meat", "weight": 10 }
     ]
+  },
+  {
+    "name": "Wyrms",
+    "drops": [
+      { "name": "Dragon Scale", "weight": 10 },
+      { "name": "Meat", "weight": 10 }
+    ]
   }
 ]
