@@ -7,6 +7,9 @@ use rltk::{Point, Rltk, VirtualKeyCode, RGB};
 mod cheat_menu;
 pub use cheat_menu::*;
 
+mod item;
+pub use item::*;
+
 mod tooltip;
 use tooltip::*;
 
@@ -169,26 +172,37 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
 
     // Equipped
     let mut y = 13;
+    let entities = ecs.entities();
     let equipped = ecs.read_storage::<Equipped>();
-    let name = ecs.read_storage::<Name>();
-    for (equipped_by, item_name) in (&equipped, &name).join() {
+    for (entity, equipped_by) in (&entities, &equipped).join() {
         if equipped_by.owner == *player_entity {
-            ctx.print_color(50, y, white, black, &item_name.name);
+            ctx.print_color(
+                50,
+                y,
+                get_item_color(ecs, entity),
+                black,
+                &get_item_display_name(ecs, entity),
+            );
             y += 1;
         }
     }
 
     // Consumables
     y += 1;
-    let green = RGB::from_f32(0.0, 1.0, 0.0);
     let yellow = RGB::named(rltk::YELLOW);
     let consumables = ecs.read_storage::<Consumable>();
     let backpack = ecs.read_storage::<InBackpack>();
     let mut index = 1;
-    for (carried_by, _consumable, item_name) in (&backpack, &consumables, &name).join() {
+    for (entity, carried_by, _consumable) in (&entities, &backpack, &consumables).join() {
         if carried_by.owner == *player_entity && index < 10 {
             ctx.print_color(50, y, yellow, black, &format!("↑{}", index));
-            ctx.print_color(53, y, green, black, &item_name.name);
+            ctx.print_color(
+                53,
+                y,
+                get_item_color(ecs, entity),
+                black,
+                &get_item_display_name(ecs, entity),
+            );
             y += 1;
             index += 1;
         }
@@ -215,256 +229,6 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     }
 
     draw_tooltips(ecs, ctx);
-}
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum ItemMenuResult {
-    Cancel,
-    NoResponse,
-    Selected,
-}
-
-pub fn show_inventory(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
-    let player_entity = gs.ecs.fetch::<Entity>();
-    let names = gs.ecs.read_storage::<Name>();
-    let backpack = gs.ecs.read_storage::<InBackpack>();
-    let entities = gs.ecs.entities();
-
-    let inventory = (&backpack, &names).join().filter(|item| item.0.owner == *player_entity);
-    let count = inventory.count();
-
-    let mut y = (25 - (count / 2)) as i32;
-    ctx.draw_box(
-        15,
-        y - 2,
-        31,
-        (count + 3) as i32,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-    );
-    ctx.print_color(
-        18,
-        y - 2,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "Inventory",
-    );
-    ctx.print_color(
-        18,
-        y + count as i32 + 1,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "ESCAPE to cancel",
-    );
-
-    let mut equippable: Vec<Entity> = Vec::new();
-    for (j, (entity, _pack, name)) in (&entities, &backpack, &names)
-        .join()
-        .filter(|item| item.1.owner == *player_entity)
-        .enumerate()
-    {
-        ctx.set(
-            17,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437('('),
-        );
-        ctx.set(
-            18,
-            y,
-            RGB::named(rltk::YELLOW),
-            RGB::named(rltk::BLACK),
-            97 + j as rltk::FontCharType,
-        );
-        ctx.set(
-            19,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437(')'),
-        );
-
-        ctx.print(21, y, &name.name.to_string());
-        equippable.push(entity);
-        y += 1;
-    }
-
-    match ctx.key {
-        None => (ItemMenuResult::NoResponse, None),
-        Some(key) => match key {
-            VirtualKeyCode::Escape => (ItemMenuResult::Cancel, None),
-            _ => {
-                let selection = rltk::letter_to_option(key);
-                if selection > -1 && selection < count as i32 {
-                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
-                }
-                (ItemMenuResult::NoResponse, None)
-            },
-        },
-    }
-}
-
-pub fn drop_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
-    let player_entity = gs.ecs.fetch::<Entity>();
-    let names = gs.ecs.read_storage::<Name>();
-    let backpack = gs.ecs.read_storage::<InBackpack>();
-    let entities = gs.ecs.entities();
-
-    let inventory = (&backpack, &names).join().filter(|item| item.0.owner == *player_entity);
-    let count = inventory.count();
-
-    let mut y = (25 - (count / 2)) as i32;
-    ctx.draw_box(
-        15,
-        y - 2,
-        31,
-        (count + 3) as i32,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-    );
-    ctx.print_color(
-        18,
-        y - 2,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "Drop Which Item?",
-    );
-    ctx.print_color(
-        18,
-        y + count as i32 + 1,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "ESCAPE to cancel",
-    );
-
-    let mut equippable: Vec<Entity> = Vec::new();
-    for (j, (entity, _pack, name)) in (&entities, &backpack, &names)
-        .join()
-        .filter(|item| item.1.owner == *player_entity)
-        .enumerate()
-    {
-        ctx.set(
-            17,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437('('),
-        );
-        ctx.set(
-            18,
-            y,
-            RGB::named(rltk::YELLOW),
-            RGB::named(rltk::BLACK),
-            97 + j as rltk::FontCharType,
-        );
-        ctx.set(
-            19,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437(')'),
-        );
-
-        ctx.print(21, y, &name.name.to_string());
-        equippable.push(entity);
-        y += 1;
-    }
-
-    match ctx.key {
-        None => (ItemMenuResult::NoResponse, None),
-        Some(key) => match key {
-            VirtualKeyCode::Escape => (ItemMenuResult::Cancel, None),
-            _ => {
-                let selection = rltk::letter_to_option(key);
-                if selection > -1 && selection < count as i32 {
-                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
-                }
-                (ItemMenuResult::NoResponse, None)
-            },
-        },
-    }
-}
-
-pub fn remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Option<Entity>) {
-    let player_entity = gs.ecs.fetch::<Entity>();
-    let names = gs.ecs.read_storage::<Name>();
-    let backpack = gs.ecs.read_storage::<Equipped>();
-    let entities = gs.ecs.entities();
-
-    let inventory = (&backpack, &names).join().filter(|item| item.0.owner == *player_entity);
-    let count = inventory.count();
-
-    let mut y = (25 - (count / 2)) as i32;
-    ctx.draw_box(
-        15,
-        y - 2,
-        31,
-        (count + 3) as i32,
-        RGB::named(rltk::WHITE),
-        RGB::named(rltk::BLACK),
-    );
-    ctx.print_color(
-        18,
-        y - 2,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "Remove Which Item?",
-    );
-    ctx.print_color(
-        18,
-        y + count as i32 + 1,
-        RGB::named(rltk::YELLOW),
-        RGB::named(rltk::BLACK),
-        "ESCAPE to cancel",
-    );
-
-    let mut equippable: Vec<Entity> = Vec::new();
-    for (j, (entity, _pack, name)) in (&entities, &backpack, &names)
-        .join()
-        .filter(|item| item.1.owner == *player_entity)
-        .enumerate()
-    {
-        ctx.set(
-            17,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437('('),
-        );
-        ctx.set(
-            18,
-            y,
-            RGB::named(rltk::YELLOW),
-            RGB::named(rltk::BLACK),
-            97 + j as rltk::FontCharType,
-        );
-        ctx.set(
-            19,
-            y,
-            RGB::named(rltk::WHITE),
-            RGB::named(rltk::BLACK),
-            rltk::to_cp437(')'),
-        );
-
-        ctx.print(21, y, &name.name.to_string());
-        equippable.push(entity);
-        y += 1;
-    }
-
-    match ctx.key {
-        None => (ItemMenuResult::NoResponse, None),
-        Some(key) => match key {
-            VirtualKeyCode::Escape => (ItemMenuResult::Cancel, None),
-            _ => {
-                let selection = rltk::letter_to_option(key);
-                if selection > -1 && selection < count as i32 {
-                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
-                }
-                (ItemMenuResult::NoResponse, None)
-            },
-        },
-    }
 }
 
 pub fn ranged_target(gs: &mut State, ctx: &mut Rltk, range: i32) -> (ItemMenuResult, Option<Point>) {

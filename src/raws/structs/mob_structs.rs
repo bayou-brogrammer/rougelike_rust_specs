@@ -6,7 +6,7 @@ use super::{BaseRawComponent, Renderable};
 // Trait Implementations
 impl BaseRawComponent for Mob {
     fn name(&self) -> String { self.name.clone() }
-    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
+    fn renderable(&self) -> Option<&Renderable> { self.renderable.as_ref() }
 }
 
 impl<T: BaseRawComponent> From<&T> for Mob {

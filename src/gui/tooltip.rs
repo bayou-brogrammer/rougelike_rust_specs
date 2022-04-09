@@ -3,6 +3,8 @@ use specs::prelude::*;
 use super::{camera, Attributes, Hidden, Map, Name, Pools, Position};
 use rltk::{Rltk, RGB};
 
+use super::item::get_item_display_name;
+
 struct Tooltip {
     lines: Vec<String>,
 }
@@ -44,7 +46,6 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
 
     let (min_x, _max_x, min_y, _max_y) = camera::get_screen_bounds(ecs, ctx);
     let map = ecs.fetch::<Map>();
-    let names = ecs.read_storage::<Name>();
     let positions = ecs.read_storage::<Position>();
     let hidden = ecs.read_storage::<Hidden>();
     let attributes = ecs.read_storage::<Attributes>();
@@ -67,10 +68,10 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
     }
 
     let mut tip_boxes: Vec<Tooltip> = Vec::new();
-    for (entity, name, position, _hidden) in (&entities, &names, &positions, !&hidden).join() {
+    for (entity, position, _hidden) in (&entities, &positions, !&hidden).join() {
         if position.x == mouse_map_pos.0 && position.y == mouse_map_pos.1 {
             let mut tip = Tooltip::new();
-            tip.add(name.name.to_string());
+            tip.add(get_item_display_name(ecs, entity));
 
             // Comment on attributes
             let attr = attributes.get(entity);

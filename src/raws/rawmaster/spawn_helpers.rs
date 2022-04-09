@@ -133,3 +133,43 @@ pub fn get_vendor_items(categories: &[String], raws: &RawMaster) -> Vec<(String,
 
     result
 }
+
+pub fn get_scroll_tags() -> Vec<String> {
+    let raws = &crate::raws::RAWS.lock().unwrap();
+    let mut result = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(magic) = &item.magic {
+            if &magic.naming == "scroll" {
+                result.push(item.name.clone());
+            }
+        }
+    }
+
+    result
+}
+
+pub fn get_potion_tags() -> Vec<String> {
+    let raws = &crate::raws::RAWS.lock().unwrap();
+    let mut result = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(magic) = &item.magic {
+            if &magic.naming == "potion" {
+                result.push(item.name.clone());
+            }
+        }
+    }
+
+    result
+}
+
+pub fn is_tag_magic(tag: &str) -> bool {
+    let raws = &crate::raws::RAWS.lock().unwrap();
+    if raws.item_index.contains_key(tag) {
+        let item_template = &raws.raws.items[raws.item_index[tag]];
+        item_template.magic.is_some()
+    } else {
+        false
+    }
+}

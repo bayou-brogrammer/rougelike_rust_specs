@@ -1,6 +1,16 @@
 use specs::prelude::*;
 
-use crate::{EquipmentChanged, GameLog, InBackpack, Name, Position, WantsToPickupItem};
+use crate::{
+    EquipmentChanged,
+    GameLog,
+    InBackpack,
+    MagicItem,
+    MasterDungeonMap,
+    Name,
+    ObfuscatedName,
+    Position,
+    WantsToPickupItem,
+};
 
 pub struct ItemCollectionSystem {}
 
@@ -14,11 +24,24 @@ impl<'a> System<'a> for ItemCollectionSystem {
         ReadStorage<'a, Name>,
         WriteStorage<'a, InBackpack>,
         WriteStorage<'a, EquipmentChanged>,
+        ReadStorage<'a, MagicItem>,
+        ReadStorage<'a, ObfuscatedName>,
+        ReadExpect<'a, MasterDungeonMap>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (player_entity, mut gamelog, mut wants_pickup, mut positions, names, mut backpack, mut dirty_equipment) =
-            data;
+        let (
+            player_entity,
+            mut gamelog,
+            mut wants_pickup,
+            mut positions,
+            names,
+            mut backpack,
+            mut dirty_equipment,
+            magic_items,
+            obfuscated_names,
+            dm,
+        ) = data;
 
         for pickup in wants_pickup.join() {
             positions.remove(pickup.item);
@@ -37,9 +60,10 @@ impl<'a> System<'a> for ItemCollectionSystem {
                 .expect("Unable to insert");
 
             if pickup.collected_by == *player_entity {
-                gamelog
-                    .entries
-                    .push(format!("You pick up the {}.", names.get(pickup.item).unwrap().name));
+                gamelog.entries.push(format!(
+                    "You pick up the {}.",
+                    super::common::obfuscate_name(pickup.item, &names, &magic_items, &obfuscated_names, &dm)
+                ));
             }
         }
 

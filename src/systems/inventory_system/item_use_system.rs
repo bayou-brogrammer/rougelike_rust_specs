@@ -11,6 +11,7 @@ use crate::{
     GameLog,
     HungerClock,
     HungerState,
+    IdentifiedItem,
     InBackpack,
     InflictsDamage,
     MagicMapper,
@@ -55,6 +56,7 @@ impl<'a> System<'a> for ItemUseSystem {
         WriteExpect<'a, RunState>,
         WriteStorage<'a, EquipmentChanged>,
         ReadStorage<'a, TownPortal>,
+        WriteStorage<'a, IdentifiedItem>,
     );
 
     #[allow(clippy::cognitive_complexity)]
@@ -84,6 +86,7 @@ impl<'a> System<'a> for ItemUseSystem {
             mut runstate,
             mut dirty_equipment,
             town_portal,
+            mut identified_item,
         ) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
@@ -127,6 +130,18 @@ impl<'a> System<'a> for ItemUseSystem {
                         },
                     }
                 },
+            }
+
+            // Identify
+            if entity == *player_entity {
+                identified_item
+                    .insert(
+                        entity,
+                        IdentifiedItem {
+                            name: names.get(useitem.item).unwrap().name.clone(),
+                        },
+                    )
+                    .expect("Unable to insert");
             }
 
             // If it is equippable, then we want to equip it - and unequip whatever else was in that slot

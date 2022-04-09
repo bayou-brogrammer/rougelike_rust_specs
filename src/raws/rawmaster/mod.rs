@@ -120,6 +120,13 @@ impl RawMaster {
 
 // pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : SpawnType) -> Option<Entity> {
 pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
+    let dm = ecs.fetch::<crate::map::MasterDungeonMap>();
+
+    let scroll_names = dm.scroll_mappings.clone();
+    let potion_names = dm.potion_mappings.clone();
+    let identified = dm.identified_items.clone();
+    std::mem::drop(dm);
+
     let (mut eb, item_template) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
 
     // Item Component
@@ -205,6 +212,36 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
             slot,
             armor_class: wearable.armor_class,
         });
+    }
+
+    // Magic Component
+    if let Some(magic) = &item_template.magic {
+        let class = match magic.class.as_str() {
+            "rare" => MagicItemClass::Rare,
+            "legendary" => MagicItemClass::Legendary,
+            _ => MagicItemClass::Common,
+        };
+        eb = eb.with(MagicItem { class });
+
+        if !identified.contains(&item_template.name) {
+            match magic.naming.as_str() {
+                "scroll" => {
+                    eb = eb.with(ObfuscatedName {
+                        name: scroll_names[&item_template.name].clone(),
+                    });
+                },
+                "potion" => {
+                    eb = eb.with(ObfuscatedName {
+                        name: potion_names[&item_template.name].clone(),
+                    });
+                },
+                _ => {
+                    eb = eb.with(ObfuscatedName {
+                        name: magic.naming.clone(),
+                    });
+                },
+            }
+        }
     }
 
     Some(eb.build())

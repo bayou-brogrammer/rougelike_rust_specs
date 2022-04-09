@@ -369,6 +369,28 @@ pub struct ApplyTeleport {
     pub dest_depth: i32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum MagicItemClass {
+    Common,
+    Rare,
+    Legendary,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct MagicItem {
+    pub class: MagicItemClass,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ObfuscatedName {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct IdentifiedItem {
+    pub name: String,
+}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 

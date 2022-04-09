@@ -62,7 +62,7 @@ pub fn save_game(ecs: &mut World) {
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
             OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
             WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor, TownPortal, TeleportTo, ApplyMove,
-            ApplyTeleport
+            ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem
         );
     }
 
@@ -120,7 +120,7 @@ pub fn load_game(ecs: &mut World) {
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
             OtherLevelPosition, DMSerializationHelper, LightSource, Initiative, MyTurn, Faction,
             WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor, TownPortal, TeleportTo, ApplyMove,
-            ApplyTeleport
+            ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem
         );
     }
 

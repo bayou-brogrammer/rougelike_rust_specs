@@ -12,7 +12,8 @@ use crate::{
     Name,
     Position,
     SingleActivation,
-    SufferDamage, TeleportTo,
+    SufferDamage,
+    TeleportTo,
 };
 
 pub struct TriggerSystem {}

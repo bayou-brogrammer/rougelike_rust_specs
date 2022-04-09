@@ -6,8 +6,7 @@ use super::BaseRawComponent;
 // Trait Implementations
 impl BaseRawComponent for Item {
     fn name(&self) -> String { self.name.clone() }
-    fn renderable(&self) -> Option<Renderable> { self.renderable.clone() }
-    // fn as_any(&self) -> &dyn Any { self }
+    fn renderable(&self) -> Option<&Renderable> { self.renderable.as_ref() }
 }
 
 impl<T: BaseRawComponent> From<&T> for Item {
@@ -25,6 +24,7 @@ pub struct Item {
     pub weight_lbs: Option<f32>,
     pub base_value: Option<f32>,
     pub vendor_category: Option<String>,
+    pub magic: Option<MagicItem>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -52,4 +52,10 @@ pub struct Weapon {
 pub struct Wearable {
     pub armor_class: f32,
     pub slot: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct MagicItem {
+    pub class: String,
+    pub naming: String,
 }

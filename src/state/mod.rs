@@ -74,6 +74,9 @@ impl State {
         let mut item_use = ItemUseSystem {};
         item_use.run_now(&self.ecs);
 
+        let mut item_id = ItemIdentificationSystem {};
+        item_id.run_now(&self.ecs);
+
         let mut drop_items = ItemDropSystem {};
         drop_items.run_now(&self.ecs);
 

@@ -22,9 +22,9 @@ impl<'a> System<'a> for MovementSystem {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
-            mut map,
+            map,
             mut position,
-            blockers,
+            _blockers,
             entities,
             mut apply_move,
             mut apply_teleport,

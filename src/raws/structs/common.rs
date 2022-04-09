@@ -4,7 +4,7 @@ use super::Renderable;
 
 pub trait BaseRawComponent {
     fn name(&self) -> String;
-    fn renderable(&self) -> Option<Renderable>;
+    fn renderable(&self) -> Option<&Renderable>;
     // fn as_any(&self) -> &dyn Any;
 }
 

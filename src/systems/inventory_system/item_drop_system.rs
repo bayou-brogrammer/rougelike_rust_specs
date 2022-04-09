@@ -1,6 +1,16 @@
 use specs::prelude::*;
 
-use crate::{EquipmentChanged, GameLog, InBackpack, Name, Position, WantsToDropItem};
+use crate::{
+    EquipmentChanged,
+    GameLog,
+    InBackpack,
+    MagicItem,
+    MasterDungeonMap,
+    Name,
+    ObfuscatedName,
+    Position,
+    WantsToDropItem,
+};
 
 pub struct ItemDropSystem {}
 
@@ -15,6 +25,9 @@ impl<'a> System<'a> for ItemDropSystem {
         WriteStorage<'a, Position>,
         WriteStorage<'a, InBackpack>,
         WriteStorage<'a, EquipmentChanged>,
+        ReadStorage<'a, MagicItem>,
+        ReadStorage<'a, ObfuscatedName>,
+        ReadExpect<'a, MasterDungeonMap>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -27,6 +40,9 @@ impl<'a> System<'a> for ItemDropSystem {
             mut positions,
             mut backpack,
             mut dirty_equipment,
+            magic_items,
+            obfuscated_names,
+            dm,
         ) = data;
 
         for (entity, to_drop) in (&entities, &wants_drop).join() {
@@ -55,7 +71,7 @@ impl<'a> System<'a> for ItemDropSystem {
             if entity == *player_entity {
                 gamelog.entries.push(format!(
                     "You drop the {}.",
-                    names.get(to_drop.item).unwrap().name
+                    super::common::obfuscate_name(to_drop.item, &names, &magic_items, &obfuscated_names, &dm)
                 ));
             }
         }
