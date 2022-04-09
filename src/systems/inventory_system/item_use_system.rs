@@ -22,6 +22,7 @@ use crate::{
     ProvidesHealing,
     RunState,
     SufferDamage,
+    TownPortal,
     WantsToUseItem,
 };
 
@@ -53,6 +54,7 @@ impl<'a> System<'a> for ItemUseSystem {
         ReadStorage<'a, MagicMapper>,
         WriteExpect<'a, RunState>,
         WriteStorage<'a, EquipmentChanged>,
+        ReadStorage<'a, TownPortal>,
     );
 
     #[allow(clippy::cognitive_complexity)]
@@ -81,6 +83,7 @@ impl<'a> System<'a> for ItemUseSystem {
             magic_mapper,
             mut runstate,
             mut dirty_equipment,
+            town_portal,
         ) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
@@ -197,6 +200,19 @@ impl<'a> System<'a> for ItemUseSystem {
                     gamelog.entries.push("The map is revealed to you!".to_string());
                     *runstate = RunState::MagicMapReveal { row: 0 };
                 },
+            }
+
+            // If its a town portal...
+            if let Some(_townportal) = town_portal.get(useitem.item) {
+                if map.depth == 1 {
+                    gamelog
+                        .entries
+                        .push("You are already in town, so the scroll does nothing.".to_string());
+                } else {
+                    used_item = true;
+                    gamelog.entries.push("You are telported back to town!".to_string());
+                    *runstate = RunState::TownPortal;
+                }
             }
 
             // If it heals, apply the healing

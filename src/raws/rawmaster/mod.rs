@@ -164,6 +164,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
                 },
                 "magic_mapping" => eb = eb.with(MagicMapper {}),
                 "food" => eb = eb.with(ProvidesFood {}),
+                "town_portal" => eb = eb.with(TownPortal {}),
                 _ => {
                     rltk::console::log(format!("Warning: consumable effect {} not implemented.", effect_name));
                 },

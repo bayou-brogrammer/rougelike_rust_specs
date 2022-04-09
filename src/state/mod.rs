@@ -56,6 +56,9 @@ impl State {
         let mut defaultmove = ai::DefaultMoveAI {};
         defaultmove.run_now(&self.ecs);
 
+        let mut moving = MovementSystem {};
+        moving.run_now(&self.ecs);
+
         let mut triggers = TriggerSystem {};
         triggers.run_now(&self.ecs);
 
