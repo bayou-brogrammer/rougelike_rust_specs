@@ -1,5 +1,6 @@
-use crate::State;
 use rltk::{Rltk, VirtualKeyCode, RGB};
+
+use super::State;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum CheatMenuResult {

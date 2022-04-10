@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{ApplyMove, Map, MyTurn, Position, WantsToFlee};
+use super::{ApplyMove, Map, MyTurn, Position, WantsToFlee};
 
 pub struct FleeAI {}
 

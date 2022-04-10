@@ -1,13 +1,13 @@
 use specs::prelude::*;
 
-use crate::{IdentifiedItem, Item, Name, ObfuscatedName, Player};
+use super::{IdentifiedItem, Item, Name, ObfuscatedName};
 
 pub struct ItemIdentificationSystem {}
 
 impl<'a> System<'a> for ItemIdentificationSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-        ReadStorage<'a, Player>,
+        ReadStorage<'a, crate::components::Player>,
         WriteStorage<'a, IdentifiedItem>,
         WriteExpect<'a, crate::map::MasterDungeonMap>,
         ReadStorage<'a, Item>,

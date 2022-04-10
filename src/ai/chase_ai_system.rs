@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use std::collections::HashMap;
 
-use crate::{ApplyMove, Chasing, Map, MyTurn, Position};
+use super::{ApplyMove, Chasing, Map, MyTurn, Position};
 
 pub struct ChaseAI {}
 

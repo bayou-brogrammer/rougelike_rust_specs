@@ -1,30 +1,33 @@
 use specs::prelude::*;
 
-use crate::{
-    particle_system::ParticleBuilder,
+use super::{
     AreaOfEffect,
-    Confusion,
-    Consumable,
     EquipmentChanged,
     Equippable,
     Equipped,
     GameLog,
-    HungerClock,
-    HungerState,
     IdentifiedItem,
     InBackpack,
-    InflictsDamage,
-    MagicMapper,
     Map,
     Name,
-    Pools,
     Position,
+    WantsToUseItem,
+};
+
+use crate::{
+    particle_system::ParticleBuilder,
+    Confusion,
+    Consumable,
+    HungerClock,
+    HungerState,
+    InflictsDamage,
+    MagicMapper,
+    Pools,
     ProvidesFood,
     ProvidesHealing,
     RunState,
     SufferDamage,
     TownPortal,
-    WantsToUseItem,
 };
 
 pub struct ItemUseSystem {}

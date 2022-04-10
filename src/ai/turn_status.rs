@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{Confusion, MyTurn, RunState};
+use super::{Confusion, MyTurn, RunState};
 
 pub struct TurnStatusSystem {}
 

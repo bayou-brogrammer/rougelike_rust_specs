@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use std::collections::HashMap;
 
-use crate::{gamelog::GameLog, Attributes, EquipmentChanged, Equipped, InBackpack, Item, Pools};
+use super::{Attributes, EquipmentChanged, Equipped, GameLog, InBackpack, Item, Pools};
 
 pub struct EncumbranceSystem {}
 

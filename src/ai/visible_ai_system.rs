@@ -1,16 +1,6 @@
 use specs::prelude::*;
 
-use crate::{
-    raws::faction_structs::Reaction,
-    Chasing,
-    Faction,
-    Map,
-    MyTurn,
-    Position,
-    Viewshed,
-    WantsToApproach,
-    WantsToFlee,
-};
+use super::{Chasing, Faction, Map, MyTurn, Position, Reaction, Viewshed, WantsToApproach, WantsToFlee};
 
 fn evaluate(
     idx: usize,

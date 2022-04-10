@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{Attributes, Initiative, MyTurn, Pools, Position, RunState};
+use super::{Attributes, Initiative, MyTurn, Pools, Position, RunState};
 
 pub struct InitiativeSystem {}
 

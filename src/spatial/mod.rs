@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use std::sync::Mutex;
 
-use crate::{tile_walkable, Map, RunState};
+use super::{tile_walkable, Map, RunState};
 
 struct SpatialMap {
     blocked: Vec<(bool, bool)>,

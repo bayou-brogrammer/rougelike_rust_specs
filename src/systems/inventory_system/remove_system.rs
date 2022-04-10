@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{Equipped, InBackpack, WantsToRemoveItem};
+use super::{Equipped, InBackpack, WantsToRemoveItem};
 
 pub struct ItemRemoveSystem {}
 

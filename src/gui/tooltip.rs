@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{camera, Attributes, Hidden, Map, Name, Pools, Position};
+use super::{camera, Attributes, Hidden, Map, Pools, Position};
 use rltk::{Rltk, RGB};
 
 use super::item::get_item_display_name;

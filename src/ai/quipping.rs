@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{gamelog::GameLog, MyTurn, Name, Quips, Viewshed};
+use super::{GameLog, MyTurn, Name, Quips, Viewshed};
 
 pub struct QuipSystem {}
 

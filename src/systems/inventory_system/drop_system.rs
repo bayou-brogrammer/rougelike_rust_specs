@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{
+use super::{
     EquipmentChanged,
     GameLog,
     InBackpack,
@@ -71,7 +71,7 @@ impl<'a> System<'a> for ItemDropSystem {
             if entity == *player_entity {
                 gamelog.entries.push(format!(
                     "You drop the {}.",
-                    super::common::obfuscate_name(to_drop.item, &names, &magic_items, &obfuscated_names, &dm)
+                    super::obfuscate_name(to_drop.item, &names, &magic_items, &obfuscated_names, &dm)
                 ));
             }
         }

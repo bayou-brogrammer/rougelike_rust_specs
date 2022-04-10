@@ -1,6 +1,3 @@
-pub mod common;
-pub use common::*;
-
 pub mod faction_structs;
 pub mod item_structs;
 pub mod loot_structs;
@@ -14,3 +11,19 @@ pub use loot_structs::*;
 pub use mob_structs::*;
 pub use prop_structs::*;
 pub use spawn_table_structs::*;
+
+use core::fmt::Debug;
+
+use item_structs::Renderable;
+
+pub trait BaseRawComponent {
+    fn name(&self) -> String;
+    fn renderable(&self) -> Option<&Renderable>;
+    // fn as_any(&self) -> &dyn Any;
+}
+
+impl Debug for dyn BaseRawComponent {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "BaseRawComponent{{{}}}", self.name())
+    }
+}

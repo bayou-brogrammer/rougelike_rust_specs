@@ -1,7 +1,7 @@
 use specs::prelude::*;
 
-use super::State;
-use crate::{components::*, gui::CheatMenuResult, Map, RunState};
+use super::{Map, RunState, State};
+use crate::{components::*, gui::CheatMenuResult};
 
 ///////////////////////////////////////////////////////////////////////////
 // Cheat Menu Helper Functions

@@ -1,4 +1,4 @@
-use crate::{raws::faction_structs::Reaction, Faction, Map, MyTurn, Position, WantsToMelee};
+use super::{Reaction, Faction, Map, MyTurn, Position, WantsToMelee};
 use specs::prelude::*;
 
 fn evaluate(

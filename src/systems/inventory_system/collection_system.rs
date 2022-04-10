@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{
+use super::{
     EquipmentChanged,
     GameLog,
     InBackpack,
@@ -62,7 +62,7 @@ impl<'a> System<'a> for ItemCollectionSystem {
             if pickup.collected_by == *player_entity {
                 gamelog.entries.push(format!(
                     "You pick up the {}.",
-                    super::common::obfuscate_name(pickup.item, &names, &magic_items, &obfuscated_names, &dm)
+                    super::obfuscate_name(pickup.item, &names, &magic_items, &obfuscated_names, &dm)
                 ));
             }
         }

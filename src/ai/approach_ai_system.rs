@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{ApplyMove, Map, MyTurn, Position, WantsToApproach};
+use super::{ApplyMove, Map, MyTurn, Position, WantsToApproach};
 
 pub struct ApproachAI {}
 

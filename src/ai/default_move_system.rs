@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{map::tile_walkable, ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
+use super::{map::tile_walkable, ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
 
 pub struct DefaultMoveAI {}
 
