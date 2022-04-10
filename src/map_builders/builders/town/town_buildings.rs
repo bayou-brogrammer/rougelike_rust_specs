@@ -71,7 +71,9 @@ impl TownBuilder {
             "Chair",
             "Candle",
             "Candle",
+            "Altar",
         ];
+
         self.random_building_spawn(building, build_data, rng, &mut to_place, 0);
     }
 

@@ -14,8 +14,6 @@ pub use spawn_table_structs::*;
 
 use core::fmt::Debug;
 
-use item_structs::Renderable;
-
 pub trait BaseRawComponent {
     fn name(&self) -> String;
     fn renderable(&self) -> Option<&Renderable>;

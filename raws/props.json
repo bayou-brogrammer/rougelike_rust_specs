@@ -236,5 +236,21 @@
         "single_activation": "1"
       }
     }
+  },
+
+  {
+    "name": "Altar",
+    "renderable": {
+      "glyph": "╫",
+      "fg": "#55FF55",
+      "bg": "#000000",
+      "order": 2
+    },
+    "hidden": false,
+    "entry_trigger": {
+      "effects": {
+        "provides_healing": "100"
+      }
+    }
   }
 ]

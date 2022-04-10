@@ -26,7 +26,8 @@ use super::{
     WantsToMelee,
     WantsToPickupItem,
 };
-use crate::raws::faction_structs::Reaction;
+
+use crate::raws::structs::Reaction;
 
 use rltk::{Point, Rltk, VirtualKeyCode};
 

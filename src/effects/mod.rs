@@ -82,14 +82,14 @@ fn target_applicator(ecs: &mut World, effect: &EffectSpawner) {
 }
 
 fn tile_effect_hits_entities(effect: &EffectType) -> bool {
-    match effect {
-        EffectType::Damage { .. } => true,
-        EffectType::WellFed => true,
-        EffectType::Healing { .. } => true,
-        EffectType::Confusion { .. } => true,
-        EffectType::TeleportTo { .. } => true,
-        _ => false,
-    }
+    matches!(
+        effect,
+        EffectType::Damage { .. }
+            | EffectType::WellFed
+            | EffectType::Healing { .. }
+            | EffectType::Confusion { .. }
+            | EffectType::TeleportTo { .. }
+    )
 }
 
 fn affect_tile(ecs: &mut World, effect: &EffectSpawner, tile_idx: i32) {
@@ -116,7 +116,7 @@ fn affect_entity(ecs: &mut World, effect: &EffectSpawner, target: Entity) {
         },
         EffectType::Particle { .. } => {
             if let Some(pos) = entity_position(ecs, target) {
-                particles::particle_to_tile(ecs, pos, &effect)
+                particles::particle_to_tile(ecs, pos, effect)
             }
         },
         EffectType::WellFed => hunger::well_fed(ecs, effect, target),

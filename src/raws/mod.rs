@@ -2,7 +2,6 @@ use serde::Deserialize;
 use std::sync::Mutex;
 
 pub mod structs;
-pub use structs::faction_structs;
 use structs::*;
 
 mod rawmaster;
