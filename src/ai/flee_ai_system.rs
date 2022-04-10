@@ -5,7 +5,6 @@ use super::{ApplyMove, Map, MyTurn, Position, WantsToFlee};
 pub struct FleeAI {}
 
 impl<'a> System<'a> for FleeAI {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         WriteStorage<'a, WantsToFlee>,

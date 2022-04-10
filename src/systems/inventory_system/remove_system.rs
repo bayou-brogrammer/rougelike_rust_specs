@@ -5,7 +5,6 @@ use super::{Equipped, InBackpack, WantsToRemoveItem};
 pub struct ItemRemoveSystem {}
 
 impl<'a> System<'a> for ItemRemoveSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, WantsToRemoveItem>,

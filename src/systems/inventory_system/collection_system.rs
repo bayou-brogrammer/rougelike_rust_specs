@@ -15,7 +15,6 @@ use super::{
 pub struct ItemCollectionSystem {}
 
 impl<'a> System<'a> for ItemCollectionSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadExpect<'a, Entity>,
         WriteExpect<'a, GameLog>,
@@ -60,7 +59,7 @@ impl<'a> System<'a> for ItemCollectionSystem {
                 .expect("Unable to insert");
 
             if pickup.collected_by == *player_entity {
-                gamelog.entries.push(format!(
+                gamelog.add(format!(
                     "You pick up the {}.",
                     super::obfuscate_name(pickup.item, &names, &magic_items, &obfuscated_names, &dm)
                 ));

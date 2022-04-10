@@ -15,7 +15,6 @@ use super::{
 pub struct ItemDropSystem {}
 
 impl<'a> System<'a> for ItemDropSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadExpect<'a, Entity>,
         WriteExpect<'a, GameLog>,
@@ -69,7 +68,7 @@ impl<'a> System<'a> for ItemDropSystem {
                 .expect("Unable to insert");
 
             if entity == *player_entity {
-                gamelog.entries.push(format!(
+                gamelog.add(format!(
                     "You drop the {}.",
                     super::obfuscate_name(to_drop.item, &names, &magic_items, &obfuscated_names, &dm)
                 ));

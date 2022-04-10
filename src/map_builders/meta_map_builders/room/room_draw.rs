@@ -34,9 +34,7 @@ impl RoomDrawer {
                 let idx = build_data.map.xy_idx(x, y);
                 let distance = rltk::DistanceAlg::Pythagoras.distance2d(center_pt, rltk::Point::new(x, y));
 
-                if idx > 0
-                    && idx < ((build_data.map.width * build_data.map.height) - 1) as usize
-                    && distance <= radius
+                if idx > 0 && idx < ((build_data.map.width * build_data.map.height) - 1) as usize && distance <= radius
                 {
                     build_data.map.tiles[idx] = TileType::Floor;
                 }

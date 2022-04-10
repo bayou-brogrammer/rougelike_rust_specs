@@ -180,7 +180,7 @@ pub fn try_next_level(ecs: &mut World) -> bool {
         true
     } else {
         let mut gamelog = ecs.fetch_mut::<GameLog>();
-        gamelog.entries.push("There is no way down from here.".to_string());
+        gamelog.add("There is no way down from here.".to_string());
         false
     }
 }
@@ -194,7 +194,7 @@ pub fn try_previous_level(ecs: &mut World) -> bool {
         true
     } else {
         let mut gamelog = ecs.fetch_mut::<GameLog>();
-        gamelog.entries.push("There is no way up from here.".to_string());
+        gamelog.add("There is no way up from here.".to_string());
         false
     }
 }
@@ -216,7 +216,7 @@ fn get_item(ecs: &mut World) {
     }
 
     match target_item {
-        None => gamelog.entries.push("There is nothing here to pick up.".to_string()),
+        None => gamelog.add("There is nothing here to pick up.".to_string()),
         Some(item) => {
             let mut pickup = ecs.write_storage::<WantsToPickupItem>();
             pickup

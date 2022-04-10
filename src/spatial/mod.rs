@@ -60,6 +60,11 @@ pub fn is_blocked(idx: usize) -> bool {
 // Tile Content Helpers
 ///////////////////////////////////////////////////////////////////////////
 
+pub fn get_tile_content_clone(idx: usize) -> Vec<Entity> {
+    let lock = SPATIAL_MAP.lock().unwrap();
+    lock.tile_content[idx].iter().map(|(e, _)| *e).collect()
+}
+
 pub fn for_each_tile_content<F>(idx: usize, mut f: F)
 where F: FnMut(Entity) {
     let lock = SPATIAL_MAP.lock().unwrap();

@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{ai, gamelog, map, spawner, systems::*, Map, RunState};
+use super::{ai, effects, gamelog, map, spawner, systems::*, Map, RunState};
 
 pub mod cheat_actions;
 
@@ -65,11 +65,11 @@ impl State {
         let mut melee = MeleeCombatSystem {};
         melee.run_now(&self.ecs);
 
-        let mut damage = DamageSystem {};
-        damage.run_now(&self.ecs);
-
         let mut pickup = ItemCollectionSystem {};
         pickup.run_now(&self.ecs);
+
+        let mut itemequip = ItemEquipOnUse {};
+        itemequip.run_now(&self.ecs);
 
         let mut item_use = ItemUseSystem {};
         item_use.run_now(&self.ecs);
@@ -85,6 +85,8 @@ impl State {
 
         let mut hunger = hunger_system::HungerSystem {};
         hunger.run_now(&self.ecs);
+
+        effects::run_effects_queue(&mut self.ecs);
 
         let mut particles = particle_system::ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
@@ -109,7 +111,7 @@ impl State {
 
         // Notify the player
         let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.entries.push("You change level.".to_string());
+        gamelog.add("You change level.".to_string());
     }
 
     pub fn game_over_cleanup(&mut self) {

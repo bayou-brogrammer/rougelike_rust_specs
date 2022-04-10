@@ -1,7 +1,7 @@
-use rltk::RGB;
 use specs::prelude::*;
 
-use crate::{ParticleLifetime, Position, Renderable, Rltk};
+use super::{ParticleLifetime, Position, Renderable};
+use rltk::{Rltk, RGB};
 
 pub fn cull_dead_particles(ecs: &mut World, ctx: &Rltk) {
     let mut dead_particles: Vec<Entity> = Vec::new();
@@ -35,7 +35,6 @@ pub struct ParticleBuilder {
 }
 
 impl ParticleBuilder {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> ParticleBuilder { ParticleBuilder { requests: Vec::new() } }
 
     pub fn request(&mut self, x: i32, y: i32, fg: RGB, bg: RGB, glyph: rltk::FontCharType, lifetime: f32) {
@@ -53,7 +52,6 @@ impl ParticleBuilder {
 pub struct ParticleSpawnSystem {}
 
 impl<'a> System<'a> for ParticleSpawnSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Position>,
@@ -75,6 +73,7 @@ impl<'a> System<'a> for ParticleSpawnSystem {
                     },
                 )
                 .expect("Unable to inser position");
+
             renderables
                 .insert(
                     p,
@@ -86,6 +85,7 @@ impl<'a> System<'a> for ParticleSpawnSystem {
                     },
                 )
                 .expect("Unable to insert renderable");
+
             particles
                 .insert(
                     p,

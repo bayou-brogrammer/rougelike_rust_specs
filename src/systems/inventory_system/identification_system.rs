@@ -5,7 +5,6 @@ use super::{IdentifiedItem, Item, Name, ObfuscatedName};
 pub struct ItemIdentificationSystem {}
 
 impl<'a> System<'a> for ItemIdentificationSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadStorage<'a, crate::components::Player>,
         WriteStorage<'a, IdentifiedItem>,

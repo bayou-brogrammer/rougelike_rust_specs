@@ -1,6 +1,7 @@
 use specs::prelude::*;
 
 use super::{
+    effects,
     AreaOfEffect,
     EquipmentChanged,
     Equippable,
@@ -25,12 +26,14 @@ mod collection_system;
 mod drop_system;
 mod identification_system;
 mod remove_system;
+mod use_equip;
 mod use_system;
 
 pub use collection_system::ItemCollectionSystem;
 pub use drop_system::ItemDropSystem;
 pub use identification_system::ItemIdentificationSystem;
 pub use remove_system::ItemRemoveSystem;
+pub use use_equip::ItemEquipOnUse;
 pub use use_system::ItemUseSystem;
 
 pub fn obfuscate_name(

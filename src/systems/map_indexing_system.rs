@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use crate::{spatial, BlocksTile, Map, Pools, Position};
+use super::{spatial, BlocksTile, Map, Pools, Position};
 
 pub struct MapIndexingSystem {}
 
@@ -21,7 +21,6 @@ impl<'a> System<'a> for MapIndexingSystem {
 
         for (entity, position) in (&entities, &position).join() {
             let mut alive = true;
-
             if let Some(pools) = pools.get(entity) {
                 if pools.hit_points.current < 1 {
                     alive = false;

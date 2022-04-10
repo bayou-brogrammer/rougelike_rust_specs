@@ -1,7 +1,10 @@
 use std::collections::HashSet;
 
+#[rustfmt::skip]
 pub mod prefab_levels;
+#[rustfmt::skip]
 pub mod prefab_rooms;
+#[rustfmt::skip]
 pub mod prefab_sections;
 
 use super::{BuilderMap, InitialMapBuilder, MetaMapBuilder, Position, TileType};

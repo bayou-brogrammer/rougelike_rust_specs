@@ -5,7 +5,6 @@ use super::{map::tile_walkable, ApplyMove, Map, MoveMode, Movement, MyTurn, Posi
 pub struct DefaultMoveAI {}
 
 impl<'a> System<'a> for DefaultMoveAI {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         WriteStorage<'a, MoveMode>,

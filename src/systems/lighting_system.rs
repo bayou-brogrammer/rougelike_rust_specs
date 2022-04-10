@@ -1,12 +1,11 @@
 use specs::prelude::*;
 
-use crate::{LightSource, Map, Position, Viewshed};
+use super::{LightSource, Map, Position, Viewshed};
 use rltk::RGB;
 
 pub struct LightingSystem {}
 
 impl<'a> System<'a> for LightingSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteExpect<'a, Map>,
         ReadStorage<'a, Viewshed>,

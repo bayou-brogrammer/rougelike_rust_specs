@@ -6,7 +6,6 @@ use super::{Attributes, EquipmentChanged, Equipped, GameLog, InBackpack, Item, P
 pub struct EncumbranceSystem {}
 
 impl<'a> System<'a> for EncumbranceSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, EquipmentChanged>,
         Entities<'a>,

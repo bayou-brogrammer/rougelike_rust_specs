@@ -25,6 +25,7 @@ use player::*;
 use systems::{damage_system, particle_system, saveload_system};
 
 pub mod camera;
+pub mod effects;
 pub mod map_builders;
 pub mod random_table;
 pub mod raws;
@@ -397,7 +398,6 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Skills>();
     gs.ecs.register::<SingleActivation>();
-    gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<TeleportTo>();
     gs.ecs.register::<TownPortal>();
     gs.ecs.register::<Vendor>();

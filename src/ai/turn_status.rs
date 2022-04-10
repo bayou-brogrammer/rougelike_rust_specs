@@ -5,7 +5,6 @@ use super::{Confusion, MyTurn, RunState};
 pub struct TurnStatusSystem {}
 
 impl<'a> System<'a> for TurnStatusSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         WriteStorage<'a, Confusion>,

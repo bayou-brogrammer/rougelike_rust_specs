@@ -5,7 +5,6 @@ use super::{GameLog, MyTurn, Name, Quips, Viewshed};
 pub struct QuipSystem {}
 
 impl<'a> System<'a> for QuipSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteExpect<'a, GameLog>,
         WriteStorage<'a, Quips>,

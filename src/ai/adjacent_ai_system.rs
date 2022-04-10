@@ -1,12 +1,7 @@
-use super::{Reaction, Faction, Map, MyTurn, Position, WantsToMelee};
+use super::{Faction, Map, MyTurn, Position, Reaction, WantsToMelee};
 use specs::prelude::*;
 
-fn evaluate(
-    idx: usize,
-    factions: &ReadStorage<Faction>,
-    my_faction: &str,
-    reactions: &mut Vec<(Entity, Reaction)>,
-) {
+fn evaluate(idx: usize, factions: &ReadStorage<Faction>, my_faction: &str, reactions: &mut Vec<(Entity, Reaction)>) {
     crate::spatial::for_each_tile_content(idx, |other_entity| {
         if let Some(faction) = factions.get(other_entity) {
             reactions.push((
@@ -20,7 +15,6 @@ fn evaluate(
 pub struct AdjacentAI {}
 
 impl<'a> System<'a> for AdjacentAI {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         ReadStorage<'a, Faction>,
@@ -36,7 +30,6 @@ impl<'a> System<'a> for AdjacentAI {
 
         let mut turn_done: Vec<Entity> = Vec::new();
         for (entity, _turn, my_faction, pos) in (&entities, &turns, &factions, &positions).join() {
-
             #[rustfmt::skip]
             if entity != *player {
                 let mut reactions : Vec<(Entity, Reaction)> = Vec::new();

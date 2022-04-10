@@ -6,7 +6,6 @@ use super::{ApplyMove, Chasing, Map, MyTurn, Position};
 pub struct ChaseAI {}
 
 impl<'a> System<'a> for ChaseAI {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         WriteStorage<'a, Chasing>,

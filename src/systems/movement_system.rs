@@ -1,15 +1,14 @@
 use specs::prelude::*;
 
-use crate::{ApplyMove, ApplyTeleport, BlocksTile, EntityMoved, Map, OtherLevelPosition, Position, RunState, Viewshed};
+use super::{ApplyMove, ApplyTeleport, EntityMoved, Map, OtherLevelPosition, Position, RunState, Viewshed};
 
 pub struct MovementSystem {}
 
 impl<'a> System<'a> for MovementSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteExpect<'a, Map>,
         WriteStorage<'a, Position>,
-        ReadStorage<'a, BlocksTile>,
+        // ReadStorage<'a, BlocksTile>,
         Entities<'a>,
         WriteStorage<'a, ApplyMove>,
         WriteStorage<'a, ApplyTeleport>,
@@ -24,7 +23,7 @@ impl<'a> System<'a> for MovementSystem {
         let (
             map,
             mut position,
-            _blockers,
+            // _blockers,
             entities,
             mut apply_move,
             mut apply_teleport,
@@ -68,6 +67,7 @@ impl<'a> System<'a> for MovementSystem {
                         },
                     )
                     .expect("Unable to insert");
+
                 position.remove(entity);
             }
         }
@@ -89,6 +89,7 @@ impl<'a> System<'a> for MovementSystem {
 
             moved.insert(entity, EntityMoved {}).expect("Unable to insert");
         }
+
         apply_move.clear();
     }
 }

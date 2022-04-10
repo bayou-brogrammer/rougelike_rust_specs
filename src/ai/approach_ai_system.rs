@@ -5,7 +5,6 @@ use super::{ApplyMove, Map, MyTurn, Position, WantsToApproach};
 pub struct ApproachAI {}
 
 impl<'a> System<'a> for ApproachAI {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, MyTurn>,
         WriteStorage<'a, WantsToApproach>,

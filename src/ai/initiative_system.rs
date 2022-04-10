@@ -5,7 +5,6 @@ use super::{Attributes, Initiative, MyTurn, Pools, Position, RunState};
 pub struct InitiativeSystem {}
 
 impl<'a> System<'a> for InitiativeSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         WriteStorage<'a, Initiative>,
         ReadStorage<'a, Position>,
