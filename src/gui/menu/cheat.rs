@@ -1,6 +1,4 @@
-use rltk::{Rltk, VirtualKeyCode, RGB};
-
-use super::State;
+use super::{Rltk, State, VirtualKeyCode, RGB};
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum CheatMenuResult {
@@ -13,7 +11,7 @@ pub enum CheatMenuResult {
 }
 
 #[rustfmt::skip]
-pub fn show_cheat_mode(_gs : &mut State, ctx : &mut Rltk) -> CheatMenuResult {
+pub fn show_cheat_menu(_gs : &mut State, ctx : &mut Rltk) -> CheatMenuResult {
     let count = 2;
     let mut y = (25 - (count / 2)) as i32;
     ctx.draw_box(15, y-2, 31, (count+3) as i32, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));

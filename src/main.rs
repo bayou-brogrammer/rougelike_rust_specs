@@ -61,6 +61,8 @@ pub enum RunState {
     ShowCheatMenu,
     ShowVendor { vendor: Entity, mode: VendorMode },
     TeleportingToOtherLevel { x: i32, y: i32, depth: i32 },
+    ShowRemoveCurse,
+    ShowIdentify,
 }
 
 impl GameState for State {
@@ -124,6 +126,8 @@ impl GameState for State {
                         RunState::TeleportingToOtherLevel { x, y, depth } => {
                             newrunstate = RunState::TeleportingToOtherLevel { x, y, depth }
                         },
+                        RunState::ShowRemoveCurse => newrunstate = RunState::ShowRemoveCurse,
+                        RunState::ShowIdentify => newrunstate = RunState::ShowIdentify,
                         _ => newrunstate = RunState::Ticking,
                     }
                 }
@@ -227,8 +231,36 @@ impl GameState for State {
                     gui::VendorResult::Sell => self.sell_items(result.1),
                 }
             },
+            RunState::ShowRemoveCurse => {
+                let result = gui::remove_curse_menu(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::NoResponse => {},
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        self.ecs.write_storage::<CursedItem>().remove(item_entity);
+                        newrunstate = RunState::Ticking;
+                    },
+                }
+            },
+            RunState::ShowIdentify => {
+                let result = gui::identify_menu(self, ctx);
+
+                match result.0 {
+                    gui::ItemMenuResult::NoResponse => {},
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        if let Some(name) = self.ecs.read_storage::<Name>().get(item_entity) {
+                            let mut dm = self.ecs.fetch_mut::<MasterDungeonMap>();
+                            dm.identified_items.insert(name.name.clone());
+                        }
+                        newrunstate = RunState::Ticking;
+                    },
+                }
+            },
             RunState::ShowCheatMenu => {
-                let result = gui::show_cheat_mode(self, ctx);
+                let result = gui::show_cheat_menu(self, ctx);
                 newrunstate = self.handle_cheat_action(result);
             },
             RunState::MainMenu { .. } => {
@@ -362,6 +394,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Chasing>();
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<Consumable>();
+    gs.ecs.register::<CursedItem>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
@@ -393,6 +426,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Position>();
     gs.ecs.register::<ProvidesFood>();
     gs.ecs.register::<ProvidesHealing>();
+    gs.ecs.register::<ProvidesIdentification>();
+    gs.ecs.register::<ProvidesRemoveCurse>();
     gs.ecs.register::<Quips>();
     gs.ecs.register::<Ranged>();
     gs.ecs.register::<Renderable>();

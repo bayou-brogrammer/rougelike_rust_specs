@@ -1,4 +1,5 @@
 use super::*;
+
 use crate::components::*;
 use crate::gamelog::GameLog;
 use crate::RunState;
@@ -83,6 +84,20 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
         let mut runstate = ecs.fetch_mut::<RunState>();
         gamelog.add("The map is revealed to you!".to_string());
         *runstate = RunState::MagicMapReveal { row: 0 };
+        did_something = true;
+    }
+
+    // Remove Curse
+    if ecs.read_storage::<ProvidesRemoveCurse>().get(entity).is_some() {
+        let mut runstate = ecs.fetch_mut::<RunState>();
+        *runstate = RunState::ShowRemoveCurse;
+        did_something = true;
+    }
+
+    // Identify Item
+    if ecs.read_storage::<ProvidesIdentification>().get(entity).is_some() {
+        let mut runstate = ecs.fetch_mut::<RunState>();
+        *runstate = RunState::ShowIdentify;
         did_something = true;
     }
 

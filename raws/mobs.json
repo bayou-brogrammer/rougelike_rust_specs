@@ -284,8 +284,8 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {
-      "Might": 3,
-      "Fitness": 3
+      "might": 3,
+      "fitness": 3
     },
     "skills": {
       "Melee": -1,
@@ -310,8 +310,8 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {
-      "Might": 3,
-      "Fitness": 3
+      "might": 3,
+      "fitness": 3
     },
     "skills": {
       "Melee": -1,
@@ -337,8 +337,8 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {
-      "Might": 3,
-      "Fitness": 3
+      "might": 3,
+      "fitness": 3
     },
     "skills": {
       "Melee": -1,
@@ -364,8 +364,8 @@
     "vision_range": 8,
     "movement": "random",
     "attributes": {
-      "Might": 3,
-      "Fitness": 3
+      "might": 3,
+      "fitness": 3
     },
     "skills": {
       "Melee": -1,
@@ -418,6 +418,24 @@
   },
 
   {
+    "name": "Orc Leader",
+    "renderable": {
+      "glyph": "O",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "movement": "static",
+    "attributes": {},
+    "faction": "Cave Goblins",
+    "gold": "3d8",
+    "equipped": ["Battleaxe", "Tower Shield", "Leather Armor", "Leather Boots"],
+    "level": 2
+  },
+
+  {
     "name": "Goblin",
     "renderable": {
       "glyph": "g",
@@ -461,8 +479,8 @@
     "vision_range": 6,
     "movement": "random",
     "attributes": {
-      "Might": 3,
-      "Fitness": 3
+      "might": 3,
+      "fitness": 3
     },
     "skills": {
       "Melee": -1,
@@ -516,24 +534,6 @@
       "range": 4,
       "color": "#550000"
     }
-  },
-
-  {
-    "name": "Orc Leader",
-    "renderable": {
-      "glyph": "O",
-      "fg": "#FF0000",
-      "bg": "#000000",
-      "order": 1
-    },
-    "blocks_tile": true,
-    "vision_range": 8,
-    "movement": "static",
-    "attributes": {},
-    "faction": "Cave Goblins",
-    "gold": "3d8",
-    "equipped": ["Battleaxe", "Tower Shield", "Leather Armor", "Leather Boots"],
-    "level": 2
   },
 
   {

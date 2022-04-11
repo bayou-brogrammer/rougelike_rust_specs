@@ -3,8 +3,6 @@ use specs::prelude::*;
 use super::{camera, Attributes, Hidden, Map, Pools, Position};
 use rltk::{Rltk, RGB};
 
-use super::item::get_item_display_name;
-
 struct Tooltip {
     lines: Vec<String>,
 }
@@ -71,7 +69,7 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
     for (entity, position, _hidden) in (&entities, &positions, !&hidden).join() {
         if position.x == mouse_map_pos.0 && position.y == mouse_map_pos.1 {
             let mut tip = Tooltip::new();
-            tip.add(get_item_display_name(ecs, entity));
+            tip.add(super::get_item_display_name(ecs, entity));
 
             // Comment on attributes
             let attr = attributes.get(entity);

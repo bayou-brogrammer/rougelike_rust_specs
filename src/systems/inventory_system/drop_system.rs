@@ -2,7 +2,6 @@ use specs::prelude::*;
 
 use super::{
     EquipmentChanged,
-    GameLog,
     InBackpack,
     MagicItem,
     MasterDungeonMap,
@@ -17,7 +16,7 @@ pub struct ItemDropSystem {}
 impl<'a> System<'a> for ItemDropSystem {
     type SystemData = (
         ReadExpect<'a, Entity>,
-        WriteExpect<'a, GameLog>,
+        WriteExpect<'a, crate::gamelog::GameLog>,
         Entities<'a>,
         WriteStorage<'a, WantsToDropItem>,
         ReadStorage<'a, Name>,

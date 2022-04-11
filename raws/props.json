@@ -17,6 +17,40 @@
   },
 
   {
+    "name": "Stonefall Trap",
+    "renderable": {
+      "glyph": "^",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 2
+    },
+    "hidden": true,
+    "entry_trigger": {
+      "effects": {
+        "damage": "12",
+        "single_activation": "1"
+      }
+    }
+  },
+
+  {
+    "name": "Landmine",
+    "renderable": {
+      "glyph": "^",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 2
+    },
+    "hidden": true,
+    "entry_trigger": {
+      "effects": {
+        "damage": "18",
+        "single_activation": "1"
+      }
+    }
+  },
+
+  {
     "name": "Door",
     "renderable": {
       "glyph": "+",
@@ -61,6 +95,22 @@
       "order": 2
     },
     "hidden": false
+  },
+
+  {
+    "name": "Altar",
+    "renderable": {
+      "glyph": "╫",
+      "fg": "#5555FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "hidden": false,
+    "entry_trigger": {
+      "effects": {
+        "provides_healing": "100"
+      }
+    }
   },
 
   {
@@ -200,56 +250,6 @@
     "entry_trigger": {
       "effects": {
         "damage": "6"
-      }
-    }
-  },
-
-  {
-    "name": "Stonefall Trap",
-    "renderable": {
-      "glyph": "^",
-      "fg": "#FF0000",
-      "bg": "#000000",
-      "order": 2
-    },
-    "hidden": true,
-    "entry_trigger": {
-      "effects": {
-        "damage": "12",
-        "single_activation": "1"
-      }
-    }
-  },
-
-  {
-    "name": "Landmine",
-    "renderable": {
-      "glyph": "^",
-      "fg": "#FF0000",
-      "bg": "#000000",
-      "order": 2
-    },
-    "hidden": true,
-    "entry_trigger": {
-      "effects": {
-        "damage": "18",
-        "single_activation": "1"
-      }
-    }
-  },
-
-  {
-    "name": "Altar",
-    "renderable": {
-      "glyph": "╫",
-      "fg": "#55FF55",
-      "bg": "#000000",
-      "order": 2
-    },
-    "hidden": false,
-    "entry_trigger": {
-      "effects": {
-        "provides_healing": "100"
       }
     }
   }

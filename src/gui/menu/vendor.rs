@@ -1,9 +1,6 @@
 use specs::prelude::*;
 
-use super::{InBackpack, Item, Name, State, Vendor};
-use crate::VendorMode;
-
-use rltk::{Rltk, VirtualKeyCode, RGB};
+use super::{InBackpack, Item, Name, Rltk, State, Vendor, VendorMode, VirtualKeyCode, RGB};
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum VendorResult {

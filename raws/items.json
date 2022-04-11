@@ -28,7 +28,7 @@
       "effects": {
         "ranged": "6",
         "damage": "20",
-        "particle_line": "*;#00FFFF;200.0"
+        "particle_line": "▓;#00FFFF;200.0"
       }
     },
     "weight_lbs": 0.5,
@@ -50,7 +50,7 @@
         "ranged": "6",
         "damage": "20",
         "area_of_effect": "3",
-        "particle": "*;#FFA500;200.0"
+        "particle": "▓;#FFA500;200.0"
       }
     },
     "weight_lbs": 0.5,
@@ -102,7 +102,7 @@
     "name": "Town Portal Scroll",
     "renderable": {
       "glyph": ")",
-      "fg": "#FFAAAA",
+      "fg": "#AAAAFF",
       "bg": "#000000",
       "order": 2
     },
@@ -621,5 +621,68 @@
     "base_value": 5.0,
     "initiative_penalty": 0.25,
     "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Longsword -1",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "might",
+      "base_damage": "1d8-1",
+      "hit_bonus": -1
+    },
+    "weight_lbs": 2.0,
+    "base_value": 100.0,
+    "initiative_penalty": 3,
+    "vendor_category": "weapon",
+    "magic": {
+      "class": "common",
+      "naming": "Unidentified Longsword",
+      "cursed": true
+    }
+  },
+
+  {
+    "name": "Remove Curse Scroll",
+    "renderable": {
+      "glyph": ")",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "remove_curse": ""
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "scroll" }
+  },
+
+  {
+    "name": "Identify Scroll",
+    "renderable": {
+      "glyph": ")",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "identify": ""
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "scroll" }
   }
 ]

@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{EquipmentChanged, Equippable, Equipped, GameLog, InBackpack, Name, WantsToUseItem};
+use super::{CursedItem, EquipmentChanged, Equippable, Equipped, IdentifiedItem, InBackpack, Name, WantsToUseItem};
 
 pub struct ItemEquipOnUse {}
 
@@ -8,7 +8,7 @@ impl<'a> System<'a> for ItemEquipOnUse {
     #[allow(clippy::type_complexity)]
     type SystemData = (
         ReadExpect<'a, Entity>,
-        WriteExpect<'a, GameLog>,
+        WriteExpect<'a, crate::gamelog::GameLog>,
         Entities<'a>,
         WriteStorage<'a, WantsToUseItem>,
         ReadStorage<'a, Name>,
@@ -16,6 +16,8 @@ impl<'a> System<'a> for ItemEquipOnUse {
         WriteStorage<'a, Equipped>,
         WriteStorage<'a, InBackpack>,
         WriteStorage<'a, EquipmentChanged>,
+        WriteStorage<'a, IdentifiedItem>,
+        ReadStorage<'a, CursedItem>,
     );
 
     #[allow(clippy::cognitive_complexity)]
@@ -30,6 +32,8 @@ impl<'a> System<'a> for ItemEquipOnUse {
             mut equipped,
             mut backpack,
             mut dirty,
+            mut identified_item,
+            cursed,
         ) = data;
 
         let mut remove_use: Vec<Entity> = Vec::new();
@@ -39,38 +43,63 @@ impl<'a> System<'a> for ItemEquipOnUse {
                 let target_slot = can_equip.slot;
 
                 // Remove any items the target has in the item's slot
+                let mut can_equip = true;
+                let mut log_entries: Vec<String> = Vec::new();
                 let mut to_unequip: Vec<Entity> = Vec::new();
                 for (item_entity, already_equipped, name) in (&entities, &equipped, &names).join() {
                     if already_equipped.owner == target && already_equipped.slot == target_slot {
-                        to_unequip.push(item_entity);
-
-                        if target == *player_entity {
-                            gamelog.add(format!("You unequip {}.", name.name));
+                        if cursed.get(item_entity).is_some() {
+                            can_equip = false;
+                            gamelog.add(format!("You cannot unequip {}, it is cursed.", name.name));
+                        } else {
+                            to_unequip.push(item_entity);
+                            if target == *player_entity {
+                                log_entries.push(format!("You unequip {}.", name.name));
+                            }
                         }
                     }
                 }
-                for item in to_unequip.iter() {
-                    equipped.remove(*item);
-                    backpack
-                        .insert(*item, InBackpack { owner: target })
-                        .expect("Unable to insert backpack entry");
-                }
 
-                // Wield the item
-                equipped
-                    .insert(
-                        useitem.item,
-                        Equipped {
-                            owner: target,
-                            slot: target_slot,
-                        },
-                    )
-                    .expect("Unable to insert equipped component");
+                if can_equip {
+                    // Identify the item
+                    if target == *player_entity {
+                        identified_item
+                            .insert(
+                                target,
+                                IdentifiedItem {
+                                    name: names.get(useitem.item).unwrap().name.clone(),
+                                },
+                            )
+                            .expect("Unable to insert");
+                    }
 
-                backpack.remove(useitem.item);
+                    for item in to_unequip.iter() {
+                        equipped.remove(*item);
+                        backpack
+                            .insert(*item, InBackpack { owner: target })
+                            .expect("Unable to insert backpack entry");
+                    }
 
-                if target == *player_entity {
-                    gamelog.add(format!("You equip {}.", names.get(useitem.item).unwrap().name));
+                    for le in log_entries.iter() {
+                        gamelog.add(le.to_string());
+                    }
+
+                    // Wield the item
+                    backpack.remove(useitem.item);
+
+                    equipped
+                        .insert(
+                            useitem.item,
+                            Equipped {
+                                owner: target,
+                                slot: target_slot,
+                            },
+                        )
+                        .expect("Unable to insert equipped component");
+
+                    if target == *player_entity {
+                        gamelog.add(format!("You equip {}.", names.get(useitem.item).unwrap().name));
+                    }
                 }
 
                 // Done with item

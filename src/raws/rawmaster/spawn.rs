@@ -78,11 +78,13 @@ macro_rules! apply_effects {
                 "confusion" => $eb = $eb.with(Confusion{ turns: effect.1.parse::<i32>().unwrap() }),
                 "damage" => $eb = $eb.with(InflictsDamage{ damage : effect.1.parse::<i32>().unwrap() }),
                 "food" => $eb = $eb.with(ProvidesFood{}),
+                "identify" => $eb = $eb.with(ProvidesIdentification{}),
                 "magic_mapping" => $eb = $eb.with(MagicMapper{}),
-                "particle_line" => $eb = $eb.with(parse_particle_line(&effect.1)),
                 "particle" => $eb = $eb.with(parse_particle(&effect.1)),
+                "particle_line" => $eb = $eb.with(parse_particle_line(&effect.1)),
                 "provides_healing" => $eb = $eb.with(ProvidesHealing{ heal_amount: effect.1.parse::<i32>().unwrap() }),
                 "ranged" => $eb = $eb.with(Ranged{ range: effect.1.parse::<i32>().unwrap() }),
+                "remove_curse" => $eb = $eb.with(ProvidesRemoveCurse{}),
                 "single_activation" => $eb = $eb.with(SingleActivation{}),
                 "town_portal" => $eb = $eb.with(TownPortal{}),
                 _ => rltk::console::log(format!("Warning: consumable effect {} not implemented.", effect_name))
@@ -151,6 +153,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
 
     // Magic Component
     if let Some(magic) = &item_template.magic {
+        // Class
         let class = match magic.class.as_str() {
             "rare" => MagicItemClass::Rare,
             "legendary" => MagicItemClass::Legendary,
@@ -158,6 +161,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
         };
         eb = eb.with(MagicItem { class });
 
+        // ObfuscatedName
         if !identified.contains(&item_template.name) {
             match magic.naming.as_str() {
                 "scroll" => {
@@ -175,6 +179,13 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
                         name: magic.naming.clone(),
                     });
                 },
+            }
+        }
+
+        // Cursed item X(
+        if let Some(cursed) = magic.cursed {
+            if cursed {
+                eb = eb.with(CursedItem {});
             }
         }
     }

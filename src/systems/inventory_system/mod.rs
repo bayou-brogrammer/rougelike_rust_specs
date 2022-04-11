@@ -3,10 +3,10 @@ use specs::prelude::*;
 use super::{
     effects,
     AreaOfEffect,
+    CursedItem,
     EquipmentChanged,
     Equippable,
     Equipped,
-    GameLog,
     IdentifiedItem,
     InBackpack,
     Item,
