@@ -1,42 +1,60 @@
 use specs::prelude::*;
+use std::collections::HashSet;
 
-use super::{Confusion, MyTurn, RunState};
+use super::{Confusion, MyTurn, RunState, StatusEffect};
 
 pub struct TurnStatusSystem {}
 
 impl<'a> System<'a> for TurnStatusSystem {
     type SystemData = (
         WriteStorage<'a, MyTurn>,
-        WriteStorage<'a, Confusion>,
+        ReadStorage<'a, Confusion>,
         Entities<'a>,
         ReadExpect<'a, RunState>,
+        ReadStorage<'a, StatusEffect>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut turns, mut confusion, entities, runstate) = data;
+        let (mut turns, confusion, entities, runstate, statuses) = data;
 
         if *runstate != RunState::Ticking {
             return;
         }
 
-        let mut not_my_turn: Vec<Entity> = Vec::new();
-        let mut not_confused: Vec<Entity> = Vec::new();
-        for (entity, _turn, confused) in (&entities, &mut turns, &mut confusion).join() {
-            confused.turns -= 1;
+        // Collect a set of all entities whose turn it is
+        let mut entity_turns = HashSet::new();
+        for (entity, _turn) in (&entities, &turns).join() {
+            entity_turns.insert(entity);
+        }
 
-            if confused.turns < 1 {
-                not_confused.push(entity);
-            } else {
-                not_my_turn.push(entity);
+        // Find status effects affecting entities whose turn it is
+        let mut not_my_turn: Vec<Entity> = Vec::new();
+        for (effect_entity, status_effect) in (&entities, &statuses).join() {
+            if entity_turns.contains(&status_effect.target) {
+                use crate::effects::{add_effect, EffectType, Targets};
+
+                // Skip turn for confusion
+                if confusion.get(effect_entity).is_some() {
+                    add_effect(
+                        None,
+                        EffectType::Particle {
+                            glyph: rltk::to_cp437('?'),
+                            fg: rltk::RGB::named(rltk::CYAN),
+                            bg: rltk::RGB::named(rltk::BLACK),
+                            lifespan: 200.0,
+                        },
+                        Targets::Single {
+                            target: status_effect.target,
+                        },
+                    );
+
+                    not_my_turn.push(status_effect.target);
+                }
             }
         }
 
         for e in not_my_turn {
             turns.remove(e);
-        }
-
-        for e in not_confused {
-            confusion.remove(e);
         }
     }
 }

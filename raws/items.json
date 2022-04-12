@@ -17,6 +17,27 @@
   },
 
   {
+    "name": "Strength Potion",
+    "renderable": {
+      "glyph": "!",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "particle": "!;#FF0000;200.0",
+        "duration": "20"
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "potion" },
+    "attributes": { "might": 5 }
+  },
+
+  {
     "name": "Magic Missile Scroll",
     "renderable": {
       "glyph": ")",
@@ -83,7 +104,7 @@
     "name": "Magic Mapping Scroll",
     "renderable": {
       "glyph": ")",
-      "fg": "#AAAAFF",
+      "fg": "#FFAAAA",
       "bg": "#000000",
       "order": 2
     },
@@ -102,7 +123,7 @@
     "name": "Town Portal Scroll",
     "renderable": {
       "glyph": ")",
-      "fg": "#AAAAFF",
+      "fg": "#FFAAAA",
       "bg": "#000000",
       "order": 2
     },
@@ -113,6 +134,44 @@
     },
     "weight_lbs": 0.5,
     "base_value": 20.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "scroll" }
+  },
+
+  {
+    "name": "Remove Curse Scroll",
+    "renderable": {
+      "glyph": ")",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "remove_curse": ""
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "scroll" }
+  },
+
+  {
+    "name": "Identify Scroll",
+    "renderable": {
+      "glyph": ")",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "identify": ""
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
     "vendor_category": "alchemy",
     "magic": { "class": "common", "naming": "scroll" }
   },
@@ -309,6 +368,31 @@
     "initiative_penalty": 1,
     "vendor_category": "weapon",
     "magic": { "class": "common", "naming": "Unidentified Longsword" }
+  },
+
+  {
+    "name": "Longsword -1",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "might",
+      "base_damage": "1d8-1",
+      "hit_bonus": -1
+    },
+    "weight_lbs": 2.0,
+    "base_value": 100.0,
+    "initiative_penalty": 3,
+    "vendor_category": "weapon",
+    "magic": {
+      "class": "common",
+      "naming": "Unidentified Longsword",
+      "cursed": true
+    }
   },
 
   {
@@ -596,7 +680,7 @@
       "order": 2
     },
     "wearable": {
-      "slot": "Head",
+      "slot": "Torso",
       "armor_class": 1.0
     },
     "weight_lbs": 5.0,
@@ -624,65 +708,45 @@
   },
 
   {
-    "name": "Longsword -1",
+    "name": "Gauntlets of Ogre Power",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Hands",
+      "armor_class": 0.1
+    },
+    "weight_lbs": 1.0,
+    "base_value": 300.0,
+    "initiative_penalty": 0.0,
+    "vendor_category": "armor",
+    "magic": { "class": "common", "naming": "Unidentified Gauntlets" },
+    "attributes": { "might": 5 }
+  },
+
+  {
+    "name": "Rod of Fireballs",
     "renderable": {
       "glyph": "/",
-      "fg": "#FFAAFF",
-      "bg": "#000000",
-      "order": 2
-    },
-    "weapon": {
-      "range": "melee",
-      "attribute": "might",
-      "base_damage": "1d8-1",
-      "hit_bonus": -1
-    },
-    "weight_lbs": 2.0,
-    "base_value": 100.0,
-    "initiative_penalty": 3,
-    "vendor_category": "weapon",
-    "magic": {
-      "class": "common",
-      "naming": "Unidentified Longsword",
-      "cursed": true
-    }
-  },
-
-  {
-    "name": "Remove Curse Scroll",
-    "renderable": {
-      "glyph": ")",
       "fg": "#FFAAAA",
       "bg": "#000000",
       "order": 2
     },
     "consumable": {
       "effects": {
-        "remove_curse": ""
-      }
+        "ranged": "6",
+        "damage": "20",
+        "area_of_effect": "3",
+        "particle": "▓;#FFA500;200.0"
+      },
+      "charges": 5
     },
     "weight_lbs": 0.5,
-    "base_value": 50.0,
+    "base_value": 500.0,
     "vendor_category": "alchemy",
-    "magic": { "class": "common", "naming": "scroll" }
-  },
-
-  {
-    "name": "Identify Scroll",
-    "renderable": {
-      "glyph": ")",
-      "fg": "#FFAAAA",
-      "bg": "#000000",
-      "order": 2
-    },
-    "consumable": {
-      "effects": {
-        "identify": ""
-      }
-    },
-    "weight_lbs": 0.5,
-    "base_value": 50.0,
-    "vendor_category": "alchemy",
-    "magic": { "class": "common", "naming": "scroll" }
+    "magic": { "class": "common", "naming": "Unidentified Rod" }
   }
 ]

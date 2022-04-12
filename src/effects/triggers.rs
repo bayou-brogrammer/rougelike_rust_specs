@@ -5,12 +5,31 @@ use crate::gamelog::GameLog;
 use crate::RunState;
 
 pub fn item_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, ecs: &mut World) {
+    // Check charges
+    if let Some(c) = ecs.write_storage::<Consumable>().get_mut(item) {
+        if c.charges < 1 {
+            // Cancel
+            let mut gamelog = ecs.fetch_mut::<GameLog>();
+            gamelog.add(format!(
+                "{} is out of charges!",
+                ecs.read_storage::<Name>().get(item).unwrap().name
+            ));
+            return;
+        } else {
+            c.charges -= 1;
+        }
+    }
+
     // Use the item via the generic system
     let did_something = event_trigger(creator, item, targets, ecs);
 
     // If it was a consumable, then it gets deleted
     if did_something && ecs.read_storage::<Consumable>().get(item).is_some() {
-        ecs.entities().delete(item).expect("Delete Failed");
+        if let Some(c) = ecs.read_storage::<Consumable>().get(item) {
+            if c.max_charges == 0 {
+                ecs.entities().delete(item).expect("Delete Failed");
+            }
+        }
     }
 }
 
@@ -73,9 +92,7 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     if ecs.read_storage::<ProvidesFood>().get(entity).is_some() {
         add_effect(creator, EffectType::WellFed, targets.clone());
         let names = ecs.read_storage::<Name>();
-        gamelog
-            .entries
-            .push(format!("You eat the {}.", names.get(entity).unwrap().name));
+        gamelog.add(format!("You eat the {}.", names.get(entity).unwrap().name));
         did_something = true;
     }
 
@@ -105,9 +122,7 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     if ecs.read_storage::<TownPortal>().get(entity).is_some() {
         let map = ecs.fetch::<Map>();
         if map.depth == 1 {
-            gamelog
-                .entries
-                .push("You are already in town, so the scroll does nothing.".to_string());
+            gamelog.add("You are already in town, so the scroll does nothing.".to_string());
         } else {
             gamelog.add("You are telported back to town!".to_string());
 
@@ -136,13 +151,15 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     }
 
     // Confusion
-    if let Some(confusion) = ecs.read_storage::<Confusion>().get(entity) {
-        add_effect(
-            creator,
-            EffectType::Confusion { turns: confusion.turns },
-            targets.clone(),
-        );
-        did_something = true;
+    if let Some(_confusion) = ecs.read_storage::<Confusion>().get(entity) {
+        if let Some(duration) = ecs.read_storage::<Duration>().get(entity) {
+            add_effect(
+                creator,
+                EffectType::Confusion { turns: duration.turns },
+                targets.clone(),
+            );
+            did_something = true;
+        }
     }
 
     // Teleport
@@ -154,6 +171,25 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
                 y: teleport.y,
                 depth: teleport.depth,
                 player_only: teleport.player_only,
+            },
+            targets.clone(),
+        );
+        did_something = true;
+    }
+
+    // Attribute Modifiers
+    if let Some(attr) = ecs.read_storage::<AttributeBonus>().get(entity) {
+        let turns = match ecs.read_storage::<Duration>().get(entity) {
+            Some(duration) => duration.turns,
+            None => 10,
+        };
+
+        add_effect(
+            creator,
+            EffectType::AttributeEffect {
+                bonus: attr.clone(),
+                duration: turns,
+                name: ecs.read_storage::<Name>().get(entity).unwrap().name.clone(),
             },
             targets.clone(),
         );

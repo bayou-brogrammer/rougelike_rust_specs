@@ -1,6 +1,7 @@
 use specs::prelude::*;
 
 use super::{
+    Consumable,
     CursedItem,
     Equipped,
     InBackpack,

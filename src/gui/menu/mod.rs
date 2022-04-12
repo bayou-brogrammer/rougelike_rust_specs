@@ -1,4 +1,5 @@
 use super::{
+    Consumable,
     CursedItem,
     Equipped,
     InBackpack,

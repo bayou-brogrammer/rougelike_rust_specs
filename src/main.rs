@@ -388,6 +388,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<ApplyMove>();
     gs.ecs.register::<ApplyTeleport>();
     gs.ecs.register::<AreaOfEffect>();
+    gs.ecs.register::<AttributeBonus>();
     gs.ecs.register::<Attributes>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<BlocksVisibility>();
@@ -396,6 +397,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Consumable>();
     gs.ecs.register::<CursedItem>();
     gs.ecs.register::<Door>();
+    gs.ecs.register::<Duration>();
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<EquipmentChanged>();
@@ -435,6 +437,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<SpawnParticleBurst>();
     gs.ecs.register::<SpawnParticleLine>();
+    gs.ecs.register::<StatusEffect>();
     gs.ecs.register::<TeleportTo>();
     gs.ecs.register::<TownPortal>();
     gs.ecs.register::<Vendor>();
@@ -462,9 +465,7 @@ fn main() -> rltk::BError {
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
     gs.ecs.insert(RunState::MapGeneration {});
-    gs.ecs.insert(gamelog::GameLog {
-        entries: vec!["Welcome to Rusty Roguelike".to_string()],
-    });
+    gs.ecs.insert(gamelog::GameLog::default());
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 

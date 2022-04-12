@@ -1,9 +1,12 @@
 use specs::prelude::*;
 
 use super::*;
-use crate::components::{Attributes, Confusion, Player, Pools};
+use crate::components::{
+    Attributes, Confusion, Duration, EquipmentChanged, Name, Player, Pools, SerializeMe, StatusEffect,
+};
 use crate::gamelog::GameLog;
 use crate::gamesystem::{mana_at_level, player_hp_at_level};
+use specs::saveload::{MarkedBuilder, SimpleMarker};
 
 pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
     let mut pools = ecs.write_storage::<Pools>();
@@ -57,9 +60,31 @@ pub fn heal_damage(ecs: &mut World, heal: &EffectSpawner, target: Entity) {
 
 pub fn add_confusion(ecs: &mut World, effect: &EffectSpawner, target: Entity) {
     if let EffectType::Confusion { turns } = &effect.effect_type {
-        ecs.write_storage::<Confusion>()
-            .insert(target, Confusion { turns: *turns })
-            .expect("Unable to insert status");
+        ecs.create_entity()
+            .with(StatusEffect { target })
+            .with(Confusion {})
+            .with(Duration { turns: *turns })
+            .with(Name {
+                name: "Confusion".to_string(),
+            })
+            .marked::<SimpleMarker<SerializeMe>>()
+            .build();
+    }
+}
+
+pub fn attribute_effect(ecs: &mut World, effect: &EffectSpawner, target: Entity) {
+    if let EffectType::AttributeEffect { bonus, name, duration } = &effect.effect_type {
+        ecs.create_entity()
+            .with(StatusEffect { target })
+            .with(bonus.clone())
+            .with(Duration { turns: *duration })
+            .with(Name { name: name.clone() })
+            .marked::<SimpleMarker<SerializeMe>>()
+            .build();
+
+        ecs.write_storage::<EquipmentChanged>()
+            .insert(target, EquipmentChanged {})
+            .expect("Insert failed");
     }
 }
 

@@ -41,8 +41,76 @@ pub struct Viewshed {
     pub dirty: bool,
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct LightSource {
+    pub color: RGB,
+    pub range: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Initiative {
+    pub current: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Vendor {
+    pub categories: Vec<String>,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct MyTurn {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Faction {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ApplyMove {
+    pub dest_idx: usize,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ApplyTeleport {
+    pub dest_x: i32,
+    pub dest_y: i32,
+    pub dest_depth: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantsToApproach {
+    pub idx: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantsToFlee {
+    pub indices: Vec<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum Movement {
+    Static,
+    Random,
+    RandomWaypoint { path: Option<Vec<usize>> },
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct MoveMode {
+    pub mode: Movement,
+}
+
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Name {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ObfuscatedName {
+    pub name: String,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct IdentifiedItem {
     pub name: String,
 }
 
@@ -99,10 +167,18 @@ pub struct WantsToMelee {
     pub target: Entity,
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct Chasing {
+    pub target: Entity,
+}
+
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct LootTable {
     pub table: String,
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct EquipmentChanged {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Item {
@@ -111,8 +187,40 @@ pub struct Item {
     pub base_value: f32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum MagicItemClass {
+    Common,
+    Rare,
+    Legendary,
+}
+
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Consumable {}
+pub struct MagicItem {
+    pub class: MagicItemClass,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct AttributeBonus {
+    pub might: Option<i32>,
+    pub fitness: Option<i32>,
+    pub quickness: Option<i32>,
+    pub intelligence: Option<i32>,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct CursedItem {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Consumable {
+    pub max_charges: i32,
+    pub charges: i32,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ProvidesRemoveCurse {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ProvidesIdentification {}
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Ranged {
@@ -129,9 +237,17 @@ pub struct AreaOfEffect {
     pub radius: i32,
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct Confusion {
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Confusion {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Duration {
     pub turns: i32,
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct StatusEffect {
+    pub target: Entity,
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
@@ -237,6 +353,20 @@ pub struct ParticleLifetime {
     pub lifetime_ms: f32,
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SpawnParticleLine {
+    pub glyph: rltk::FontCharType,
+    pub color: RGB,
+    pub lifetime_ms: f32,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SpawnParticleBurst {
+    pub glyph: rltk::FontCharType,
+    pub color: RGB,
+    pub lifetime_ms: f32,
+}
+
 #[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
 pub enum HungerState {
     WellFed,
@@ -258,6 +388,17 @@ pub struct ProvidesFood {}
 pub struct MagicMapper {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct TownPortal {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct TeleportTo {
+    pub x: i32,
+    pub y: i32,
+    pub depth: i32,
+    pub player_only: bool,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Hidden {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -273,128 +414,6 @@ pub struct SingleActivation {}
 pub struct Quips {
     pub available: Vec<String>,
 }
-
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct LightSource {
-    pub color: RGB,
-    pub range: i32,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Initiative {
-    pub current: i32,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct MyTurn {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Faction {
-    pub name: String,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct WantsToApproach {
-    pub idx: i32,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct WantsToFlee {
-    pub indices: Vec<usize>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
-pub enum Movement {
-    Static,
-    Random,
-    RandomWaypoint { path: Option<Vec<usize>> },
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct MoveMode {
-    pub mode: Movement,
-}
-
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct Chasing {
-    pub target: Entity,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct EquipmentChanged {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Vendor {
-    pub categories: Vec<String>,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct TownPortal {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct TeleportTo {
-    pub x: i32,
-    pub y: i32,
-    pub depth: i32,
-    pub player_only: bool,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct ApplyMove {
-    pub dest_idx: usize,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct ApplyTeleport {
-    pub dest_x: i32,
-    pub dest_y: i32,
-    pub dest_depth: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
-pub enum MagicItemClass {
-    Common,
-    Rare,
-    Legendary,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct MagicItem {
-    pub class: MagicItemClass,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct ObfuscatedName {
-    pub name: String,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct IdentifiedItem {
-    pub name: String,
-}
-
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct SpawnParticleLine {
-    pub glyph: rltk::FontCharType,
-    pub color: RGB,
-    pub lifetime_ms: f32,
-}
-
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct SpawnParticleBurst {
-    pub glyph: rltk::FontCharType,
-    pub color: RGB,
-    pub lifetime_ms: f32,
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct CursedItem {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct ProvidesRemoveCurse {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct ProvidesIdentification {}
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.

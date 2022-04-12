@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{camera, Attributes, Hidden, Map, Pools, Position};
+use super::{camera, Attributes, Duration, Hidden, Map, Name, Pools, Position, StatusEffect};
 use rltk::{Rltk, RGB};
 
 struct Tooltip {
@@ -109,6 +109,16 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
             let stat = pools.get(entity);
             if let Some(stat) = stat {
                 tip.add(format!("Level: {}", stat.level));
+            }
+
+            // Status effects
+            let statuses = ecs.read_storage::<StatusEffect>();
+            let durations = ecs.read_storage::<Duration>();
+            let names = ecs.read_storage::<Name>();
+            for (status, duration, name) in (&statuses, &durations, &names).join() {
+                if status.target == entity {
+                    tip.add(format!("{} ({})", name.name, duration.turns));
+                }
             }
 
             tip_boxes.push(tip);

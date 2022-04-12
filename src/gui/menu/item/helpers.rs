@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{CursedItem, MagicItem, MagicItemClass, Name, ObfuscatedName, RGB};
+use super::{Consumable, CursedItem, MagicItem, MagicItemClass, Name, ObfuscatedName, RGB};
 
 pub fn get_item_color(ecs: &World, item: Entity) -> RGB {
     let dm = ecs.fetch::<crate::map::MasterDungeonMap>();
@@ -27,8 +27,15 @@ pub fn get_item_display_name(ecs: &World, item: Entity) -> String {
     if let Some(name) = ecs.read_storage::<Name>().get(item) {
         if ecs.read_storage::<MagicItem>().get(item).is_some() {
             let dm = ecs.fetch::<crate::map::MasterDungeonMap>();
+
+            // Is Identified?
             if dm.identified_items.contains(&name.name) {
-                name.name.clone()
+                // is Consumable?
+                if let Some(c) = ecs.read_storage::<Consumable>().get(item) {
+                    if c.max_charges > 1 { format!("{} ({})", name.name.clone(), c.charges) } else { name.name.clone() }
+                } else {
+                    name.name.clone()
+                }
             } else if let Some(obfuscated) = ecs.read_storage::<ObfuscatedName>().get(item) {
                 obfuscated.name.clone()
             } else {

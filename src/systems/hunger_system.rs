@@ -44,8 +44,7 @@ impl<'a> System<'a> for HungerSystem {
                     HungerState::Starving => {
                         // Inflict damage from hunger
                         if entity == *player_entity {
-                            log.entries
-                                .push("Your hunger pangs are getting painful! You suffer 1 hp damage.".to_string());
+                            log.add("Your hunger pangs are getting painful! You suffer 1 hp damage.".to_string());
                         }
                         add_effect(
                             None,

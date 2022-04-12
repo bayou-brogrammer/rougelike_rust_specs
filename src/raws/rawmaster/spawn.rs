@@ -5,13 +5,8 @@ use specs::{
 use std::collections::HashMap;
 
 use super::{
-    components::*,
-    find_slot_for_equippable_item,
-    gamesystem,
-    get_renderable_component,
-    string_to_slot,
-    BaseRawComponent,
-    RawMaster,
+    components::*, find_slot_for_equippable_item, gamesystem, get_renderable_component, string_to_slot,
+    BaseRawComponent, RawMaster,
 };
 
 use super::parse::{parse_dice_string, parse_particle, parse_particle_line};
@@ -75,8 +70,12 @@ macro_rules! apply_effects {
         let effect_name = effect.0.as_str();
             match effect_name {
                 "area_of_effect" => $eb = $eb.with(AreaOfEffect{ radius: effect.1.parse::<i32>().unwrap() }),
-                "confusion" => $eb = $eb.with(Confusion{ turns: effect.1.parse::<i32>().unwrap() }),
+                "confusion" => {
+                    $eb = $eb.with(Confusion{});
+                    $eb = $eb.with(Duration{ turns: effect.1.parse::<i32>().unwrap() });
+                }
                 "damage" => $eb = $eb.with(InflictsDamage{ damage : effect.1.parse::<i32>().unwrap() }),
+                "duration" => $eb = $eb.with(Duration { turns: effect.1.parse::<i32>().unwrap() }),
                 "food" => $eb = $eb.with(ProvidesFood{}),
                 "identify" => $eb = $eb.with(ProvidesIdentification{}),
                 "magic_mapping" => $eb = $eb.with(MagicMapper{}),
@@ -112,7 +111,11 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
 
     // Consumable Component
     if let Some(consumable) = &item_template.consumable {
-        eb = eb.with(crate::components::Consumable {});
+        let max_charges = consumable.charges.unwrap_or(1);
+        eb = eb.with(crate::components::Consumable {
+            max_charges,
+            charges: max_charges,
+        });
         apply_effects!(consumable.effects, eb);
     }
 
@@ -188,6 +191,16 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
                 eb = eb.with(CursedItem {});
             }
         }
+    }
+
+    // Attributes Bonus!!!
+    if let Some(ab) = &item_template.attributes {
+        eb = eb.with(AttributeBonus {
+            might: ab.might,
+            fitness: ab.fitness,
+            quickness: ab.quickness,
+            intelligence: ab.intelligence,
+        });
     }
 
     Some(eb.build())

@@ -222,10 +222,26 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
         HungerState::Starving => ctx.print_color(50, 44, RGB::named(rltk::RED), RGB::named(rltk::BLACK), "Starving"),
     }
 
+    let statuses = ecs.read_storage::<StatusEffect>();
+    let durations = ecs.read_storage::<Duration>();
+    let names = ecs.read_storage::<Name>();
+    for (status, duration, name) in (&statuses, &durations, &names).join() {
+        if status.target == *player_entity {
+            ctx.print_color(
+                50,
+                y,
+                RGB::named(rltk::RED),
+                RGB::named(rltk::BLACK),
+                &format!("{} ({})", name.name, duration.turns),
+            );
+            y -= 1;
+        }
+    }
+
     // Draw the log
     let log = ecs.fetch::<GameLog>();
     let mut y = 46;
-    for s in log.entries.iter().rev() {
+    for s in log.get_log().iter().rev() {
         if y < 59 {
             ctx.print(2, y, s);
         }

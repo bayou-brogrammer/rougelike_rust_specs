@@ -26,9 +26,7 @@ impl<'a> System<'a> for QuipSystem {
                     (rng.roll_dice(1, quip.available.len() as i32) - 1) as usize
                 };
 
-                gamelog
-                    .entries
-                    .push(format!("{} says \"{}\"", name.name, quip.available[quip_index]));
+                gamelog.add(format!("{} says \"{}\"", name.name, quip.available[quip_index]));
                 quip.available.remove(quip_index);
             }
         }

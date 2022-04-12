@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{Attributes, Initiative, MyTurn, Pools, Position, RunState};
+use super::{Attributes, Duration, EquipmentChanged, Initiative, MyTurn, Pools, Position, RunState, StatusEffect};
 
 pub struct InitiativeSystem {}
 
@@ -16,6 +16,9 @@ impl<'a> System<'a> for InitiativeSystem {
         ReadExpect<'a, Entity>,
         ReadExpect<'a, rltk::Point>,
         ReadStorage<'a, Pools>,
+        WriteStorage<'a, Duration>,
+        WriteStorage<'a, EquipmentChanged>,
+        ReadStorage<'a, StatusEffect>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -30,13 +33,16 @@ impl<'a> System<'a> for InitiativeSystem {
             player,
             player_pos,
             pools,
+            mut durations,
+            mut dirty_equipment,
+            statuses,
         ) = data;
 
         if *runstate != RunState::Ticking {
             return;
         }
 
-        // Clear any remaining MyTurn we left by mistkae
+        // Clear any remaining MyTurn we left by mistake
         turns.clear();
 
         // Roll initiative
@@ -79,6 +85,21 @@ impl<'a> System<'a> for InitiativeSystem {
                 // It's my turn!
                 if myturn {
                     turns.insert(entity, MyTurn {}).expect("Unable to insert turn");
+                }
+            }
+        }
+
+        // Handle durations
+        if *runstate == RunState::AwaitingInput {
+            for (effect_entity, duration, status) in (&entities, &mut durations, &statuses).join() {
+                duration.turns -= 1;
+
+                if duration.turns < 1 {
+                    dirty_equipment
+                        .insert(status.target, EquipmentChanged {})
+                        .expect("Unable to insert");
+
+                    entities.delete(effect_entity).expect("Unable to delete");
                 }
             }
         }
