@@ -65,7 +65,7 @@ pub fn save_game(ecs: &mut World) {
             ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem, CursedItem, ProvidesRemoveCurse,
             ProvidesIdentification, AttributeBonus, Duration, StatusEffect, KnownSpells, SpellTemplate,
             WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities,
-            TileSize
+            TileSize, OnDeath, AlwaysTargetsSelf
         );
     }
 
@@ -126,7 +126,7 @@ pub fn load_game(ecs: &mut World) {
             ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem, CursedItem, ProvidesRemoveCurse,
             ProvidesIdentification, AttributeBonus, Duration, StatusEffect, KnownSpells, SpellTemplate,
             WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities,
-            TileSize
+            TileSize, OnDeath, AlwaysTargetsSelf
         );
     }
 

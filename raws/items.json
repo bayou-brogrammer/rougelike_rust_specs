@@ -530,6 +530,27 @@
   },
 
   {
+    "name": "Longsword +2",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "might",
+      "base_damage": "1d8+2",
+      "hit_bonus": 2
+    },
+    "weight_lbs": 1.0,
+    "base_value": 100.0,
+    "initiative_penalty": 0,
+    "vendor_category": "weapon",
+    "magic": { "class": "common", "naming": "Unidentified Longsword" }
+  },
+
+  {
     "name": "Longsword -1",
     "renderable": {
       "glyph": "/",
@@ -627,6 +648,24 @@
     "weight_lbs": 45.0,
     "base_value": 30.0,
     "initiative_penalty": 1.0,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Tower Shield +1",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FFFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Shield",
+      "armor_class": 3.0
+    },
+    "weight_lbs": 45.0,
+    "base_value": 30.0,
+    "initiative_penalty": 0.0,
     "vendor_category": "armor"
   },
 
@@ -741,6 +780,60 @@
   },
 
   {
+    "name": "Leather Pants",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FFFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Legs",
+      "armor_class": 0.2
+    },
+    "weight_lbs": 5.0,
+    "base_value": 25.0,
+    "initiative_penalty": 0.2,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Chain Leggings",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FFFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Legs",
+      "armor_class": 0.3
+    },
+    "weight_lbs": 10.0,
+    "base_value": 50.0,
+    "initiative_penalty": 0.3,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Steel Greaves",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FFFF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Legs",
+      "armor_class": 0.5
+    },
+    "weight_lbs": 20.0,
+    "base_value": 100.0,
+    "initiative_penalty": 0.5,
+    "vendor_category": "clothes"
+  },
+
+  {
     "name": "Slippers",
     "renderable": {
       "glyph": "[",
@@ -813,6 +906,25 @@
   },
 
   {
+    "name": "Breastplate +1",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Torso",
+      "armor_class": 4.0
+    },
+    "weight_lbs": 20.0,
+    "base_value": 200.0,
+    "initiative_penalty": 1.0,
+    "vendor_category": "armor",
+    "magic": { "class": "common", "naming": "Unidentified Breastplate" }
+  },
+
+  {
     "name": "Dwarf-Steel Shirt",
     "renderable": {
       "glyph": "[",
@@ -827,6 +939,42 @@
     "weight_lbs": 5.0,
     "base_value": 500.0,
     "initiative_penalty": 0.0,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Cloth Cap",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Head",
+      "armor_class": 0.2
+    },
+    "weight_lbs": 0.25,
+    "base_value": 5.0,
+    "initiative_penalty": 0.1,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Leather Cap",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Head",
+      "armor_class": 0.4
+    },
+    "weight_lbs": 0.5,
+    "base_value": 10.0,
+    "initiative_penalty": 0.2,
     "vendor_category": "armor"
   },
 
@@ -849,6 +997,24 @@
   },
 
   {
+    "name": "Steel Helm",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Head",
+      "armor_class": 2.0
+    },
+    "weight_lbs": 15.0,
+    "base_value": 100.0,
+    "initiative_penalty": 1.0,
+    "vendor_category": "armor"
+  },
+
+  {
     "name": "Leather Boots",
     "renderable": {
       "glyph": "[",
@@ -863,6 +1029,114 @@
     "weight_lbs": 2.0,
     "base_value": 5.0,
     "initiative_penalty": 0.25,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Chain Boots",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Feet",
+      "armor_class": 0.3
+    },
+    "weight_lbs": 3.0,
+    "base_value": 10.0,
+    "initiative_penalty": 0.25,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Steel Boots",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#00FF00",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Feet",
+      "armor_class": 0.5
+    },
+    "weight_lbs": 5.0,
+    "base_value": 10.0,
+    "initiative_penalty": 0.4,
+    "vendor_category": "armor"
+  },
+
+  {
+    "name": "Cloth Gloves",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#FF9999",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Hands",
+      "armor_class": 0.1
+    },
+    "weight_lbs": 0.5,
+    "base_value": 1.0,
+    "initiative_penalty": 0.1,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Leather Gloves",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#FF9999",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Hands",
+      "armor_class": 0.2
+    },
+    "weight_lbs": 1.0,
+    "base_value": 1.0,
+    "initiative_penalty": 0.1,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Chain Gloves",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#FF9999",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Hands",
+      "armor_class": 0.3
+    },
+    "weight_lbs": 2.0,
+    "base_value": 10.0,
+    "initiative_penalty": 0.2,
+    "vendor_category": "clothes"
+  },
+
+  {
+    "name": "Steel Gloves",
+    "renderable": {
+      "glyph": "[",
+      "fg": "#FF9999",
+      "bg": "#000000",
+      "order": 2
+    },
+    "wearable": {
+      "slot": "Hands",
+      "armor_class": 0.5
+    },
+    "weight_lbs": 5.0,
+    "base_value": 10.0,
+    "initiative_penalty": 0.3,
     "vendor_category": "clothes"
   },
 

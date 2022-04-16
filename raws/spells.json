@@ -39,5 +39,44 @@
       "area_of_effect": "3",
       "particle": "☼;#00FF00;400.0"
     }
+  },
+
+  {
+    "name": "Explode",
+    "mana_cost": 1,
+    "effects": {
+      "ranged": "3",
+      "damage": "20",
+      "area_of_effect": "3",
+      "particle": "▒;#FFAA50;400.0",
+      "single_activation": "1",
+      "target_self": "1"
+    }
+  },
+
+  {
+    "name": "ConfusionCloud",
+    "mana_cost": 1,
+    "effects": {
+      "ranged": "3",
+      "confusion": "4",
+      "area_of_effect": "3",
+      "particle": "?;#FFFF00;400.0",
+      "single_activation": "1",
+      "target_self": "1"
+    }
+  },
+
+  {
+    "name": "PoisonCloud",
+    "mana_cost": 1,
+    "effects": {
+      "ranged": "3",
+      "damage_over_time": "4",
+      "area_of_effect": "3",
+      "particle": "*;#00FF00;400.0",
+      "single_activation": "1",
+      "target_self": "1"
+    }
   }
 ]

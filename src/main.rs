@@ -1,4 +1,5 @@
 #![feature(stmt_expr_attributes)]
+#![feature(let_chains)]
 
 #[macro_use]
 extern crate lazy_static;
@@ -399,6 +400,7 @@ fn main() -> rltk::BError {
         }),
     };
 
+    gs.ecs.register::<AlwaysTargetsSelf>();
     gs.ecs.register::<ApplyMove>();
     gs.ecs.register::<ApplyTeleport>();
     gs.ecs.register::<AreaOfEffect>();
@@ -437,6 +439,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Name>();
     gs.ecs.register::<NaturalAttackDefense>();
     gs.ecs.register::<ObfuscatedName>();
+    gs.ecs.register::<OnDeath>();
     gs.ecs.register::<OtherLevelPosition>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();

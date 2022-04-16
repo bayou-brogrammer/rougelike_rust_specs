@@ -284,7 +284,7 @@
     "vision_range": 8,
     "movement": "static",
     "attributes": {
-      "might": 3,
+      "might": 7,
       "fitness": 3
     },
     "skills": {
@@ -569,6 +569,44 @@
   },
 
   {
+    "name": "Black Dragon",
+    "renderable": {
+      "glyph": "D",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1,
+      "x_size": 2,
+      "y_size": 2
+    },
+    "blocks_tile": true,
+    "vision_range": 12,
+    "movement": "static",
+    "attributes": {
+      "might": 13,
+      "fitness": 13
+    },
+    "skills": {
+      "Melee": 18,
+      "Defense": 16
+    },
+    "natural": {
+      "armor_class": 17,
+      "attacks": [
+        { "name": "bite", "hit_bonus": 4, "damage": "1d10+2" },
+        { "name": "left_claw", "hit_bonus": 2, "damage": "1d10" },
+        { "name": "right_claw", "hit_bonus": 2, "damage": "1d10" }
+      ]
+    },
+    "loot_table": "Wyrms",
+    "faction": "Wyrm",
+    "level": 6,
+    "gold": "20d10",
+    "abilities": [
+      { "spell": "Acid Breath", "chance": 0.2, "range": 8.0, "min_range": 2.0 }
+    ]
+  },
+
+  {
     "name": "Lizardman",
     "renderable": {
       "glyph": "l",
@@ -619,40 +657,132 @@
   },
 
   {
-    "name": "Black Dragon",
+    "name": "Firecap Mushroom",
     "renderable": {
-      "glyph": "D",
-      "fg": "#FF0000",
+      "glyph": "♠",
+      "fg": "#FFAA50",
       "bg": "#000000",
-      "order": 1,
-      "x_size": 2,
-      "y_size": 2
+      "order": 1
     },
     "blocks_tile": true,
-    "vision_range": 12,
+    "vision_range": 3,
     "movement": "static",
-    "attributes": {
-      "might": 13,
-      "fitness": 13
-    },
-    "skills": {
-      "Melee": 18,
-      "Defense": 16
-    },
-    "natural": {
-      "armor_class": 17,
-      "attacks": [
-        { "name": "bite", "hit_bonus": 4, "damage": "1d10+2" },
-        { "name": "left_claw", "hit_bonus": 2, "damage": "1d10" },
-        { "name": "right_claw", "hit_bonus": 2, "damage": "1d10" }
-      ]
-    },
-    "loot_table": "Wyrms",
-    "faction": "Wyrm",
-    "level": 6,
-    "gold": "10d6",
+    "attributes": {},
+    "faction": "Fungi",
+    "level": 1,
     "abilities": [
-      { "spell": "Acid Breath", "chance": 0.2, "range": 8.0, "min_range": 2.0 }
+      { "spell": "Explode", "chance": 1.0, "range": 3.0, "min_range": 0.0 }
+    ],
+    "on_death": [
+      { "spell": "Explode", "chance": 1.0, "range": 0.0, "min_range": 0.0 }
     ]
+  },
+
+  {
+    "name": "Sporecap Mushroom",
+    "renderable": {
+      "glyph": "♠",
+      "fg": "#00AAFF",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 3,
+    "movement": "static",
+    "attributes": {},
+    "faction": "Fungi",
+    "level": 1,
+    "abilities": [
+      {
+        "spell": "ConfusionCloud",
+        "chance": 1.0,
+        "range": 3.0,
+        "min_range": 0.0
+      }
+    ],
+    "on_death": [
+      {
+        "spell": "ConfusionCloud",
+        "chance": 1.0,
+        "range": 0.0,
+        "min_range": 0.0
+      }
+    ]
+  },
+
+  {
+    "name": "Deathcap Mushroom",
+    "renderable": {
+      "glyph": "♠",
+      "fg": "#55FF55",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 3,
+    "movement": "static",
+    "attributes": {},
+    "faction": "Fungi",
+    "level": 1,
+    "abilities": [
+      { "spell": "PoisonCloud", "chance": 1.0, "range": 3.0, "min_range": 0.0 }
+    ],
+    "on_death": [
+      { "spell": "PoisonCloud", "chance": 1.0, "range": 0.0, "min_range": 0.0 }
+    ]
+  },
+
+  {
+    "name": "Fungus Man",
+    "renderable": {
+      "glyph": "f",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "movement": "random_waypoint",
+    "attributes": {},
+    "faction": "Fungi",
+    "gold": "2d8",
+    "level": 4,
+    "loot_table": "Animal"
+  },
+
+  {
+    "name": "Spore Zombie",
+    "renderable": {
+      "glyph": "z",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "movement": "random_waypoint",
+    "attributes": {},
+    "faction": "Fungi",
+    "gold": "2d8",
+    "level": 5
+  },
+
+  {
+    "name": "Fungal Beast",
+    "renderable": {
+      "glyph": "F",
+      "fg": "#995555",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 6,
+    "movement": "random",
+    "attributes": {},
+    "natural": {
+      "armor_class": 11,
+      "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
+    },
+    "faction": "Fungi"
   }
 ]

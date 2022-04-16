@@ -478,6 +478,14 @@ pub struct TileSize {
     pub y: i32,
 }
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct OnDeath {
+    pub abilities: Vec<SpecialAbility>,
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct AlwaysTargetsSelf {}
+
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.
 

@@ -95,6 +95,7 @@ macro_rules! apply_effects {
                 "remove_curse" => $eb = $eb.with(ProvidesRemoveCurse{}),
                 "single_activation" => $eb = $eb.with(SingleActivation{}),
                 "slow" => $eb = $eb.with(Slow{ initiative_penalty : effect.1.parse::<f32>().unwrap() }),
+                "target_self" => $eb = $eb.with( AlwaysTargetsSelf{} ),
                 "teach_spell" => $eb = $eb.with(TeachesSpell{ spell: effect.1.to_string() }),
                 "town_portal" => $eb = $eb.with(TownPortal{}),
                 _ => rltk::console::log(format!("Warning: consumable effect {} not implemented.", effect_name))
@@ -430,6 +431,19 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
     // Special Abilities!!!
     if let Some(ability_list) = &mob_template.abilities {
         let mut a = SpecialAbilities { abilities: Vec::new() };
+        for ability in ability_list.iter() {
+            a.abilities.push(SpecialAbility {
+                chance: ability.chance,
+                spell: ability.spell.clone(),
+                range: ability.range,
+                min_range: ability.min_range,
+            });
+        }
+        eb = eb.with(a);
+    }
+
+    if let Some(ability_list) = &mob_template.on_death {
+        let mut a = OnDeath { abilities: Vec::new() };
         for ability in ability_list.iter() {
             a.abilities.push(SpecialAbility {
                 chance: ability.chance,

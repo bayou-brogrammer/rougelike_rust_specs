@@ -29,7 +29,10 @@
     "name": "Hungry Rodents",
     "responses": { "Default": "attack", "Hungry Rodents": "ignore" }
   },
-  { "name": "Wyrm", "responses": { "Default": "attack", "Wyrm": "ignore" } },
+  {
+    "name": "Wyrm",
+    "responses": { "Default": "attack", "Wyrm": "ignore", "Fungi": "ignore" }
+  },
   {
     "name": "Dwarven Remnant",
     "responses": {
@@ -37,5 +40,9 @@
       "Player": "ignore",
       "Dwarven Remnant": "ignore"
     }
+  },
+  {
+    "name": "Fungi",
+    "responses": { "Default": "attack", "Fungi": "ignore", "Wyrm": "ignore" }
   }
 ]
