@@ -5,6 +5,7 @@ mod bsp_interior;
 mod cellular_automata;
 mod dla;
 mod drunkard;
+mod dwarf_fort;
 mod forest;
 mod limestone_cavern;
 mod maze;
@@ -26,6 +27,7 @@ pub use simple_map::SimpleMapBuilder;
 pub use voronoi::VoronoiCellBuilder;
 pub use waveform_collapse::WaveformCollapseBuilder;
 
+pub use dwarf_fort::*;
 pub use forest::*;
 pub use limestone_cavern::*;
 pub use town::*;

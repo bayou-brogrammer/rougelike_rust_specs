@@ -53,6 +53,13 @@ pub fn build_base_entity<'a, T: BaseRawComponent + Clone>(
     // Renderable
     if let Some(renderable) = &entity_template.renderable() {
         eb = eb.with(get_renderable_component(renderable));
+
+        if renderable.x_size.is_some() || renderable.y_size.is_some() {
+            eb = eb.with(TileSize {
+                x: renderable.x_size.unwrap_or(1),
+                y: renderable.y_size.unwrap_or(1),
+            });
+        }
     }
 
     // // Name Component
@@ -531,5 +538,21 @@ pub fn spawn_all_spells(ecs: &mut World) {
     let raws = &crate::raws::RAWS.lock().unwrap();
     for spell in raws.raws.spells.iter() {
         spawn_named_spell(raws, ecs, &spell.name);
+    }
+}
+
+pub enum SpawnTableType {
+    Item,
+    Mob,
+    Prop,
+}
+
+pub fn spawn_type_by_name(raws: &RawMaster, key: &str) -> SpawnTableType {
+    if raws.item_index.contains_key(key) {
+        SpawnTableType::Item
+    } else if raws.mob_index.contains_key(key) {
+        SpawnTableType::Mob
+    } else {
+        SpawnTableType::Prop
     }
 }

@@ -4,8 +4,8 @@ pub fn attr_bonus(value: i32) -> i32 {
     (value - 10) / 2 // See: https://roll20.net/compendium/dnd5e/Ability%20Scores#content
 }
 
-pub fn player_hp_per_level(fitness: i32) -> i32 { 10 + attr_bonus(fitness) }
-pub fn player_hp_at_level(fitness: i32, level: i32) -> i32 { 10 + player_hp_per_level(fitness) * level }
+pub fn player_hp_per_level(fitness: i32) -> i32 { 15 + attr_bonus(fitness) }
+pub fn player_hp_at_level(fitness: i32, level: i32) -> i32 { 15 + player_hp_per_level(fitness) * level }
 
 pub fn npc_hp(fitness: i32, level: i32) -> i32 {
     let mut total = 1;

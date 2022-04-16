@@ -28,5 +28,16 @@
       "damage_over_time": "4",
       "particle_line": "▓;#00FF00;400.0"
     }
+  },
+
+  {
+    "name": "Acid Breath",
+    "mana_cost": 2,
+    "effects": {
+      "ranged": "6",
+      "damage": "10",
+      "area_of_effect": "3",
+      "particle": "☼;#00FF00;400.0"
+    }
   }
 ]

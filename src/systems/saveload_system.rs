@@ -64,7 +64,8 @@ pub fn save_game(ecs: &mut World) {
             WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor, TownPortal, TeleportTo, ApplyMove,
             ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem, CursedItem, ProvidesRemoveCurse,
             ProvidesIdentification, AttributeBonus, Duration, StatusEffect, KnownSpells, SpellTemplate,
-            WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities
+            WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities,
+            TileSize
         );
     }
 
@@ -124,7 +125,8 @@ pub fn load_game(ecs: &mut World) {
             WantsToApproach, WantsToFlee, MoveMode, Chasing, Vendor, TownPortal, TeleportTo, ApplyMove,
             ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem, CursedItem, ProvidesRemoveCurse,
             ProvidesIdentification, AttributeBonus, Duration, StatusEffect, KnownSpells, SpellTemplate,
-            WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities
+            WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities,
+            TileSize
         );
     }
 

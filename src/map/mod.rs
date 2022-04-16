@@ -27,21 +27,6 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn xy_idx(&self, x: i32, y: i32) -> usize { (y as usize * self.width as usize) + x as usize }
-
-    fn is_exit_valid(&self, x: i32, y: i32) -> bool {
-        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
-            return false;
-        }
-
-        let idx = self.xy_idx(x, y);
-        !crate::spatial::is_blocked(idx)
-    }
-
-    pub fn populate_blocked(&mut self) { crate::spatial::populate_blocked_from_map(self); }
-
-    pub fn clear_content_index(&mut self) { crate::spatial::clear(); }
-
     /// Generates an empty map, consisting entirely of solid walls
     pub fn new<S: ToString>(new_depth: i32, width: i32, height: i32, name: S) -> Map {
         let map_tile_count = (width * height) as usize;
@@ -59,6 +44,48 @@ impl Map {
             name: name.to_string(),
             outdoors: true,
             light: vec![rltk::RGB::from_f32(0.0, 0.0, 0.0); map_tile_count],
+        }
+    }
+
+    pub fn xy_idx(&self, x: i32, y: i32) -> usize { (y as usize * self.width as usize) + x as usize }
+
+    fn is_exit_valid(&self, x: i32, y: i32) -> bool {
+        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
+            return false;
+        }
+
+        let idx = self.xy_idx(x, y);
+        !crate::spatial::is_blocked(idx)
+    }
+
+    pub fn clear_content_index(&mut self) { crate::spatial::clear(); }
+
+    pub fn populate_blocked(&mut self) { crate::spatial::populate_blocked_from_map(self); }
+
+    pub fn populate_blocked_multi(&mut self, width: i32, height: i32) {
+        self.populate_blocked();
+
+        for y in 1..self.height - 1 {
+            for x in 1..self.width - 1 {
+                let idx = self.xy_idx(x, y);
+
+                if !crate::spatial::is_blocked(idx) {
+                    for cy in 0..height {
+                        for cx in 0..width {
+                            let tx = x + cx;
+                            let ty = y + cy;
+                            if tx < self.width - 1 && ty < self.height - 1 {
+                                let tidx = self.xy_idx(tx, ty);
+                                if crate::spatial::is_blocked(tidx) {
+                                    crate::spatial::set_blocked(idx, true);
+                                }
+                            } else {
+                                crate::spatial::set_blocked(idx, true);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

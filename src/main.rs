@@ -460,6 +460,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<StatusEffect>();
     gs.ecs.register::<TeachesSpell>();
     gs.ecs.register::<TeleportTo>();
+    gs.ecs.register::<TileSize>();
     gs.ecs.register::<TownPortal>();
     gs.ecs.register::<Vendor>();
     gs.ecs.register::<Viewshed>();
@@ -491,7 +492,8 @@ fn main() -> rltk::BError {
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 
-    gs.generate_world_map(1, 0);
+    gs.generate_world_map(6, 0);
+    // gs.generate_world_map(1, 0);
 
     rltk::main_loop(context, gs)
 }

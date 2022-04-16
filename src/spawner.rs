@@ -5,7 +5,7 @@ use specs::saveload::{MarkedBuilder, SimpleMarker};
 
 use rltk::{RandomNumberGenerator, RGB};
 
-use super::{components::*, random_table::RandomTable, raws::*, Map, MasterDungeonMap, Rect, TileType};
+use super::{components::*, random_table::MasterTable, raws::*, Map, MasterDungeonMap, Rect, TileType};
 use crate::gamesystem::*;
 
 /// Spawns the player and returns his/her entity object.
@@ -94,7 +94,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
 
 const MAX_MONSTERS: i32 = 4;
 
-fn room_table(map_depth: i32) -> RandomTable { get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth) }
+fn room_table(map_depth: i32) -> MasterTable { get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth) }
 
 /// Fills a room with stuff!
 pub fn spawn_room(

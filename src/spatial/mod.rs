@@ -56,6 +56,11 @@ pub fn is_blocked(idx: usize) -> bool {
     lock.blocked[idx].0 || lock.blocked[idx].1
 }
 
+pub fn set_blocked(idx: usize, blocked: bool) {
+    let mut lock = SPATIAL_MAP.lock().unwrap();
+    lock.blocked[idx] = (lock.blocked[idx].0, blocked);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Tile Content Helpers
 ///////////////////////////////////////////////////////////////////////////
