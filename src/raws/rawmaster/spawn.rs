@@ -75,6 +75,7 @@ macro_rules! apply_effects {
                     $eb = $eb.with(Duration{ turns: effect.1.parse::<i32>().unwrap() });
                 }
                 "damage" => $eb = $eb.with(InflictsDamage{ damage : effect.1.parse::<i32>().unwrap() }),
+                "damage_over_time" => $eb = $eb.with( DamageOverTime { damage : effect.1.parse::<i32>().unwrap() } ),
                 "duration" => $eb = $eb.with(Duration { turns: effect.1.parse::<i32>().unwrap() }),
                 "food" => $eb = $eb.with(ProvidesFood{}),
                 "identify" => $eb = $eb.with(ProvidesIdentification{}),
@@ -82,9 +83,12 @@ macro_rules! apply_effects {
                 "particle" => $eb = $eb.with(parse_particle(&effect.1)),
                 "particle_line" => $eb = $eb.with(parse_particle_line(&effect.1)),
                 "provides_healing" => $eb = $eb.with(ProvidesHealing{ heal_amount: effect.1.parse::<i32>().unwrap() }),
+                "provides_mana" => $eb = $eb.with(ProvidesMana{ mana_amount: effect.1.parse::<i32>().unwrap() }),
                 "ranged" => $eb = $eb.with(Ranged{ range: effect.1.parse::<i32>().unwrap() }),
                 "remove_curse" => $eb = $eb.with(ProvidesRemoveCurse{}),
                 "single_activation" => $eb = $eb.with(SingleActivation{}),
+                "slow" => $eb = $eb.with(Slow{ initiative_penalty : effect.1.parse::<f32>().unwrap() }),
+                "teach_spell" => $eb = $eb.with(TeachesSpell{ spell: effect.1.to_string() }),
                 "town_portal" => $eb = $eb.with(TownPortal{}),
                 _ => rltk::console::log(format!("Warning: consumable effect {} not implemented.", effect_name))
             }
@@ -133,13 +137,20 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
             damage_die_type: die_type,
             damage_bonus: bonus,
             hit_bonus: weapon.hit_bonus,
+            proc_chance: weapon.proc_chance,
+            proc_target: weapon.proc_target.clone(),
         };
 
         match weapon.attribute.as_str() {
             "Quickness" => wpn.attribute = WeaponAttribute::Quickness,
             _ => wpn.attribute = WeaponAttribute::Might,
         }
+
         eb = eb.with(wpn);
+
+        if let Some(proc_effects) = &weapon.proc_effects {
+            apply_effects!(proc_effects, eb);
+        }
     }
 
     // Wearable Component
@@ -409,6 +420,20 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
         });
     }
 
+    // Special Abilities!!!
+    if let Some(ability_list) = &mob_template.abilities {
+        let mut a = SpecialAbilities { abilities: Vec::new() };
+        for ability in ability_list.iter() {
+            a.abilities.push(SpecialAbility {
+                chance: ability.chance,
+                spell: ability.spell.clone(),
+                range: ability.range,
+                min_range: ability.min_range,
+            });
+        }
+        eb = eb.with(a);
+    }
+
     // Build a mob person thing
     let new_mob = eb.build();
 
@@ -467,6 +492,28 @@ pub fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::structs
     Some(eb.build())
 }
 
+pub fn spawn_named_spell(raws: &RawMaster, ecs: &mut World, key: &str) -> Option<Entity> {
+    if raws.spell_index.contains_key(key) {
+        let spell_template = &raws.raws.spells[raws.spell_index[key]];
+
+        let mut eb = ecs.create_entity().marked::<SimpleMarker<SerializeMe>>();
+
+        eb = eb.with(SpellTemplate {
+            mana_cost: spell_template.mana_cost,
+        });
+
+        eb = eb.with(Name {
+            name: spell_template.name.clone(),
+        });
+
+        apply_effects!(spell_template.effects, eb);
+
+        return Some(eb.build());
+    }
+
+    None
+}
+
 pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
         return spawn_named_item(raws, ecs, key, pos);
@@ -478,4 +525,11 @@ pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spa
     }
 
     None
+}
+
+pub fn spawn_all_spells(ecs: &mut World) {
+    let raws = &crate::raws::RAWS.lock().unwrap();
+    for spell in raws.raws.spells.iter() {
+        spawn_named_spell(raws, ecs, &spell.name);
+    }
 }

@@ -1,25 +1,9 @@
 use specs::prelude::*;
 
 use super::{
-    effects,
-    AreaOfEffect,
-    CursedItem,
-    EquipmentChanged,
-    Equippable,
-    Equipped,
-    IdentifiedItem,
-    InBackpack,
-    Item,
-    MagicItem,
-    Map,
-    MasterDungeonMap,
-    Name,
-    ObfuscatedName,
-    Position,
-    WantsToDropItem,
-    WantsToPickupItem,
-    WantsToRemoveItem,
-    WantsToUseItem,
+    effects, AreaOfEffect, CursedItem, EquipmentChanged, Equippable, Equipped, IdentifiedItem, InBackpack, Item,
+    MagicItem, Map, MasterDungeonMap, Name, ObfuscatedName, Position, WantsToCastSpell, WantsToDropItem,
+    WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
 };
 
 mod collection_system;
@@ -34,7 +18,7 @@ pub use drop_system::ItemDropSystem;
 pub use identification_system::ItemIdentificationSystem;
 pub use remove_system::ItemRemoveSystem;
 pub use use_equip::ItemEquipOnUse;
-pub use use_system::ItemUseSystem;
+pub use use_system::{ItemUseSystem, SpellUseSystem};
 
 pub fn obfuscate_name(
     item: Entity,

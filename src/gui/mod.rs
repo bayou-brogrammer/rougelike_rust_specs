@@ -2,15 +2,7 @@ use specs::prelude::*;
 use std::cmp::Ordering;
 
 use super::{
-    camera,
-    components::*,
-    gamelog::GameLog,
-    rex_assets::RexAssets,
-    Map,
-    MasterDungeonMap,
-    RunState,
-    State,
-    VendorMode,
+    camera, components::*, gamelog::GameLog, rex_assets::RexAssets, Map, MasterDungeonMap, RunState, State, VendorMode,
 };
 use rltk::{Point, Rltk, VirtualKeyCode, RGB};
 
@@ -212,6 +204,25 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
         }
     }
 
+    // Spells
+    y += 1;
+    let blue = RGB::named(rltk::CYAN);
+    let known_spells_storage = ecs.read_storage::<KnownSpells>();
+    let known_spells = &known_spells_storage.get(*player_entity).unwrap().spells;
+    let mut index = 1;
+    for spell in known_spells.iter() {
+        ctx.print_color(50, y, blue, black, &format!("^{}", index));
+        ctx.print_color(
+            53,
+            y,
+            blue,
+            black,
+            &format!("{} ({})", spell.display_name, spell.mana_cost),
+        );
+        index += 1;
+        y += 1;
+    }
+
     // Status
     let hunger = ecs.read_storage::<HungerClock>();
     let hc = hunger.get(*player_entity).unwrap();
@@ -222,6 +233,7 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
         HungerState::Starving => ctx.print_color(50, 44, RGB::named(rltk::RED), RGB::named(rltk::BLACK), "Starving"),
     }
 
+    // Status Effects
     let statuses = ecs.read_storage::<StatusEffect>();
     let durations = ecs.read_storage::<Duration>();
     let names = ecs.read_storage::<Name>();

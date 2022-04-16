@@ -1,7 +1,8 @@
+use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
 pub use super::{structs, structs::BaseRawComponent, Raws};
-use crate::{components, gamesystem, random_table::RandomTable, EquipmentSlot};
+use crate::{components, gamesystem, random_table::RandomTable, EquipmentSlot, Name, SpellTemplate};
 
 mod load;
 use load::*;
@@ -18,6 +19,7 @@ pub struct RawMaster {
     prop_index: HashMap<String, usize>,
     loot_index: HashMap<String, usize>,
     faction_index: HashMap<String, HashMap<String, structs::Reaction>>,
+    spell_index: HashMap<String, usize>,
 }
 
 impl RawMaster {
@@ -30,12 +32,14 @@ impl RawMaster {
                 spawn_table: Vec::new(),
                 loot_tables: Vec::new(),
                 faction_table: Vec::new(),
+                spells: Vec::new(),
             },
             item_index: HashMap::new(),
             mob_index: HashMap::new(),
             prop_index: HashMap::new(),
             loot_index: HashMap::new(),
             faction_index: HashMap::new(),
+            spell_index: HashMap::new(),
         }
     }
 
@@ -82,6 +86,11 @@ impl RawMaster {
             }
 
             self.faction_index.insert(faction.name.clone(), reactions);
+        }
+
+        // Spells
+        for (i, spell) in self.raws.spells.iter().enumerate() {
+            self.spell_index.insert(spell.name.clone(), i);
         }
     }
 }
@@ -236,4 +245,32 @@ pub fn is_tag_magic(tag: &str) -> bool {
     } else {
         false
     }
+}
+
+pub fn find_spell_entity(ecs: &World, name: &str) -> Option<Entity> {
+    let names = ecs.read_storage::<Name>();
+    let spell_templates = ecs.read_storage::<SpellTemplate>();
+    let entities = ecs.entities();
+
+    for (entity, sname, _template) in (&entities, &names, &spell_templates).join() {
+        if name == sname.name {
+            return Some(entity);
+        }
+    }
+    None
+}
+
+pub fn find_spell_entity_by_name(
+    name: &str,
+    names: &ReadStorage<Name>,
+    spell_templates: &ReadStorage<SpellTemplate>,
+    entities: &Entities,
+) -> Option<Entity> {
+    for (entity, sname, _template) in (entities, names, spell_templates).join() {
+        if name == sname.name {
+            return Some(entity);
+        }
+    }
+
+    None
 }

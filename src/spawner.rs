@@ -10,6 +10,8 @@ use crate::gamesystem::*;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
+    spawn_all_spells(ecs);
+
     let mut skills = Skills { skills: HashMap::new() };
     skills.skills.insert(Skill::Melee, 1);
     skills.skills.insert(Skill::Defense, 1);
@@ -56,6 +58,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(Initiative{current: 0})
         .with(Faction{name : "Player".to_string() })
         .with(EquipmentChanged{})
+        .with(KnownSpells{ spells : Vec::new() })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 
@@ -68,7 +71,6 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rusty Longsword", SpawnType::Equipped{by : player});
         spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Dried Sausage", SpawnType::Carried{by : player} );
         spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Beer", SpawnType::Carried{by : player});
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Strength Potion", SpawnType::Carried{by : player});
     }
 
     // Starting hangover

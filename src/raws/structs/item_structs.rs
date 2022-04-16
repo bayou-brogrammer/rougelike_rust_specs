@@ -48,6 +48,9 @@ pub struct Weapon {
     pub attribute: String,
     pub base_damage: String,
     pub hit_bonus: i32,
+    pub proc_chance: Option<f32>,
+    pub proc_target: Option<String>,
+    pub proc_effects: Option<HashMap<String, String>>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

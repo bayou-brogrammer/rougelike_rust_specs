@@ -1,7 +1,9 @@
 use specs::prelude::*;
 use std::collections::HashMap;
 
-use super::{AttributeBonus, Attributes, EquipmentChanged, Equipped, GameLog, InBackpack, Item, Pools, StatusEffect};
+use super::{
+    AttributeBonus, Attributes, EquipmentChanged, Equipped, GameLog, InBackpack, Item, Pools, Slow, StatusEffect,
+};
 
 pub struct EncumbranceSystem {}
 
@@ -18,6 +20,7 @@ impl<'a> System<'a> for EncumbranceSystem {
         WriteExpect<'a, GameLog>,
         ReadStorage<'a, AttributeBonus>,
         ReadStorage<'a, StatusEffect>,
+        ReadStorage<'a, Slow>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -33,6 +36,7 @@ impl<'a> System<'a> for EncumbranceSystem {
             mut gamelog,
             attr_bonus,
             statuses,
+            slowed,
         ) = data;
 
         if equip_dirty.is_empty() {
@@ -100,6 +104,14 @@ impl<'a> System<'a> for EncumbranceSystem {
                 totals.fitness += attr.fitness.unwrap_or(0);
                 totals.quickness += attr.quickness.unwrap_or(0);
                 totals.intelligence += attr.intelligence.unwrap_or(0);
+            }
+        }
+
+        // Total up haste/slow
+        for (status, slow) in (&statuses, &slowed).join() {
+            if to_update.contains_key(&status.target) {
+                let totals = to_update.get_mut(&status.target).unwrap();
+                totals.initiative += slow.initiative_penalty;
             }
         }
 

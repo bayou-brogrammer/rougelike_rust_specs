@@ -1,5 +1,104 @@
 [
   {
+    "name": "Beginner's Magic",
+    "renderable": {
+      "glyph": "¶",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "teach_spell": "Zap" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy"
+  },
+
+  {
+    "name": "Arachnophilia 101",
+    "renderable": {
+      "glyph": "¶",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "teach_spell": "Web" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy"
+  },
+
+  {
+    "name": "Venom 101",
+    "renderable": {
+      "glyph": "¶",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "teach_spell": "Venom" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy"
+  },
+
+  {
+    "name": "Poison Potion",
+    "renderable": {
+      "glyph": "!",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "damage_over_time": "2" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "potion" }
+  },
+
+  {
+    "name": "Slow Potion",
+    "renderable": {
+      "glyph": "!",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "slow": "2.0" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "potion" }
+  },
+
+  {
+    "name": "Haste Potion",
+    "renderable": {
+      "glyph": "!",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "slow": "-2.0" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 100.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "potion" }
+  },
+
+  {
     "name": "Health Potion",
     "renderable": {
       "glyph": "!",
@@ -17,6 +116,23 @@
   },
 
   {
+    "name": "Mana Potion",
+    "renderable": {
+      "glyph": "!",
+      "fg": "#FF00FF",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": { "provides_mana": "4" }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "potion" }
+  },
+
+  {
     "name": "Strength Potion",
     "renderable": {
       "glyph": "!",
@@ -25,10 +141,7 @@
       "order": 2
     },
     "consumable": {
-      "effects": {
-        "particle": "!;#FF0000;200.0",
-        "duration": "20"
-      }
+      "effects": { "particle": "!;#FF0000;200.0" }
     },
     "weight_lbs": 0.5,
     "base_value": 50.0,
@@ -54,6 +167,28 @@
     },
     "weight_lbs": 0.5,
     "base_value": 50.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "scroll" }
+  },
+
+  {
+    "name": "Web Scroll",
+    "renderable": {
+      "glyph": ")",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "ranged": "6",
+        "slow": "10.0",
+        "area_of_effect": "3",
+        "particle_line": "☼;#FFFFFF;200.0"
+      }
+    },
+    "weight_lbs": 0.5,
+    "base_value": 500.0,
     "vendor_category": "alchemy",
     "magic": { "class": "common", "naming": "scroll" }
   },
@@ -307,6 +442,30 @@
     "base_value": 2.0,
     "initiative_penalty": 0,
     "vendor_category": "weapon"
+  },
+
+  {
+    "name": "Dagger of Venom",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "weapon": {
+      "range": "melee",
+      "attribute": "Quickness",
+      "base_damage": "1d4+1",
+      "hit_bonus": 1,
+      "proc_chance": 0.5,
+      "proc_target": "Target",
+      "proc_effects": { "damage_over_time": "2" }
+    },
+    "weight_lbs": 1.0,
+    "base_value": 2.0,
+    "initiative_penalty": -1,
+    "vendor_category": "weapon",
+    "magic": { "class": "common", "naming": "Unidentified Dagger" }
   },
 
   {
@@ -680,7 +839,7 @@
       "order": 2
     },
     "wearable": {
-      "slot": "Torso",
+      "slot": "Head",
       "armor_class": 1.0
     },
     "weight_lbs": 5.0,
@@ -741,6 +900,28 @@
         "damage": "20",
         "area_of_effect": "3",
         "particle": "▓;#FFA500;200.0"
+      },
+      "charges": 5
+    },
+    "weight_lbs": 0.5,
+    "base_value": 500.0,
+    "vendor_category": "alchemy",
+    "magic": { "class": "common", "naming": "Unidentified Rod" }
+  },
+
+  {
+    "name": "Rod of Venom",
+    "renderable": {
+      "glyph": "/",
+      "fg": "#FFAAAA",
+      "bg": "#000000",
+      "order": 2
+    },
+    "consumable": {
+      "effects": {
+        "ranged": "6",
+        "damage_over_time": "1",
+        "particle_line": "▓;#00FF00;200.0"
       },
       "charges": 5
     },

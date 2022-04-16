@@ -45,7 +45,9 @@
     "entry_trigger": {
       "effects": {
         "damage": "18",
-        "single_activation": "1"
+        "single_activation": "1",
+        "area_of_effect": "3",
+        "particle": "▓;#FFA500;200.0"
       }
     }
   },

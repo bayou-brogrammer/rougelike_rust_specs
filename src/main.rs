@@ -196,14 +196,28 @@ impl GameState for State {
             },
             RunState::ShowTargeting { range, item } => {
                 let result = gui::ranged_target(self, ctx, range);
+
                 match result.0 {
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
                     gui::ItemMenuResult::NoResponse => {},
                     gui::ItemMenuResult::Selected => {
-                        let mut intent = self.ecs.write_storage::<WantsToUseItem>();
-                        intent
-                            .insert(*self.ecs.fetch::<Entity>(), WantsToUseItem { item, target: result.1 })
-                            .expect("Unable to insert intent");
+                        if self.ecs.read_storage::<SpellTemplate>().get(item).is_some() {
+                            let mut intent = self.ecs.write_storage::<WantsToCastSpell>();
+                            intent
+                                .insert(
+                                    *self.ecs.fetch::<Entity>(),
+                                    WantsToCastSpell {
+                                        spell: item,
+                                        target: result.1,
+                                    },
+                                )
+                                .expect("Unable to insert intent");
+                        } else {
+                            let mut intent = self.ecs.write_storage::<WantsToUseItem>();
+                            intent
+                                .insert(*self.ecs.fetch::<Entity>(), WantsToUseItem { item, target: result.1 })
+                                .expect("Unable to insert intent");
+                        }
 
                         newrunstate = RunState::Ticking;
                     },
@@ -396,6 +410,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<Consumable>();
     gs.ecs.register::<CursedItem>();
+    gs.ecs.register::<DamageOverTime>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<Duration>();
     gs.ecs.register::<EntryTrigger>();
@@ -411,6 +426,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<Initiative>();
     gs.ecs.register::<Item>();
+    gs.ecs.register::<KnownSpells>();
     gs.ecs.register::<LightSource>();
     gs.ecs.register::<LootTable>();
     gs.ecs.register::<MagicItem>();
@@ -429,20 +445,26 @@ fn main() -> rltk::BError {
     gs.ecs.register::<ProvidesFood>();
     gs.ecs.register::<ProvidesHealing>();
     gs.ecs.register::<ProvidesIdentification>();
+    gs.ecs.register::<ProvidesMana>();
     gs.ecs.register::<ProvidesRemoveCurse>();
     gs.ecs.register::<Quips>();
     gs.ecs.register::<Ranged>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Skills>();
+    gs.ecs.register::<Slow>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<SpawnParticleBurst>();
     gs.ecs.register::<SpawnParticleLine>();
+    gs.ecs.register::<SpecialAbilities>();
+    gs.ecs.register::<SpellTemplate>();
     gs.ecs.register::<StatusEffect>();
+    gs.ecs.register::<TeachesSpell>();
     gs.ecs.register::<TeleportTo>();
     gs.ecs.register::<TownPortal>();
     gs.ecs.register::<Vendor>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<WantsToApproach>();
+    gs.ecs.register::<WantsToCastSpell>();
     gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<WantsToFlee>();
     gs.ecs.register::<WantsToMelee>();

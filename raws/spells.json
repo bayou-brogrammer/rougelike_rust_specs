@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Zap",
+    "mana_cost": 1,
+    "effects": {
+      "ranged": "6",
+      "damage": "5",
+      "particle_line": "▓;#00FFFF;400.0"
+    }
+  },
+
+  {
+    "name": "Web",
+    "mana_cost": 2,
+    "effects": {
+      "ranged": "6",
+      "slow": "10",
+      "area_of_effect": "3",
+      "particle_line": "☼;#FFFFFF;400.0"
+    }
+  },
+
+  {
+    "name": "Venom",
+    "mana_cost": 2,
+    "effects": {
+      "ranged": "6",
+      "damage_over_time": "4",
+      "particle_line": "▓;#00FF00;400.0"
+    }
+  }
+]

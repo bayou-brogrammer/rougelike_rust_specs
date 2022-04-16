@@ -1,6 +1,9 @@
 use specs::prelude::*;
 
-use super::{Chasing, Faction, Map, MyTurn, Position, Reaction, Viewshed, WantsToApproach, WantsToFlee};
+use super::{
+    Chasing, Faction, Map, MyTurn, Name, Position, Reaction, SpecialAbilities, SpellTemplate, Viewshed,
+    WantsToApproach, WantsToCastSpell, WantsToFlee,
+};
 
 fn evaluate(
     idx: usize,
@@ -33,6 +36,11 @@ impl<'a> System<'a> for VisibleAI {
         ReadExpect<'a, Entity>,
         ReadStorage<'a, Viewshed>,
         WriteStorage<'a, Chasing>,
+        ReadStorage<'a, SpecialAbilities>,
+        WriteExpect<'a, rltk::RandomNumberGenerator>,
+        WriteStorage<'a, WantsToCastSpell>,
+        ReadStorage<'a, Name>,
+        ReadStorage<'a, SpellTemplate>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -47,6 +55,11 @@ impl<'a> System<'a> for VisibleAI {
             player,
             viewsheds,
             mut chasing,
+            abilities,
+            mut rng,
+            mut casting,
+            names,
+            spells,
         ) = data;
 
         for (entity, _turn, my_faction, pos, viewshed) in (&entities, &turns, &factions, &positions, &viewsheds).join()
@@ -67,15 +80,53 @@ impl<'a> System<'a> for VisibleAI {
                 for reaction in reactions.iter() {
                     match reaction.1 {
                         Reaction::Attack => {
-                            want_approach
-                                .insert(entity, WantsToApproach { idx: reaction.0 as i32 })
-                                .expect("Unable to insert");
+                            if let Some(abilities) = abilities.get(entity) {
+                                let range = rltk::DistanceAlg::Pythagoras.distance2d(
+                                    rltk::Point::new(pos.x, pos.y),
+                                    rltk::Point::new(reaction.0 as i32 % map.width, reaction.0 as i32 / map.width),
+                                );
+                                for ability in abilities.abilities.iter() {
+                                    if range >= ability.min_range
+                                        && range <= ability.range
+                                        && rng.roll_dice(1, 100) >= (ability.chance * 100.0) as i32
+                                    {
+                                        use crate::raws::find_spell_entity_by_name;
 
-                            chasing
-                                .insert(entity, Chasing { target: reaction.2 })
-                                .expect("Unable to insert");
+                                        casting
+                                            .insert(
+                                                entity,
+                                                WantsToCastSpell {
+                                                    spell: find_spell_entity_by_name(
+                                                        &ability.spell,
+                                                        &names,
+                                                        &spells,
+                                                        &entities,
+                                                    )
+                                                    .unwrap(),
+                                                    target: Some(rltk::Point::new(
+                                                        reaction.0 as i32 % map.width,
+                                                        reaction.0 as i32 / map.width,
+                                                    )),
+                                                },
+                                            )
+                                            .expect("Unable to insert");
 
-                            done = true;
+                                        done = true;
+                                    }
+                                }
+                            }
+
+                            if !done {
+                                want_approach
+                                    .insert(entity, WantsToApproach { idx: reaction.0 as i32 })
+                                    .expect("Unable to insert");
+
+                                chasing
+                                    .insert(entity, Chasing { target: reaction.2 })
+                                    .expect("Unable to insert");
+
+                                done = true;
+                            }
                         },
                         Reaction::Flee => {
                             flee.push(reaction.0);

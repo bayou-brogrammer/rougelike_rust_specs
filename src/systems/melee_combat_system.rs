@@ -1,23 +1,8 @@
 use specs::prelude::*;
 
 use super::{
-    effects::*,
-    gamesystem::skill_bonus,
-    Attributes,
-    EquipmentSlot,
-    Equipped,
-    GameLog,
-    HungerClock,
-    HungerState,
-    MeleeWeapon,
-    Name,
-    NaturalAttackDefense,
-    Pools,
-    Skill,
-    Skills,
-    WantsToMelee,
-    WeaponAttribute,
-    Wearable,
+    effects::*, gamesystem::skill_bonus, Attributes, EquipmentSlot, Equipped, GameLog, HungerClock, HungerState,
+    MeleeWeapon, Name, NaturalAttackDefense, Pools, Skill, Skills, WantsToMelee, WeaponAttribute, Wearable,
 };
 
 pub struct MeleeCombatSystem {}
@@ -72,6 +57,8 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     damage_n_dice: 1,
                     damage_die_type: 4,
                     damage_bonus: 0,
+                    proc_chance: None,
+                    proc_target: None,
                 };
 
                 if let Some(nat) = natural.get(entity) {
@@ -89,9 +76,11 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     }
                 }
 
-                for (wielded, melee) in (&equipped_items, &meleeweapons).join() {
+                let mut weapon_entity: Option<Entity> = None;
+                for (weaponentity, wielded, melee) in (&entities, &equipped_items, &meleeweapons).join() {
                     if wielded.owner == entity && wielded.slot == EquipmentSlot::Melee {
                         weapon_info = melee.clone();
+                        weapon_entity = Some(weaponentity);
                     }
                 }
 
@@ -153,6 +142,27 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     );
 
                     log.add(format!("{} hits {}, for {} hp.", &name.name, &target_name.name, damage));
+
+                    // Proc effects
+                    if let Some(chance) = &weapon_info.proc_chance {
+                        if rng.roll_dice(1, 100) <= (chance * 100.0) as i32 {
+                            let effect_target = if weapon_info.proc_target.unwrap() == "Self" {
+                                Targets::Single { target: entity }
+                            } else {
+                                Targets::Single {
+                                    target: wants_melee.target,
+                                }
+                            };
+
+                            add_effect(
+                                Some(entity),
+                                EffectType::ItemUse {
+                                    item: weapon_entity.unwrap(),
+                                },
+                                effect_target,
+                            )
+                        }
+                    }
                 } else if natural_roll == 1 {
                     // Natural 1 miss
                     log.add(format!(
