@@ -1,9 +1,7 @@
-use specs::prelude::*;
 use std::collections::HashMap;
 
-use super::{
-    AttributeBonus, Attributes, EquipmentChanged, Equipped, GameLog, InBackpack, Item, Pools, Slow, StatusEffect,
-};
+use super::*;
+use crate::gamesystem;
 
 pub struct EncumbranceSystem {}
 
@@ -17,7 +15,6 @@ impl<'a> System<'a> for EncumbranceSystem {
         WriteStorage<'a, Pools>,
         WriteStorage<'a, Attributes>,
         ReadExpect<'a, Entity>,
-        WriteExpect<'a, GameLog>,
         ReadStorage<'a, AttributeBonus>,
         ReadStorage<'a, StatusEffect>,
         ReadStorage<'a, Slow>,
@@ -33,7 +30,6 @@ impl<'a> System<'a> for EncumbranceSystem {
             mut pools,
             mut attributes,
             player,
-            mut gamelog,
             attr_bonus,
             statuses,
             slowed,
@@ -122,16 +118,15 @@ impl<'a> System<'a> for EncumbranceSystem {
                 pool.total_initiative_penalty = item.initiative;
 
                 if let Some(attr) = attributes.get_mut(*entity) {
-                    use crate::gamesystem::attr_bonus;
-
                     attr.might.modifiers = item.might;
                     attr.fitness.modifiers = item.fitness;
                     attr.quickness.modifiers = item.quickness;
                     attr.intelligence.modifiers = item.intelligence;
-                    attr.might.bonus = attr_bonus(attr.might.base + attr.might.modifiers);
-                    attr.fitness.bonus = attr_bonus(attr.fitness.base + attr.fitness.modifiers);
-                    attr.quickness.bonus = attr_bonus(attr.quickness.base + attr.quickness.modifiers);
-                    attr.intelligence.bonus = attr_bonus(attr.intelligence.base + attr.intelligence.modifiers);
+                    attr.might.bonus = gamesystem::attr_bonus(attr.might.base + attr.might.modifiers);
+                    attr.fitness.bonus = gamesystem::attr_bonus(attr.fitness.base + attr.fitness.modifiers);
+                    attr.quickness.bonus = gamesystem::attr_bonus(attr.quickness.base + attr.quickness.modifiers);
+                    attr.intelligence.bonus =
+                        gamesystem::attr_bonus(attr.intelligence.base + attr.intelligence.modifiers);
 
                     let carry_capacity_lbs = (attr.might.base + attr.might.modifiers) * 15;
                     if pool.total_weight as i32 > carry_capacity_lbs {
@@ -139,7 +134,10 @@ impl<'a> System<'a> for EncumbranceSystem {
                         pool.total_initiative_penalty += 4.0;
 
                         if *entity == *player {
-                            gamelog.add("You are overburdened, and suffering an initiative penalty.".to_string());
+                            crate::gamelog::Logger::new()
+                                .color(rltk::ORANGE)
+                                .append("You are overburdened, and suffering an initiative penalty.")
+                                .log();
                         }
                     }
                 }

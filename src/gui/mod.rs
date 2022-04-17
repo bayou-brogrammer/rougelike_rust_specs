@@ -1,10 +1,6 @@
-use specs::prelude::*;
 use std::cmp::Ordering;
 
-use super::{
-    camera, components::*, gamelog::GameLog, rex_assets::RexAssets, Map, MasterDungeonMap, RunState, State, VendorMode,
-};
-use rltk::{Point, Rltk, VirtualKeyCode, RGB};
+use crate::prelude::*;
 
 mod tooltip;
 use tooltip::*;
@@ -13,21 +9,19 @@ mod menu;
 pub use menu::*;
 
 pub fn draw_hollow_box(console: &mut Rltk, sx: i32, sy: i32, width: i32, height: i32, fg: RGB, bg: RGB) {
-    use rltk::to_cp437;
-
-    console.set(sx, sy, fg, bg, to_cp437('┌'));
-    console.set(sx + width, sy, fg, bg, to_cp437('┐'));
-    console.set(sx, sy + height, fg, bg, to_cp437('└'));
-    console.set(sx + width, sy + height, fg, bg, to_cp437('┘'));
+    console.set(sx, sy, fg, bg, rltk::to_cp437('┌'));
+    console.set(sx + width, sy, fg, bg, rltk::to_cp437('┐'));
+    console.set(sx, sy + height, fg, bg, rltk::to_cp437('└'));
+    console.set(sx + width, sy + height, fg, bg, rltk::to_cp437('┘'));
 
     for x in sx + 1..sx + width {
-        console.set(x, sy, fg, bg, to_cp437('─'));
-        console.set(x, sy + height, fg, bg, to_cp437('─'));
+        console.set(x, sy, fg, bg, rltk::to_cp437('─'));
+        console.set(x, sy + height, fg, bg, rltk::to_cp437('─'));
     }
 
     for y in sy + 1..sy + height {
-        console.set(sx, y, fg, bg, to_cp437('│'));
-        console.set(sx + width, y, fg, bg, to_cp437('│'));
+        console.set(sx, y, fg, bg, rltk::to_cp437('│'));
+        console.set(sx + width, y, fg, bg, rltk::to_cp437('│'));
     }
 }
 
@@ -59,7 +53,6 @@ fn draw_attribute(name: &str, attribute: &Attribute, y: i32, ctx: &mut Rltk) {
 }
 
 pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
-    use rltk::to_cp437;
     let box_gray: RGB = RGB::from_hex("#999999").expect("Oops");
     let black = RGB::named(rltk::BLACK);
     let white = RGB::named(rltk::WHITE);
@@ -71,19 +64,19 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     draw_hollow_box(ctx, 49, 0, 30, 8, box_gray, black); // Top-right panel
 
     // Draw box connectors
-    ctx.set(0, 45, box_gray, black, to_cp437('├'));
-    ctx.set(49, 8, box_gray, black, to_cp437('├'));
-    ctx.set(49, 0, box_gray, black, to_cp437('┬'));
-    ctx.set(49, 45, box_gray, black, to_cp437('┴'));
-    ctx.set(79, 8, box_gray, black, to_cp437('┤'));
-    ctx.set(79, 45, box_gray, black, to_cp437('┤'));
+    ctx.set(0, 45, box_gray, black, rltk::to_cp437('├'));
+    ctx.set(49, 8, box_gray, black, rltk::to_cp437('├'));
+    ctx.set(49, 0, box_gray, black, rltk::to_cp437('┬'));
+    ctx.set(49, 45, box_gray, black, rltk::to_cp437('┴'));
+    ctx.set(79, 8, box_gray, black, rltk::to_cp437('┤'));
+    ctx.set(79, 45, box_gray, black, rltk::to_cp437('┤'));
 
     // Draw the town name
     let map = ecs.fetch::<Map>();
     let name_length = map.name.len() + 2;
     let x_pos = (22 - (name_length / 2)) as i32;
-    ctx.set(x_pos, 0, box_gray, black, to_cp437('┤'));
-    ctx.set(x_pos + name_length as i32 - 1, 0, box_gray, black, to_cp437('├'));
+    ctx.set(x_pos, 0, box_gray, black, rltk::to_cp437('┤'));
+    ctx.set(x_pos + name_length as i32 - 1, 0, box_gray, black, rltk::to_cp437('├'));
     ctx.print_color(x_pos + 1, 0, white, black, &map.name);
     std::mem::drop(map);
 
@@ -179,12 +172,12 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
             y += 1;
 
             if let Some(weapon) = weapon.get(entity) {
-                let mut weapon_info = match (weapon.damage_bonus.cmp(&0)) {
+                let mut weapon_info = match weapon.damage_bonus.cmp(&0) {
+                    Ordering::Equal => format!("┤ {} ({}d{})", &name, weapon.damage_n_dice, weapon.damage_die_type),
                     Ordering::Less => format!(
                         "┤ {} ({}d{}{})",
                         &name, weapon.damage_n_dice, weapon.damage_die_type, weapon.damage_bonus
                     ),
-                    Ordering::Equal => format!("┤ {} ({}d{})", &name, weapon.damage_n_dice, weapon.damage_die_type),
                     Ordering::Greater => format!(
                         "┤ {} ({}d{}+{})",
                         &name, weapon.damage_n_dice, weapon.damage_die_type, weapon.damage_bonus
@@ -268,20 +261,15 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     }
 
     // Draw the log
-    let log = ecs.fetch::<GameLog>();
-    let mut y = 46;
-    for s in log.get_log().iter().rev() {
-        if y < 59 {
-            ctx.print(2, y, s);
-        }
-        y += 1;
-    }
+    let mut block = TextBlock::new(1, 46, 79, 58);
+    block.print(&crate::gamelog::log_display());
+    block.render(&mut rltk::BACKEND_INTERNAL.lock().consoles[0].console);
 
     draw_tooltips(ecs, ctx);
 }
 
 pub fn ranged_target(gs: &mut State, ctx: &mut Rltk, range: i32) -> (ItemMenuResult, Option<Point>) {
-    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(&gs.ecs, ctx);
+    let (min_x, max_x, min_y, max_y) = crate::camera::get_screen_bounds(&gs.ecs, ctx);
     let player_entity = gs.ecs.fetch::<Entity>();
     let player_pos = gs.ecs.fetch::<Point>();
     let viewsheds = gs.ecs.read_storage::<Viewshed>();
@@ -372,6 +360,13 @@ pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
         RGB::named(rltk::BLACK),
         "That day, sadly, is not in this chapter..",
     );
+
+    #[rustfmt::skip]
+    {
+        ctx.print_color_centered(19, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &format!("You lived for {} turns.", crate::gamelog::get_event_count("Turn")));
+        ctx.print_color_centered(20, RGB::named(rltk::RED), RGB::named(rltk::BLACK), &format!("You suffered {} points of damage.", crate::gamelog::get_event_count("Damage Taken")));
+        ctx.print_color_centered(21, RGB::named(rltk::RED), RGB::named(rltk::BLACK), &format!("You inflicted {} points of damage.", crate::gamelog::get_event_count("Damage Inflicted")));
+    }
 
     ctx.print_color_centered(
         20,

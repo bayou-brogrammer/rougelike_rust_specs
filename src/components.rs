@@ -518,4 +518,6 @@ pub struct SerializationHelper {
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct DMSerializationHelper {
     pub map: super::map::MasterDungeonMap,
+    pub log: Vec<Vec<crate::gamelog::LogFragment>>,
+    pub events: HashMap<String, i32>,
 }

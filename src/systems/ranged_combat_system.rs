@@ -1,12 +1,11 @@
+use crate::gamesystem;
 use crate::prelude::*;
 
 pub struct RangedCombatSystem {}
 
 impl<'a> System<'a> for RangedCombatSystem {
-    #[allow(clippy::type_complexity)]
     type SystemData = (
         Entities<'a>,
-        WriteExpect<'a, GameLog>,
         WriteStorage<'a, WantsToShoot>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, Attributes>,
@@ -25,7 +24,6 @@ impl<'a> System<'a> for RangedCombatSystem {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
-            mut log,
             mut wants_shoot,
             names,
             attributes,
@@ -114,7 +112,7 @@ impl<'a> System<'a> for RangedCombatSystem {
                 } else {
                     attacker_attributes.quickness.bonus
                 };
-                let skill_hit_bonus = skill_bonus(Skill::Melee, &*attacker_skills);
+                let skill_hit_bonus = gamesystem::skill_bonus(Skill::Melee, &*attacker_skills);
                 let weapon_hit_bonus = weapon_info.hit_bonus;
                 let mut status_hit_bonus = 0;
                 if let Some(hc) = hunger_clock.get(entity) {
@@ -139,7 +137,7 @@ impl<'a> System<'a> for RangedCombatSystem {
                     Some(nat) => nat.armor_class.unwrap_or(10),
                 };
                 let armor_quickness_bonus = target_attributes.quickness.bonus;
-                let armor_skill_bonus = skill_bonus(Skill::Defense, &*target_skills);
+                let armor_skill_bonus = gamesystem::skill_bonus(Skill::Defense, &*target_skills);
                 let armor_item_bonus = armor_item_bonus_f as i32;
                 let armor_class = base_armor_class + armor_quickness_bonus + armor_skill_bonus + armor_item_bonus;
 
@@ -148,7 +146,7 @@ impl<'a> System<'a> for RangedCombatSystem {
                     // Target hit! Until we support weapons, we're going with 1d4
                     let base_damage = rng.roll_dice(weapon_info.damage_n_dice, weapon_info.damage_die_type);
                     let attr_damage_bonus = attacker_attributes.might.bonus;
-                    let skill_damage_bonus = skill_bonus(Skill::Melee, &*attacker_skills);
+                    let skill_damage_bonus = gamesystem::skill_bonus(Skill::Melee, &*attacker_skills);
                     let weapon_damage_bonus = weapon_info.damage_bonus;
 
                     let damage = i32::max(
@@ -168,7 +166,14 @@ impl<'a> System<'a> for RangedCombatSystem {
                         },
                     );
 
-                    log.add(format!("{} hits {}, for {} hp.", &name.name, &target_name.name, damage));
+                    crate::gamelog::Logger::new()
+                        .npc_name(&name.name)
+                        .append("hits")
+                        .npc_name(&target_name.name)
+                        .append("for")
+                        .damage(damage)
+                        .append("hp.")
+                        .log();
 
                     // Proc effects
                     if let Some(chance) = &weapon_info.proc_chance {
@@ -195,10 +200,12 @@ impl<'a> System<'a> for RangedCombatSystem {
                     }
                 } else if natural_roll == 1 {
                     // Natural 1 miss
-                    log.add(format!(
-                        "{} considers attacking {}, but misjudges the timing.",
-                        name.name, target_name.name
-                    ));
+                    crate::gamelog::Logger::new()
+                        .npc_name(&name.name)
+                        .append("considers attacking")
+                        .npc_name(&target_name.name)
+                        .append("but misjudges the timing!")
+                        .log();
 
                     add_effect(
                         None,
@@ -214,10 +221,12 @@ impl<'a> System<'a> for RangedCombatSystem {
                     );
                 } else {
                     // Miss
-                    log.add(format!(
-                        "{} attacks {}, but can't connect.",
-                        name.name, target_name.name
-                    ));
+                    crate::gamelog::Logger::new()
+                        .npc_name(&name.name)
+                        .append("atacks")
+                        .npc_name(&target_name.name)
+                        .append("but can't connect.")
+                        .log();
 
                     add_effect(
                         None,

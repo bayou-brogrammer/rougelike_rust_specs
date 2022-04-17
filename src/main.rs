@@ -9,6 +9,7 @@ pub mod ai;
 pub mod camera;
 pub mod effects;
 pub mod gamelog;
+pub mod gamesystem;
 pub mod gui;
 pub mod map;
 pub mod player;
@@ -17,7 +18,6 @@ pub mod spatial;
 pub mod spawner;
 
 mod components;
-mod gamesystem;
 mod map_builders;
 mod random_table;
 mod rect;
@@ -138,12 +138,11 @@ fn main() -> rltk::BError {
     gs.ecs.insert(Map::new(1, 64, 64, "New Map"));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
-    let player_entity = spawner::player(&mut gs.ecs, 0, 0);
-    gs.ecs.insert(player_entity);
     gs.ecs.insert(RunState::MapGeneration {});
-    gs.ecs.insert(gamelog::GameLog::default());
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
+    let player_entity = spawner::player(&mut gs.ecs, 0, 0);
+    gs.ecs.insert(player_entity);
 
     gs.generate_world_map(1, 0);
 

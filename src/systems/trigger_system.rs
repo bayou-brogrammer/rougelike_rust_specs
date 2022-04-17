@@ -11,12 +11,11 @@ impl<'a> System<'a> for TriggerSystem {
         ReadStorage<'a, EntryTrigger>,
         ReadStorage<'a, Name>,
         Entities<'a>,
-        WriteExpect<'a, GameLog>,
         ReadStorage<'a, AreaOfEffect>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (map, mut entity_moved, position, entry_trigger, names, entities, mut log, area_of_effect) = data;
+        let (map, mut entity_moved, position, entry_trigger, names, entities, area_of_effect) = data;
 
         // Iterate the entities that moved and their final position
         for (entity, mut _entity_moved, pos) in (&entities, &mut entity_moved, &position).join() {
@@ -32,7 +31,10 @@ impl<'a> System<'a> for TriggerSystem {
                             // We triggered it
                             let name = names.get(entity_id);
                             if let Some(name) = name {
-                                log.add(format!("{} triggers!", &name.name));
+                                crate::gamelog::Logger::new()
+                                    .append_with_color(&name.name, rltk::RED)
+                                    .append_with_color("triggers!", rltk::WHITE)
+                                    .log();
                             }
 
                             // Call the effects system

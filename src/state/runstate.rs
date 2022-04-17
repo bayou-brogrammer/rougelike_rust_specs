@@ -1,4 +1,5 @@
 use super::*;
+use crate::{camera, gui};
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -77,6 +78,9 @@ impl GameState for State {
             },
             RunState::AwaitingInput => {
                 newrunstate = player::player_input(self, ctx);
+                if newrunstate != RunState::AwaitingInput {
+                    crate::gamelog::record_event("Turn", 1);
+                }
             },
             RunState::Ticking => {
                 let mut should_change_target = false;

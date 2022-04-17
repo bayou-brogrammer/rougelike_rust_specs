@@ -115,8 +115,7 @@ impl State {
         self.generate_world_map(current_depth + offset, offset);
 
         // Notify the player
-        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.add("You change level.".to_string());
+        crate::gamelog::Logger::new().append("You change level.").log();
     }
 
     pub fn game_over_cleanup(&mut self) {
@@ -148,10 +147,19 @@ impl State {
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
         let map_building_info = map::level_transition(&mut self.ecs, new_depth, offset);
+
         if let Some(history) = map_building_info {
             self.mapgen_history = history;
         } else {
             map::thaw_level_entities(&mut self.ecs);
         }
+
+        crate::gamelog::clear_log();
+        crate::gamelog::Logger::new()
+            .append("Welcome to")
+            .append_with_color("Rusty Roguelike", rltk::CYAN)
+            .log();
+
+        crate::gamelog::clear_events();
     }
 }

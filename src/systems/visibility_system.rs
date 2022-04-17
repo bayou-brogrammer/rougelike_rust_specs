@@ -1,6 +1,6 @@
 use specs::prelude::*;
 
-use super::{BlocksVisibility, GameLog, Hidden, Map, Name, Player, Position, Viewshed};
+use super::{BlocksVisibility, Hidden, Map, Name, Player, Position, Viewshed};
 use rltk::{field_of_view, Point};
 
 pub struct VisibilitySystem {}
@@ -14,14 +14,12 @@ impl<'a> System<'a> for VisibilitySystem {
         ReadStorage<'a, Player>,
         WriteStorage<'a, Hidden>,
         WriteExpect<'a, rltk::RandomNumberGenerator>,
-        WriteExpect<'a, GameLog>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, BlocksVisibility>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut map, entities, mut viewshed, pos, player, mut hidden, mut rng, mut log, names, blocks_visibility) =
-            data;
+        let (mut map, entities, mut viewshed, pos, player, mut hidden, mut rng, names, blocks_visibility) = data;
 
         map.view_blocked.clear();
         for (block_pos, _block) in (&pos, &blocks_visibility).join() {
@@ -57,7 +55,10 @@ impl<'a> System<'a> for VisibilitySystem {
                                         let name = names.get(e);
 
                                         if let Some(name) = name {
-                                            log.add(format!("You spotted a {}.", &name.name));
+                                            crate::gamelog::Logger::new()
+                                                .append("You spotted:")
+                                                .append_with_color(&name.name, rltk::RED)
+                                                .log();
                                         }
 
                                         hidden.remove(e);

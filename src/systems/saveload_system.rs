@@ -41,7 +41,11 @@ pub fn save_game(ecs: &mut World) {
 
     let savehelper2 = ecs
         .create_entity()
-        .with(DMSerializationHelper { map: dungeon_master })
+        .with(DMSerializationHelper {
+            map: dungeon_master,
+            log: crate::gamelog::clone_log(),
+            events: crate::gamelog::clone_events(),
+        })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 
@@ -98,6 +102,7 @@ pub fn load_game(ecs: &mut World) {
         for e in ecs.entities().join() {
             to_delete.push(e);
         }
+
         for del in to_delete.iter() {
             ecs.delete_entity(*del).expect("Deletion failed");
         }
@@ -151,6 +156,8 @@ pub fn load_game(ecs: &mut World) {
             let mut dungeonmaster = ecs.write_resource::<crate::map::MasterDungeonMap>();
             *dungeonmaster = h.map.clone();
             deleteme2 = Some(e);
+            crate::gamelog::restore_log(&mut h.log.clone());
+            crate::gamelog::load_events(h.events.clone());
         }
 
         for (e, _p, pos) in (&entities, &player, &position).join() {

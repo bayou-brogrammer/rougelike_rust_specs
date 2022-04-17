@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::gamesystem;
 use crate::prelude::*;
 
 /// Spawns the player and returns his/her entity object.
@@ -26,20 +27,20 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
         .with(Name{name: "Player".to_string() })
         .with(HungerClock{ state: HungerState::WellFed, duration: 20 })
         .with(Attributes{
-            might: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            fitness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            quickness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            intelligence: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            might: Attribute{ base: 11, modifiers: 0, bonus: gamesystem::attr_bonus(11) },
+            fitness: Attribute{ base: 11, modifiers: 0, bonus: gamesystem::attr_bonus(11) },
+            quickness: Attribute{ base: 11, modifiers: 0, bonus: gamesystem::attr_bonus(11) },
+            intelligence: Attribute{ base: 11, modifiers: 0, bonus: gamesystem::attr_bonus(11) },
         })
         .with(skills)
         .with(Pools{
             hit_points : Pool{ 
-                current: player_hp_at_level(11, 1), 
-                max: player_hp_at_level(11, 1) 
+                current: gamesystem::player_hp_at_level(11, 1), 
+                max: gamesystem::player_hp_at_level(11, 1) 
             },
             mana: Pool{
-                current: mana_at_level(11, 1),
-                max: mana_at_level(11, 1)
+                current: gamesystem::mana_at_level(11, 1),
+                max: gamesystem::mana_at_level(11, 1)
             },
             xp: 0,
             level: 1,

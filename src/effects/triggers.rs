@@ -1,5 +1,4 @@
 use super::*;
-use crate::prelude::*;
 
 pub fn trigger(creator: Option<Entity>, trigger: Entity, targets: &Targets, ecs: &mut World) {
     // The triggering item is no longer hidden
@@ -19,11 +18,12 @@ pub fn item_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, ec
     if let Some(c) = ecs.write_storage::<Consumable>().get_mut(item) {
         if c.charges < 1 {
             // Cancel
-            let mut gamelog = ecs.fetch_mut::<GameLog>();
-            gamelog.add(format!(
-                "{} is out of charges!",
-                ecs.read_storage::<Name>().get(item).unwrap().name
-            ));
+            crate::gamelog::Logger::new()
+                .npc_name(&ecs.read_storage::<Name>().get(item).unwrap().name)
+                .append("says")
+                .append_with_color("is out of charges!", rltk::WHITE)
+                .log();
+
             return;
         } else {
             c.charges -= 1;
@@ -90,7 +90,6 @@ pub fn spell_trigger(creator: Option<Entity>, spell: Entity, targets: &Targets, 
 
 fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs: &mut World) -> bool {
     let mut did_something = false;
-    let mut gamelog = ecs.fetch_mut::<GameLog>();
 
     // Simple particle spawn
     if let Some(part) = ecs.read_storage::<SpawnParticleBurst>().get(entity) {
@@ -134,14 +133,20 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     if ecs.read_storage::<ProvidesFood>().get(entity).is_some() {
         add_effect(creator, EffectType::WellFed, targets.clone());
         let names = ecs.read_storage::<Name>();
-        gamelog.add(format!("You eat the {}.", names.get(entity).unwrap().name));
+        crate::gamelog::Logger::new()
+            .append("You eat the")
+            .npc_name(&names.get(entity).unwrap().name)
+            .log();
+
         did_something = true;
     }
 
     // Magic mapper
     if ecs.read_storage::<MagicMapper>().get(entity).is_some() {
         let mut runstate = ecs.fetch_mut::<RunState>();
-        gamelog.add("The map is revealed to you!".to_string());
+        crate::gamelog::Logger::new()
+            .append("The map is revealed to you!")
+            .log();
         *runstate = RunState::MagicMapReveal { row: 0 };
         did_something = true;
     }
@@ -164,9 +169,13 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     if ecs.read_storage::<TownPortal>().get(entity).is_some() {
         let map = ecs.fetch::<Map>();
         if map.depth == 1 {
-            gamelog.add("You are already in town, so the scroll does nothing.".to_string());
+            crate::gamelog::Logger::new()
+                .append("You are already in town, so the scroll does nothing.")
+                .log();
         } else {
-            gamelog.add("You are telported back to town!".to_string());
+            crate::gamelog::Logger::new()
+                .append("You are telported back to town!")
+                .log();
 
             let mut runstate = ecs.fetch_mut::<RunState>();
             *runstate = RunState::TownPortal;

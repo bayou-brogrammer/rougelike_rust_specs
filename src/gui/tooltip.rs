@@ -1,7 +1,4 @@
-use specs::prelude::*;
-
-use super::{camera, Attributes, Duration, Hidden, Map, Name, Pools, StatusEffect};
-use rltk::{Rltk, RGB};
+use super::*;
 
 struct Tooltip {
     lines: Vec<String>,
@@ -40,7 +37,6 @@ impl Tooltip {
 }
 
 pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
-    use rltk::to_cp437;
     use rltk::Algorithm2D;
 
     let hidden = ecs.read_storage::<Hidden>();
@@ -49,7 +45,7 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
 
     let map = ecs.fetch::<Map>();
 
-    let (min_x, _max_x, min_y, _max_y) = camera::get_screen_bounds(ecs, ctx);
+    let (min_x, _max_x, min_y, _max_y) = crate::camera::get_screen_bounds(ecs, ctx);
 
     let mouse_pos = ctx.mouse_pos();
     let mut mouse_map_pos = mouse_pos;

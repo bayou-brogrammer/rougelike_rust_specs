@@ -1,22 +1,10 @@
-use specs::prelude::*;
-
-use super::{
-    EquipmentChanged,
-    InBackpack,
-    MagicItem,
-    MasterDungeonMap,
-    Name,
-    ObfuscatedName,
-    Position,
-    WantsToPickupItem,
-};
+use super::*;
 
 pub struct ItemCollectionSystem {}
 
 impl<'a> System<'a> for ItemCollectionSystem {
     type SystemData = (
         ReadExpect<'a, Entity>,
-        WriteExpect<'a, crate::gamelog::GameLog>,
         WriteStorage<'a, WantsToPickupItem>,
         WriteStorage<'a, Position>,
         ReadStorage<'a, Name>,
@@ -30,7 +18,6 @@ impl<'a> System<'a> for ItemCollectionSystem {
     fn run(&mut self, data: Self::SystemData) {
         let (
             player_entity,
-            mut gamelog,
             mut wants_pickup,
             mut positions,
             names,
@@ -58,10 +45,17 @@ impl<'a> System<'a> for ItemCollectionSystem {
                 .expect("Unable to insert");
 
             if pickup.collected_by == *player_entity {
-                gamelog.add(format!(
-                    "You pick up the {}.",
-                    super::obfuscate_name(pickup.item, &names, &magic_items, &obfuscated_names, &dm)
-                ));
+                crate::gamelog::Logger::new()
+                    .append("You pick up the")
+                    .color(rltk::CYAN)
+                    .append(super::obfuscate_name(
+                        pickup.item,
+                        &names,
+                        &magic_items,
+                        &obfuscated_names,
+                        &dm,
+                    ))
+                    .log();
             }
         }
 
