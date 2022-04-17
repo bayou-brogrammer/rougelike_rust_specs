@@ -1,26 +1,4 @@
-use specs::prelude::*;
-
-use super::{
-    Chasing, Faction, Map, MyTurn, Name, Position, Reaction, SpecialAbilities, SpellTemplate, Viewshed,
-    WantsToApproach, WantsToCastSpell, WantsToFlee,
-};
-
-fn evaluate(
-    idx: usize,
-    factions: &ReadStorage<Faction>,
-    my_faction: &str,
-    reactions: &mut Vec<(usize, Reaction, Entity)>,
-) {
-    crate::spatial::for_each_tile_content(idx, |other_entity| {
-        if let Some(faction) = factions.get(other_entity) {
-            reactions.push((
-                idx,
-                crate::raws::faction_reaction(my_faction, &faction.name, &crate::raws::RAWS.lock().unwrap()),
-                other_entity,
-            ));
-        }
-    });
-}
+use super::*;
 
 pub struct VisibleAI {}
 
@@ -41,6 +19,9 @@ impl<'a> System<'a> for VisibleAI {
         WriteStorage<'a, WantsToCastSpell>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, SpellTemplate>,
+        ReadStorage<'a, Equipped>,
+        ReadStorage<'a, Weapon>,
+        WriteStorage<'a, WantsToShoot>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -60,6 +41,9 @@ impl<'a> System<'a> for VisibleAI {
             mut casting,
             names,
             spells,
+            equipped,
+            weapons,
+            mut wants_shoot,
         ) = data;
 
         for (entity, _turn, my_faction, pos, viewshed) in (&entities, &turns, &factions, &positions, &viewsheds).join()
@@ -80,23 +64,21 @@ impl<'a> System<'a> for VisibleAI {
                 for reaction in reactions.iter() {
                     match reaction.1 {
                         Reaction::Attack => {
+                            let range = rltk::DistanceAlg::Pythagoras.distance2d(
+                                rltk::Point::new(pos.x, pos.y),
+                                rltk::Point::new(reaction.0 as i32 % map.width, reaction.0 as i32 / map.width),
+                            );
                             if let Some(abilities) = abilities.get(entity) {
-                                let range = rltk::DistanceAlg::Pythagoras.distance2d(
-                                    rltk::Point::new(pos.x, pos.y),
-                                    rltk::Point::new(reaction.0 as i32 % map.width, reaction.0 as i32 / map.width),
-                                );
                                 for ability in abilities.abilities.iter() {
                                     if range >= ability.min_range
                                         && range <= ability.range
-                                        && rng.roll_dice(1, 100) >= (ability.chance * 100.0) as i32
+                                        && rng.roll_dice(1, 100) <= (ability.chance * 100.0) as i32
                                     {
-                                        use crate::raws::find_spell_entity_by_name;
-
                                         casting
                                             .insert(
                                                 entity,
                                                 WantsToCastSpell {
-                                                    spell: find_spell_entity_by_name(
+                                                    spell: raws::find_spell_entity_by_name(
                                                         &ability.spell,
                                                         &names,
                                                         &spells,
@@ -112,6 +94,25 @@ impl<'a> System<'a> for VisibleAI {
                                             .expect("Unable to insert");
 
                                         done = true;
+                                    }
+                                }
+                            }
+
+                            if !done {
+                                for (weapon, equip) in (&weapons, &equipped).join() {
+                                    if let Some(wrange) = weapon.range {
+                                        if equip.owner == entity {
+                                            rltk::console::log(format!("Owner found. Ranges: {}/{}", wrange, range));
+                                            if wrange >= range as i32 {
+                                                rltk::console::log("Inserting shoot");
+
+                                                wants_shoot
+                                                    .insert(entity, WantsToShoot { target: reaction.2 })
+                                                    .expect("Insert fail");
+
+                                                done = true;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -143,4 +144,21 @@ impl<'a> System<'a> for VisibleAI {
             }
         }
     }
+}
+
+fn evaluate(
+    idx: usize,
+    factions: &ReadStorage<Faction>,
+    my_faction: &str,
+    reactions: &mut Vec<(usize, Reaction, Entity)>,
+) {
+    crate::spatial::for_each_tile_content(idx, |other_entity| {
+        if let Some(faction) = factions.get(other_entity) {
+            reactions.push((
+                idx,
+                raws::faction_reaction(my_faction, &faction.name, &raws::RAWS.lock().unwrap()),
+                other_entity,
+            ));
+        }
+    });
 }

@@ -1,12 +1,11 @@
-use super::{Faction, Map, MyTurn, Position, Reaction, TileSize, WantsToMelee};
-use specs::prelude::*;
+use super::*;
 
 fn evaluate(idx: usize, factions: &ReadStorage<Faction>, my_faction: &str, reactions: &mut Vec<(Entity, Reaction)>) {
     crate::spatial::for_each_tile_content(idx, |other_entity| {
         if let Some(faction) = factions.get(other_entity) {
             reactions.push((
                 other_entity,
-                crate::raws::faction_reaction(my_faction, &faction.name, &crate::raws::RAWS.lock().unwrap()),
+                raws::faction_reaction(my_faction, &faction.name, &raws::RAWS.lock().unwrap()),
             ));
         }
     });
@@ -38,7 +37,6 @@ impl<'a> System<'a> for AdjacentAI {
                 let h = map.height;
 
                 if let Some(size) = sizes.get(entity) {
-                    use crate::rect::Rect;
                     let mob_rect = Rect::new(pos.x, pos.y, size.x, size.y).get_all_tiles();
                     let parent_rect = Rect::new(pos.x - 1, pos.y - 1, size.x + 2, size.y + 2);
 

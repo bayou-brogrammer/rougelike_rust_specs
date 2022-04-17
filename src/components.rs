@@ -2,13 +2,14 @@ use std::collections::HashMap;
 use std::convert::Infallible;
 
 use serde::{Deserialize, Serialize};
+
 use specs::prelude::*;
 use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::*;
 
 pub type NoError = Infallible;
 
-use rltk::RGB;
+use rltk::{Point, RGB};
 
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Position {
@@ -319,7 +320,8 @@ pub enum WeaponAttribute {
 }
 
 #[derive(Component, Serialize, Deserialize, Clone)]
-pub struct MeleeWeapon {
+pub struct Weapon {
+    pub range: Option<i32>,
     pub attribute: WeaponAttribute,
     pub damage_n_dice: i32,
     pub damage_die_type: i32,
@@ -350,9 +352,18 @@ pub struct NaturalAttackDefense {
     pub attacks: Vec<NaturalAttack>,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ParticleAnimation {
+    pub step_time: f32,
+    pub path: Vec<Point>,
+    pub current_step: usize,
+    pub timer: f32,
+}
+
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
     pub lifetime_ms: f32,
+    pub animation: Option<ParticleAnimation>,
 }
 
 #[derive(Component, Serialize, Deserialize, Clone)]
@@ -485,6 +496,14 @@ pub struct OnDeath {
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct AlwaysTargetsSelf {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Target {}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantsToShoot {
+    pub target: Entity,
+}
 
 // Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
 // Entity.

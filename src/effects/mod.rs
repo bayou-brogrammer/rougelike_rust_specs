@@ -1,11 +1,9 @@
 use specs::prelude::*;
 
 use std::collections::{HashSet, VecDeque};
-
 use std::sync::Mutex;
 
-use crate::components::AttributeBonus;
-use crate::map::Map;
+use crate::prelude::*;
 
 mod damage;
 mod hunger;
@@ -25,7 +23,6 @@ lazy_static! {
 pub enum EffectType { 
     Damage { amount : i32 },
     Bloodstain,
-    Particle { glyph: rltk::FontCharType, fg : rltk::RGB, bg: rltk::RGB, lifespan: f32 },
     EntityDeath,
     ItemUse { item: Entity },
     SpellUse { spell: Entity },
@@ -34,10 +31,12 @@ pub enum EffectType {
     Mana { amount : i32 },
     Confusion { turns : i32 },
     TriggerFire { trigger: Entity },
+    Slow { initiative_penalty : f32 },
+    DamageOverTime { damage : i32 },
     TeleportTo { x:i32, y:i32, depth: i32, player_only : bool },
     AttributeEffect { bonus : AttributeBonus, name : String, duration : i32 },
-    Slow { initiative_penalty : f32 },
-    DamageOverTime { damage : i32 }
+    Particle { glyph: rltk::FontCharType, fg : rltk::RGB, bg: rltk::RGB, lifespan: f32 },
+    ParticleProjectile { glyph: rltk::FontCharType, fg : rltk::RGB, bg: rltk::RGB, lifespan: f32, speed: f32, path: Vec<Point> }
 }
 
 #[derive(Clone, Debug)]
@@ -116,6 +115,7 @@ fn affect_tile(ecs: &mut World, effect: &mut EffectSpawner, tile_idx: i32) {
     match &effect.effect_type {
         EffectType::Bloodstain => damage::bloodstain(ecs, tile_idx),
         EffectType::Particle { .. } => particles::particle_to_tile(ecs, tile_idx, effect),
+        EffectType::ParticleProjectile { .. } => particles::projectile(ecs, tile_idx, &effect),
         _ => {},
     }
 }
@@ -126,7 +126,6 @@ fn affect_entity(ecs: &mut World, effect: &mut EffectSpawner, target: Entity) {
     }
 
     effect.dedupe.insert(target);
-
 
     match &effect.effect_type {
         EffectType::AttributeEffect { .. } => damage::attribute_effect(ecs, effect, target),

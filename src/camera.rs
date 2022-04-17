@@ -1,9 +1,4 @@
-use specs::prelude::*;
-
-use super::{Hidden, Map, Position, Renderable, TileSize};
-use rltk::{Point, Rltk, RGB};
-
-use crate::map::tile_glyph;
+use crate::prelude::*;
 
 const SHOW_BOUNDARIES: bool = false;
 
@@ -37,7 +32,7 @@ pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
             if tx > 0 && tx < map_width && ty > 0 && ty < map_height {
                 let idx = map.xy_idx(tx, ty);
                 if map.revealed_tiles[idx] {
-                    let (glyph, fg, bg) = tile_glyph(idx, &*map);
+                    let (glyph, fg, bg) = map::tile_glyph(idx, &*map);
                     ctx.set(x + 1, y + 1, fg, bg, glyph);
                 }
             } else if SHOW_BOUNDARIES {
@@ -57,6 +52,7 @@ pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
     let renderables = ecs.read_storage::<Renderable>();
     let hidden = ecs.read_storage::<Hidden>();
     let sizes = ecs.read_storage::<TileSize>();
+    let targets = ecs.read_storage::<Target>();
 
     let map = ecs.fetch::<Map>();
     let entities = ecs.entities();
@@ -114,6 +110,27 @@ pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
                 }
             }
         }
+
+        if targets.get(*entity).is_some() {
+            let entity_screen_x = pos.x - min_x;
+            let entity_screen_y = pos.y - min_y;
+
+            ctx.set(
+                entity_screen_x,
+                entity_screen_y + 1,
+                rltk::RGB::named(rltk::RED),
+                rltk::RGB::named(rltk::YELLOW),
+                rltk::to_cp437('['),
+            );
+
+            ctx.set(
+                entity_screen_x + 2,
+                entity_screen_y + 1,
+                rltk::RGB::named(rltk::RED),
+                rltk::RGB::named(rltk::YELLOW),
+                rltk::to_cp437(']'),
+            );
+        }
     }
 }
 
@@ -137,7 +154,7 @@ pub fn render_debug_map(map: &Map, ctx: &mut Rltk) {
             if tx > 0 && tx < map_width && ty > 0 && ty < map_height {
                 let idx = map.xy_idx(tx, ty);
                 if map.revealed_tiles[idx] {
-                    let (glyph, fg, bg) = tile_glyph(idx, &*map);
+                    let (glyph, fg, bg) = map::tile_glyph(idx, &*map);
                     ctx.set(x, y, fg, bg, glyph);
                 }
             } else if SHOW_BOUNDARIES {

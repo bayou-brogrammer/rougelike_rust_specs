@@ -1,6 +1,4 @@
-use specs::prelude::*;
-
-use super::{effects::*, GameLog, HungerClock, HungerState, MyTurn};
+use super::*;
 
 pub struct HungerSystem {}
 

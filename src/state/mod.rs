@@ -19,10 +19,10 @@ pub struct State {
 ///////////////////////////////////////////////////////////////////////////
 impl State {
     pub fn run_systems(&mut self) {
-        let mut mapindex = MapIndexingSystem {};
+        let mut mapindex = map_indexing_system::MapIndexingSystem {};
         mapindex.run_now(&self.ecs);
 
-        let mut vis = VisibilitySystem {};
+        let mut vis = visibility_system::VisibilitySystem {};
         vis.run_now(&self.ecs);
 
         let mut encumbrance = ai::EncumbranceSystem {};
@@ -55,45 +55,48 @@ impl State {
         let mut defaultmove = ai::DefaultMoveAI {};
         defaultmove.run_now(&self.ecs);
 
-        let mut moving = MovementSystem {};
+        let mut moving = movement_system::MovementSystem {};
         moving.run_now(&self.ecs);
 
-        let mut triggers = TriggerSystem {};
+        let mut triggers = trigger_system::TriggerSystem {};
         triggers.run_now(&self.ecs);
 
-        let mut melee = MeleeCombatSystem {};
+        let mut melee = melee_combat_system::MeleeCombatSystem {};
         melee.run_now(&self.ecs);
 
-        let mut pickup = ItemCollectionSystem {};
+        let mut ranged = ranged_combat_system::RangedCombatSystem {};
+        ranged.run_now(&self.ecs);
+
+        let mut pickup = inventory_system::ItemCollectionSystem {};
         pickup.run_now(&self.ecs);
 
-        let mut itemequip = ItemEquipOnUse {};
+        let mut itemequip = inventory_system::ItemEquipOnUse {};
         itemequip.run_now(&self.ecs);
 
-        let mut item_use = ItemUseSystem {};
+        let mut item_use = inventory_system::ItemUseSystem {};
         item_use.run_now(&self.ecs);
 
-        let mut spelluse = SpellUseSystem {};
+        let mut spelluse = inventory_system::SpellUseSystem {};
         spelluse.run_now(&self.ecs);
 
-        let mut item_id = ItemIdentificationSystem {};
+        let mut item_id = inventory_system::ItemIdentificationSystem {};
         item_id.run_now(&self.ecs);
 
-        let mut drop_items = ItemDropSystem {};
+        let mut drop_items = inventory_system::ItemDropSystem {};
         drop_items.run_now(&self.ecs);
 
-        let mut item_remove = ItemRemoveSystem {};
+        let mut item_remove = inventory_system::ItemRemoveSystem {};
         item_remove.run_now(&self.ecs);
 
         let mut hunger = hunger_system::HungerSystem {};
         hunger.run_now(&self.ecs);
 
-        effects::run_effects_queue(&mut self.ecs);
+        run_effects_queue(&mut self.ecs);
 
         let mut particles = particle_system::ParticleSpawnSystem {};
         particles.run_now(&self.ecs);
 
-        let mut lighting = LightingSystem {};
+        let mut lighting = lighting_system::LightingSystem {};
         lighting.run_now(&self.ecs);
 
         self.ecs.maintain();

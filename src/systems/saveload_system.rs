@@ -56,7 +56,7 @@ pub fn save_game(ecs: &mut World) {
         serialize_individually!(ecs, serializer, data, Position, Renderable, Player, Viewshed,
             Name, BlocksTile, WantsToMelee, Item, Consumable, Ranged, InflictsDamage,
             AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
-            WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleeWeapon, Wearable,
+            WantsToDropItem, SerializationHelper, Equippable, Equipped, Weapon, Wearable,
             WantsToRemoveItem, ParticleLifetime, HungerClock, ProvidesFood, MagicMapper, Hidden,
             EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,
@@ -65,7 +65,7 @@ pub fn save_game(ecs: &mut World) {
             ApplyTeleport, MagicItem, ObfuscatedName, IdentifiedItem, CursedItem, ProvidesRemoveCurse,
             ProvidesIdentification, AttributeBonus, Duration, StatusEffect, KnownSpells, SpellTemplate,
             WantsToCastSpell, ProvidesMana, TeachesSpell, DamageOverTime, Slow, SpecialAbilities,
-            TileSize, OnDeath, AlwaysTargetsSelf
+            TileSize, OnDeath, AlwaysTargetsSelf, WantsToShoot, WantsToShoot
         );
     }
 
@@ -117,7 +117,7 @@ pub fn load_game(ecs: &mut World) {
         deserialize_individually!(ecs, de, d, Position, Renderable, Player, Viewshed,
             Name, BlocksTile, WantsToMelee, Item, Consumable, Ranged, InflictsDamage,
             AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
-            WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleeWeapon, Wearable,
+            WantsToDropItem, SerializationHelper, Equippable, Equipped, Weapon, Wearable,
             WantsToRemoveItem, ParticleLifetime, HungerClock, ProvidesFood, MagicMapper, Hidden,
             EntryTrigger, EntityMoved, SingleActivation, BlocksVisibility, Door,
             Quips, Attributes, Skills, Pools, NaturalAttackDefense, LootTable,

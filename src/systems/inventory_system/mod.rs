@@ -1,10 +1,4 @@
-use specs::prelude::*;
-
-use super::{
-    effects, AreaOfEffect, CursedItem, EquipmentChanged, Equippable, Equipped, IdentifiedItem, InBackpack, Item,
-    MagicItem, Map, MasterDungeonMap, Name, ObfuscatedName, Position, WantsToCastSpell, WantsToDropItem,
-    WantsToPickupItem, WantsToRemoveItem, WantsToUseItem,
-};
+use super::*;
 
 mod collection_system;
 mod drop_system;

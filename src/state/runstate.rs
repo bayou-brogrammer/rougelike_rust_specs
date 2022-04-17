@@ -37,7 +37,7 @@ impl GameState for State {
         }
 
         ctx.cls();
-        particle_system::cull_dead_particles(&mut self.ecs, ctx);
+        particle_system::update_particles(&mut self.ecs, ctx);
 
         match newrunstate {
             RunState::MainMenu { .. } => {},
@@ -54,6 +54,7 @@ impl GameState for State {
                     newrunstate = self.mapgen_next_state.unwrap();
                 } else {
                     ctx.cls();
+
                     if self.mapgen_index < self.mapgen_history.len() {
                         camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
                     }
@@ -75,15 +76,20 @@ impl GameState for State {
                 newrunstate = RunState::AwaitingInput;
             },
             RunState::AwaitingInput => {
-                newrunstate = player_input(self, ctx);
+                newrunstate = player::player_input(self, ctx);
             },
             RunState::Ticking => {
+                let mut should_change_target = false;
+
                 while newrunstate == RunState::Ticking {
                     self.run_systems();
                     self.ecs.maintain();
 
                     match *self.ecs.fetch::<RunState>() {
-                        RunState::AwaitingInput => newrunstate = RunState::AwaitingInput,
+                        RunState::AwaitingInput => {
+                            newrunstate = RunState::AwaitingInput;
+                            should_change_target = true;
+                        },
                         RunState::MagicMapReveal { .. } => newrunstate = RunState::MagicMapReveal { row: 0 },
                         RunState::TownPortal => newrunstate = RunState::TownPortal,
                         RunState::TeleportingToOtherLevel { x, y, depth } => {
@@ -93,6 +99,10 @@ impl GameState for State {
                         RunState::ShowIdentify => newrunstate = RunState::ShowIdentify,
                         _ => newrunstate = RunState::Ticking,
                     }
+                }
+
+                if should_change_target {
+                    player::end_turn_targeting(&mut self.ecs);
                 }
             },
             RunState::ShowInventory => {

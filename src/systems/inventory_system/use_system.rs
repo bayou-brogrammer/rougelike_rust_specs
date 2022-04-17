@@ -1,6 +1,4 @@
-use specs::prelude::*;
-
-use super::{effects::*, AreaOfEffect, EquipmentChanged, IdentifiedItem, Map, Name, WantsToCastSpell, WantsToUseItem};
+use super::*;
 
 pub struct ItemUseSystem {}
 

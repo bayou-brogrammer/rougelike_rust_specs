@@ -1,12 +1,13 @@
-use super::*;
+use crate::prelude::*;
 
-pub struct MeleeCombatSystem {}
+pub struct RangedCombatSystem {}
 
-impl<'a> System<'a> for MeleeCombatSystem {
+impl<'a> System<'a> for RangedCombatSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         Entities<'a>,
         WriteExpect<'a, GameLog>,
-        WriteStorage<'a, WantsToMelee>,
+        WriteStorage<'a, WantsToShoot>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, Attributes>,
         ReadStorage<'a, Skills>,
@@ -17,13 +18,15 @@ impl<'a> System<'a> for MeleeCombatSystem {
         ReadStorage<'a, Weapon>,
         ReadStorage<'a, Wearable>,
         ReadStorage<'a, NaturalAttackDefense>,
+        ReadStorage<'a, Position>,
+        ReadExpect<'a, Map>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
             mut log,
-            mut wants_melee,
+            mut wants_shoot,
             names,
             attributes,
             skills,
@@ -31,21 +34,47 @@ impl<'a> System<'a> for MeleeCombatSystem {
             pools,
             mut rng,
             equipped_items,
-            weapons,
+            weapon,
             wearables,
             natural,
+            positions,
+            map,
         ) = data;
 
-        for (entity, wants_melee, name, attacker_attributes, attacker_skills, attacker_pools) in
-            (&entities, &wants_melee, &names, &attributes, &skills, &pools).join()
+        for (entity, wants_shoot, name, attacker_attributes, attacker_skills, attacker_pools) in
+            (&entities, &wants_shoot, &names, &attributes, &skills, &pools).join()
         {
             // Are the attacker and defender alive? Only attack if they are
-            let target_pools = pools.get(wants_melee.target).unwrap();
-            let target_attributes = attributes.get(wants_melee.target).unwrap();
-            let target_skills = skills.get(wants_melee.target).unwrap();
+            let target_pools = pools.get(wants_shoot.target).unwrap();
+            let target_attributes = attributes.get(wants_shoot.target).unwrap();
+            let target_skills = skills.get(wants_shoot.target).unwrap();
             if attacker_pools.hit_points.current > 0 && target_pools.hit_points.current > 0 {
-                let target_name = names.get(wants_melee.target).unwrap();
+                let target_name = names.get(wants_shoot.target).unwrap();
 
+                // Fire projectile effect
+                let apos = positions.get(entity).unwrap();
+                let dpos = positions.get(wants_shoot.target).unwrap();
+
+                add_effect(
+                    None,
+                    EffectType::ParticleProjectile {
+                        glyph: to_cp437('*'),
+                        fg: RGB::named(rltk::CYAN),
+                        bg: RGB::named(rltk::BLACK),
+                        lifespan: 300.0,
+                        speed: 50.0,
+                        path: rltk::line2d(
+                            rltk::LineAlg::Bresenham,
+                            Point::new(apos.x, apos.y),
+                            Point::new(dpos.x, dpos.y),
+                        ),
+                    },
+                    Targets::Tile {
+                        tile_idx: map.xy_idx(apos.x, apos.y) as i32,
+                    },
+                );
+
+                // Define the basic unarmed attack - overridden by wielding check below if a weapon is equipped
                 let mut weapon_info = Weapon {
                     range: None,
                     attribute: WeaponAttribute::Might,
@@ -64,7 +93,6 @@ impl<'a> System<'a> for MeleeCombatSystem {
                         } else {
                             rng.roll_dice(1, nat.attacks.len() as i32) as usize - 1
                         };
-
                         weapon_info.hit_bonus = nat.attacks[attack_index].hit_bonus;
                         weapon_info.damage_n_dice = nat.attacks[attack_index].damage_n_dice;
                         weapon_info.damage_die_type = nat.attacks[attack_index].damage_die_type;
@@ -73,9 +101,9 @@ impl<'a> System<'a> for MeleeCombatSystem {
                 }
 
                 let mut weapon_entity: Option<Entity> = None;
-                for (weaponentity, wielded, weapon) in (&entities, &equipped_items, &weapons).join() {
+                for (weaponentity, wielded, melee) in (&entities, &equipped_items, &weapon).join() {
                     if wielded.owner == entity && wielded.slot == EquipmentSlot::Melee {
-                        weapon_info = weapon.clone();
+                        weapon_info = melee.clone();
                         weapon_entity = Some(weaponentity);
                     }
                 }
@@ -86,29 +114,27 @@ impl<'a> System<'a> for MeleeCombatSystem {
                 } else {
                     attacker_attributes.quickness.bonus
                 };
-
                 let skill_hit_bonus = skill_bonus(Skill::Melee, &*attacker_skills);
                 let weapon_hit_bonus = weapon_info.hit_bonus;
                 let mut status_hit_bonus = 0;
-
-                // Well-Fed grants +1
                 if let Some(hc) = hunger_clock.get(entity) {
+                    // Well-Fed grants +1
                     if hc.state == HungerState::WellFed {
                         status_hit_bonus += 1;
                     }
                 }
-
                 let modified_hit_roll =
                     natural_roll + attribute_hit_bonus + skill_hit_bonus + weapon_hit_bonus + status_hit_bonus;
+                //println!("Natural roll: {}", natural_roll);
+                //println!("Modified hit roll: {}", modified_hit_roll);
 
                 let mut armor_item_bonus_f = 0.0;
                 for (wielded, armor) in (&equipped_items, &wearables).join() {
-                    if wielded.owner == wants_melee.target {
+                    if wielded.owner == wants_shoot.target {
                         armor_item_bonus_f += armor.armor_class;
                     }
                 }
-
-                let base_armor_class = match natural.get(wants_melee.target) {
+                let base_armor_class = match natural.get(wants_shoot.target) {
                     None => 10,
                     Some(nat) => nat.armor_class.unwrap_or(10),
                 };
@@ -117,6 +143,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
                 let armor_item_bonus = armor_item_bonus_f as i32;
                 let armor_class = base_armor_class + armor_quickness_bonus + armor_skill_bonus + armor_item_bonus;
 
+                //println!("Armor class: {}", armor_class);
                 if natural_roll != 1 && (natural_roll == 20 || modified_hit_roll > armor_class) {
                     // Target hit! Until we support weapons, we're going with 1d4
                     let base_damage = rng.roll_dice(weapon_info.damage_n_dice, weapon_info.damage_die_type);
@@ -126,14 +153,18 @@ impl<'a> System<'a> for MeleeCombatSystem {
 
                     let damage = i32::max(
                         0,
-                        base_damage + attr_damage_bonus + skill_hit_bonus + skill_damage_bonus + weapon_damage_bonus,
+                        base_damage + attr_damage_bonus + skill_damage_bonus + weapon_damage_bonus,
                     );
 
+                    /*println!("Damage: {} + {}attr + {}skill + {}weapon = {}",
+                        base_damage, attr_damage_bonus, skill_damage_bonus,
+                        weapon_damage_bonus, damage
+                    );*/
                     add_effect(
                         Some(entity),
                         EffectType::Damage { amount: damage },
                         Targets::Single {
-                            target: wants_melee.target,
+                            target: wants_shoot.target,
                         },
                     );
 
@@ -141,12 +172,15 @@ impl<'a> System<'a> for MeleeCombatSystem {
 
                     // Proc effects
                     if let Some(chance) = &weapon_info.proc_chance {
-                        if rng.roll_dice(1, 100) <= (chance * 100.0) as i32 {
+                        let roll = rng.roll_dice(1, 100);
+                        //println!("Roll {}, Chance {}", roll, chance);
+                        if roll <= (chance * 100.0) as i32 {
+                            //println!("Proc!");
                             let effect_target = if weapon_info.proc_target.unwrap() == "Self" {
                                 Targets::Single { target: entity }
                             } else {
                                 Targets::Single {
-                                    target: wants_melee.target,
+                                    target: wants_shoot.target,
                                 }
                             };
 
@@ -175,7 +209,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
                             lifespan: 200.0,
                         },
                         Targets::Single {
-                            target: wants_melee.target,
+                            target: wants_shoot.target,
                         },
                     );
                 } else {
@@ -194,13 +228,13 @@ impl<'a> System<'a> for MeleeCombatSystem {
                             lifespan: 200.0,
                         },
                         Targets::Single {
-                            target: wants_melee.target,
+                            target: wants_shoot.target,
                         },
                     );
                 }
             }
         }
 
-        wants_melee.clear();
+        wants_shoot.clear();
     }
 }

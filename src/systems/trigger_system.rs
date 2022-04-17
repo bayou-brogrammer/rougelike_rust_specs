@@ -1,6 +1,4 @@
-use specs::prelude::*;
-
-use super::{effects::*, AreaOfEffect, EntityMoved, EntryTrigger, GameLog, Map, Name, Position};
+use super::*;
 
 pub struct TriggerSystem {}
 
