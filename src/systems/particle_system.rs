@@ -34,6 +34,10 @@ pub struct ParticleBuilder {
     requests: Vec<ParticleRequest>,
 }
 
+impl Default for ParticleBuilder {
+    fn default() -> Self { Self::new() }
+}
+
 impl ParticleBuilder {
     pub fn new() -> ParticleBuilder { ParticleBuilder { requests: Vec::new() } }
 

@@ -1,5 +1,4 @@
-use crate::raws::{spawn_type_by_name, RawMaster, SpawnTableType};
-use rltk::RandomNumberGenerator;
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub struct RandomEntry {
@@ -33,7 +32,7 @@ impl MasterTable {
     }
 
     pub fn add<S: ToString>(&mut self, name: S, weight: i32, raws: &RawMaster) {
-        match spawn_type_by_name(raws, &name.to_string()) {
+        match raws::spawn_type_by_name(raws, &name.to_string()) {
             SpawnTableType::Item => self.items.add(name, weight),
             SpawnTableType::Mob => self.mobs.add(name, weight),
             SpawnTableType::Prop => self.props.add(name, weight),

@@ -1,15 +1,14 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::BaseRawComponent;
-
 // Trait Implementations
-impl BaseRawComponent for Item {
+impl super::BaseRawComponent for Item {
     fn name(&self) -> String { self.name.clone() }
     fn renderable(&self) -> Option<&Renderable> { self.renderable.as_ref() }
+    fn as_any(&self) -> &dyn std::any::Any { self }
 }
 
-impl<T: BaseRawComponent> From<&T> for Item {
+impl<T: super::BaseRawComponent> From<&T> for Item {
     fn from(base: &T) -> Self { base.into() }
 }
 
@@ -26,6 +25,7 @@ pub struct Item {
     pub vendor_category: Option<String>,
     pub magic: Option<MagicItem>,
     pub attributes: Option<ItemAttributeBonus>,
+    pub template_magic: Option<ItemMagicTemplate>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -74,4 +74,12 @@ pub struct ItemAttributeBonus {
     pub fitness: Option<i32>,
     pub quickness: Option<i32>,
     pub intelligence: Option<i32>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct ItemMagicTemplate {
+    pub unidentified_name: String,
+    pub bonus_min: i32,
+    pub bonus_max: i32,
+    pub include_cursed: bool,
 }

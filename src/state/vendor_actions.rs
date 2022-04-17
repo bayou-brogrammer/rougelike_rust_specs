@@ -1,7 +1,4 @@
-use specs::prelude::*;
-
-use super::State;
-use crate::components::*;
+use crate::prelude::*;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum VendorMode {
@@ -26,8 +23,6 @@ impl State {
     }
 
     pub fn buy_items(&mut self, tag: Option<String>, price: Option<f32>) {
-        use crate::raws::*;
-
         let tag = tag.unwrap();
         let price = price.unwrap();
         let player_entity = self.ecs.fetch::<Entity>();
@@ -47,7 +42,7 @@ impl State {
             std::mem::drop(pools);
 
             let player_entity = *self.ecs.fetch::<Entity>();
-            crate::raws::spawn_named_item(
+            raws::spawn_named_item(
                 &RAWS.lock().unwrap(),
                 &mut self.ecs,
                 &tag,

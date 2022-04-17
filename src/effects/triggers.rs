@@ -1,8 +1,5 @@
 use super::*;
-
-use crate::components::*;
-use crate::gamelog::GameLog;
-use crate::RunState;
+use crate::prelude::*;
 
 pub fn trigger(creator: Option<Entity>, trigger: Entity, targets: &Targets, ecs: &mut World) {
     // The triggering item is no longer hidden
@@ -256,7 +253,7 @@ fn event_trigger(creator: Option<Entity>, entity: Entity, targets: &Targets, ecs
     // Learn spells
     if let Some(spell) = ecs.read_storage::<TeachesSpell>().get(entity) {
         if let Some(known) = ecs.write_storage::<KnownSpells>().get_mut(creator.unwrap()) {
-            if let Some(spell_entity) = crate::raws::find_spell_entity(ecs, &spell.spell) {
+            if let Some(spell_entity) = raws::find_spell_entity(ecs, &spell.spell) {
                 if let Some(spell_info) = ecs.read_storage::<SpellTemplate>().get(spell_entity) {
                     let mut already_known = false;
                     for known_spell in known.spells.iter() {

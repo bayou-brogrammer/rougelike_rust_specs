@@ -44,5 +44,9 @@
   {
     "name": "Fungi",
     "responses": { "Default": "attack", "Fungi": "ignore", "Wyrm": "ignore" }
+  },
+  {
+    "name": "DarkElf",
+    "responses": { "Default": "attack", "DarkElf": "ignore" }
   }
 ]

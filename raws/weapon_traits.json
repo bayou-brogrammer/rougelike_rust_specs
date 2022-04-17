@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Venomous",
+    "effects": { "damage_over_time": "2" }
+  },
+  {
+    "name": "Dazzling",
+    "effects": { "confusion": "2" }
+  }
+]

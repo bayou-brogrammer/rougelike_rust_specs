@@ -1,8 +1,6 @@
 use core::panic;
 
-use rltk::{parse_dice_string as rlk_parse_dice_string, DiceType};
-
-use super::components::{SpawnParticleBurst, SpawnParticleLine};
+use crate::prelude::{parse_dice_string as rlk_parse_dice_string, *};
 
 pub fn parse_dice_string(dice: &str) -> (i32, i32, i32) {
     let DiceType {

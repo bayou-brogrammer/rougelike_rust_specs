@@ -784,5 +784,29 @@
       "attacks": [{ "name": "bite", "hit_bonus": 0, "damage": "1d4" }]
     },
     "faction": "Fungi"
+  },
+
+  {
+    "name": "Dark Elf",
+    "renderable": {
+      "glyph": "e",
+      "fg": "#FF0000",
+      "bg": "#000000",
+      "order": 1
+    },
+    "blocks_tile": true,
+    "vision_range": 8,
+    "movement": "random_waypoint",
+    "attributes": {},
+    "equipped": [
+      "Scimitar",
+      "Buckler",
+      "Drow Chain",
+      "Drow Leggings",
+      "Drow Boots"
+    ],
+    "faction": "DarkElf",
+    "gold": "3d6",
+    "level": 6
   }
 ]

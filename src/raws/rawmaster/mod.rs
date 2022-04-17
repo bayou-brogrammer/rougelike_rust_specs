@@ -1,19 +1,15 @@
-use specs::prelude::*;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-pub use super::{structs, structs::BaseRawComponent, Raws};
-use crate::{
-    components, gamesystem,
-    random_table::{MasterTable, RandomTable},
-    EquipmentSlot, Name, SpellTemplate,
-};
+use crate::prelude::*;
 
+mod build;
 mod load;
-use load::*;
-
 mod parse;
 
-mod spawn;
+pub mod spawn;
+pub use build::*;
+pub use load::*;
+pub use parse::*;
 pub use spawn::*;
 
 pub struct RawMaster {
@@ -22,7 +18,7 @@ pub struct RawMaster {
     mob_index: HashMap<String, usize>,
     prop_index: HashMap<String, usize>,
     loot_index: HashMap<String, usize>,
-    faction_index: HashMap<String, HashMap<String, structs::Reaction>>,
+    faction_index: HashMap<String, HashMap<String, raws::Reaction>>,
     spell_index: HashMap<String, usize>,
 }
 
@@ -37,6 +33,7 @@ impl RawMaster {
                 loot_tables: Vec::new(),
                 faction_table: Vec::new(),
                 spells: Vec::new(),
+                weapon_traits: Vec::new(),
             },
             item_index: HashMap::new(),
             mob_index: HashMap::new(),
@@ -46,63 +43,10 @@ impl RawMaster {
             spell_index: HashMap::new(),
         }
     }
-
-    pub fn load(&mut self, raws: Raws) {
-        self.raws = raws;
-        self.item_index = HashMap::new();
-        let mut used_names: HashSet<String> = HashSet::new();
-
-        // Items
-        load_entity_data(&self.raws.items, &mut self.item_index, &mut used_names);
-        // Mobs
-        load_entity_data(&self.raws.mobs, &mut self.mob_index, &mut used_names);
-        // Props
-        load_entity_data(&self.raws.props, &mut self.prop_index, &mut used_names);
-
-        // Spawn Table
-        for spawn in self.raws.spawn_table.iter() {
-            if !used_names.contains(&spawn.name) {
-                rltk::console::log(format!(
-                    "WARNING - Spawn tables references unspecified entity {}",
-                    spawn.name
-                ));
-            }
-        }
-
-        // Loot Table
-        for (i, loot) in self.raws.loot_tables.iter().enumerate() {
-            self.loot_index.insert(loot.name.clone(), i);
-        }
-
-        // Faction Table
-        for faction in self.raws.faction_table.iter() {
-            let mut reactions: HashMap<String, structs::Reaction> = HashMap::new();
-
-            for other in faction.responses.iter() {
-                reactions.insert(
-                    other.0.clone(),
-                    match other.1.as_str() {
-                        "ignore" => structs::Reaction::Ignore,
-                        "flee" => structs::Reaction::Flee,
-                        _ => structs::Reaction::Attack,
-                    },
-                );
-            }
-
-            self.faction_index.insert(faction.name.clone(), reactions);
-        }
-
-        // Spells
-        for (i, spell) in self.raws.spells.iter().enumerate() {
-            self.spell_index.insert(spell.name.clone(), i);
-        }
-    }
 }
 
 pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> MasterTable {
-    use super::SpawnTableEntry;
-
-    let available_options: Vec<&SpawnTableEntry> = raws
+    let available_options: Vec<&raws::SpawnTableEntry> = raws
         .raws
         .spawn_table
         .iter()
@@ -124,7 +68,7 @@ pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> MasterTable {
     rt
 }
 
-pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster) -> structs::Reaction {
+pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster) -> raws::Reaction {
     if raws.faction_index.contains_key(my_faction) {
         let mf = &raws.faction_index[my_faction];
 
@@ -133,14 +77,14 @@ pub fn faction_reaction(my_faction: &str, their_faction: &str, raws: &RawMaster)
         } else if mf.contains_key("Default") {
             return mf["Default"];
         } else {
-            return structs::Reaction::Ignore;
+            return raws::Reaction::Ignore;
         }
     }
 
-    structs::Reaction::Ignore
+    raws::Reaction::Ignore
 }
 
-pub fn get_renderable_component(renderable: &self::structs::Renderable) -> crate::components::Renderable {
+pub fn get_renderable_component(renderable: &super::Renderable) -> crate::components::Renderable {
     crate::components::Renderable {
         glyph: rltk::to_cp437(renderable.glyph.chars().next().unwrap()),
         fg: rltk::RGB::from_hex(&renderable.fg).expect("Invalid RGB"),

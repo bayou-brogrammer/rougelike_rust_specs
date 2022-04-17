@@ -1,15 +1,6 @@
-use specs::prelude::*;
 use std::cmp::{max, min};
 
-use super::{
-    gamelog::GameLog, Attributes, BlocksTile, BlocksVisibility, Door, EntityMoved, Faction, HungerClock, HungerState,
-    Item, Map, Player, Pools, Position, Renderable, RunState, State, TileType, Vendor, VendorMode, Viewshed,
-    WantsToCastSpell, WantsToMelee, WantsToPickupItem,
-};
-
-use crate::raws::structs::Reaction;
-
-use rltk::{Point, Rltk, VirtualKeyCode};
+use crate::prelude::*;
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState {
     let entities = ecs.entities();
@@ -55,9 +46,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             // Check if not hostile
             if combat_stats.get(potential_target).is_some() {
                 if let Some(faction) = factions.get(potential_target) {
-                    let reaction =
-                        crate::raws::faction_reaction(&faction.name, "Player", &crate::raws::RAWS.lock().unwrap());
-                    if reaction != Reaction::Attack {
+                    let reaction = raws::faction_reaction(&faction.name, "Player", &raws::RAWS.lock().unwrap());
+
+                    if reaction != raws::structs::Reaction::Attack {
                         hostile = false;
                     }
                 }
@@ -231,9 +222,9 @@ fn skip_turn(ecs: &mut World) -> RunState {
             match faction {
                 None => {},
                 Some(faction) => {
-                    let reaction =
-                        crate::raws::faction_reaction(&faction.name, "Player", &crate::raws::RAWS.lock().unwrap());
-                    if reaction == Reaction::Attack {
+                    let reaction = raws::faction_reaction(&faction.name, "Player", &raws::RAWS.lock().unwrap());
+
+                    if reaction == raws::structs::Reaction::Attack {
                         can_heal = false;
                     }
                 },
@@ -266,8 +257,6 @@ fn skip_turn(ecs: &mut World) -> RunState {
 }
 
 fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
-    use super::{Consumable, InBackpack, WantsToUseItem};
-
     let entities = gs.ecs.entities();
     let consumables = gs.ecs.read_storage::<Consumable>();
     let backpack = gs.ecs.read_storage::<InBackpack>();
@@ -281,7 +270,6 @@ fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
     }
 
     if (key as usize) < carried_consumables.len() {
-        use crate::components::Ranged;
         if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(carried_consumables[key as usize]) {
             return RunState::ShowTargeting {
                 range: ranged.range,
@@ -306,9 +294,6 @@ fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
 }
 
 fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
-    use super::raws::find_spell_entity;
-    use super::KnownSpells;
-
     let player_entity = gs.ecs.fetch::<Entity>();
     let known_spells_storage = gs.ecs.read_storage::<KnownSpells>();
     let known_spells = &known_spells_storage.get(*player_entity).unwrap().spells;
@@ -317,9 +302,7 @@ fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
         let pools = gs.ecs.read_storage::<Pools>();
         let player_pools = pools.get(*player_entity).unwrap();
         if player_pools.mana.current >= known_spells[key as usize].mana_cost {
-            if let Some(spell_entity) = find_spell_entity(&gs.ecs, &known_spells[key as usize].display_name) {
-                use crate::components::Ranged;
-
+            if let Some(spell_entity) = raws::find_spell_entity(&gs.ecs, &known_spells[key as usize].display_name) {
                 if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(spell_entity) {
                     return RunState::ShowTargeting {
                         range: ranged.range,

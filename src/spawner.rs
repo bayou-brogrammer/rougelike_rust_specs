@@ -1,16 +1,10 @@
 use std::collections::HashMap;
 
-use specs::prelude::*;
-use specs::saveload::{MarkedBuilder, SimpleMarker};
-
-use rltk::{RandomNumberGenerator, RGB};
-
-use super::{components::*, random_table::MasterTable, raws::*, Map, MasterDungeonMap, Rect, TileType};
-use crate::gamesystem::*;
+use crate::prelude::*;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
-    spawn_all_spells(ecs);
+    raws::spawn_all_spells(ecs);
 
     let mut skills = Skills { skills: HashMap::new() };
     skills.skills.insert(Skill::Melee, 1);
@@ -65,12 +59,12 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
     // Starting equipment
     #[rustfmt::skip]
     {
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Stained Tunic", SpawnType::Equipped{by : player});
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Torn Trousers", SpawnType::Equipped{by : player});
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Old Boots", SpawnType::Equipped{by : player});
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rusty Longsword", SpawnType::Equipped{by : player});
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Dried Sausage", SpawnType::Carried{by : player} );
-        spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Beer", SpawnType::Carried{by : player});
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Stained Tunic", SpawnType::Equipped{by : player});
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Torn Trousers", SpawnType::Equipped{by : player});
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Old Boots", SpawnType::Equipped{by : player});
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rusty Longsword", SpawnType::Equipped{by : player});
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Dried Sausage", SpawnType::Carried{by : player} );
+        raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Beer", SpawnType::Carried{by : player});
     }
 
     // Starting hangover
@@ -94,7 +88,7 @@ pub fn player(ecs: &mut World, player_x: i32, player_y: i32) -> Entity {
 
 const MAX_MONSTERS: i32 = 4;
 
-fn room_table(map_depth: i32) -> MasterTable { get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth) }
+fn room_table(map_depth: i32) -> MasterTable { raws::get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth) }
 
 /// Fills a room with stuff!
 pub fn spawn_room(
@@ -168,7 +162,7 @@ pub fn spawn_entity(ecs: &mut World, spawn: &(&usize, &String)) {
 
     std::mem::drop(map);
 
-    let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs, spawn.1, SpawnType::AtPosition { x, y });
+    let spawn_result = raws::spawn_named_entity(&RAWS.lock().unwrap(), ecs, spawn.1, SpawnType::AtPosition { x, y });
     if spawn_result.is_some() {
         return;
     }

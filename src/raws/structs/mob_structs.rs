@@ -1,12 +1,13 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::{BaseRawComponent, Renderable};
+use super::{item_structs::Renderable, BaseRawComponent};
 
 // Trait Implementations
 impl BaseRawComponent for Mob {
     fn name(&self) -> String { self.name.clone() }
     fn renderable(&self) -> Option<&Renderable> { self.renderable.as_ref() }
+    fn as_any(&self) -> &dyn std::any::Any { self }
 }
 
 impl<T: BaseRawComponent> From<&T> for Mob {

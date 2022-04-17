@@ -3,44 +3,29 @@
 
 #[macro_use]
 extern crate lazy_static;
-
 extern crate serde;
 
-use rltk::{GameState, Point, Rltk};
-use specs::prelude::*;
-use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
-
 mod ai;
+mod camera;
 mod components;
+mod effects;
 mod gamelog;
 mod gamesystem;
 mod gui;
 mod map;
+mod map_builders;
 mod player;
+mod random_table;
+pub mod raws;
 mod rect;
+mod rex_assets;
 mod spatial;
 mod spawner;
+mod state;
 mod systems;
 
-use player::*;
-use systems::{damage_system, particle_system, saveload_system};
-
-pub mod camera;
-pub mod effects;
-pub mod map_builders;
-pub mod random_table;
-pub mod raws;
-pub mod rex_assets;
-pub mod state;
-
-pub use components::*;
-pub use gamelog::GameLog;
-pub use gamesystem::*;
-pub use map::*;
-pub use rect::Rect;
-pub use state::*;
-
-const SHOW_MAPGEN_VISUALIZER: bool = false;
+mod prelude;
+pub use prelude::*;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -495,8 +480,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 
-    gs.generate_world_map(6, 0);
-    // gs.generate_world_map(1, 0);
+    gs.generate_world_map(1, 0);
 
     rltk::main_loop(context, gs)
 }

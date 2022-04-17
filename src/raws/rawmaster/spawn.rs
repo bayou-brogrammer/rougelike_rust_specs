@@ -1,15 +1,9 @@
-use specs::{
-    prelude::*,
-    saveload::{MarkedBuilder, SimpleMarker},
-};
 use std::collections::HashMap;
 
-use super::{
-    components::*, find_slot_for_equippable_item, gamesystem, get_renderable_component, string_to_slot,
-    BaseRawComponent, RawMaster,
-};
+use crate::{gamesystem, prelude::*};
 
 use super::parse::{parse_dice_string, parse_particle, parse_particle_line};
+use super::{find_slot_for_equippable_item, get_renderable_component, string_to_slot};
 
 pub enum SpawnType {
     AtPosition { x: i32, y: i32 },
@@ -36,7 +30,7 @@ pub fn spawn_position<'a>(
     }
 }
 
-pub fn build_base_entity<'a, T: BaseRawComponent + Clone>(
+pub fn spawn_base_entity<'a, T: raws::BaseRawComponent + Clone>(
     raws: &RawMaster,
     ecs: &'a mut World,
     entity_list: &[T],
@@ -105,17 +99,17 @@ macro_rules! apply_effects {
 }
 
 pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
-    let dm = ecs.fetch::<crate::map::MasterDungeonMap>();
+    let dm = ecs.fetch::<MasterDungeonMap>();
 
     let scroll_names = dm.scroll_mappings.clone();
     let potion_names = dm.potion_mappings.clone();
     let identified = dm.identified_items.clone();
     std::mem::drop(dm);
 
-    let (mut eb, item_template) = build_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
+    let (mut eb, item_template) = spawn_base_entity(raws, ecs, &raws.raws.items, &raws.item_index, key, pos);
 
     // Item Component
-    eb = eb.with(crate::components::Item {
+    eb = eb.with(Item {
         initiative_penalty: item_template.initiative_penalty.unwrap_or(0.0),
         weight_lbs: item_template.weight_lbs.unwrap_or(0.0),
         base_value: item_template.base_value.unwrap_or(0.0),
@@ -124,7 +118,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
     // Consumable Component
     if let Some(consumable) = &item_template.consumable {
         let max_charges = consumable.charges.unwrap_or(1);
-        eb = eb.with(crate::components::Consumable {
+        eb = eb.with(Consumable {
             max_charges,
             charges: max_charges,
         });
@@ -226,7 +220,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spawn
 }
 
 pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnType) -> Option<Entity> {
-    let (mut eb, mob_template) = build_base_entity(raws, ecs, &raws.raws.mobs, &raws.mob_index, key, pos);
+    let (mut eb, mob_template) = spawn_base_entity(raws, ecs, &raws.raws.mobs, &raws.mob_index, key, pos);
 
     match mob_template.movement.as_ref() {
         "random" => eb = eb.with(MoveMode { mode: Movement::Random }),
@@ -468,7 +462,7 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key: &str, pos: SpawnT
     Some(new_mob)
 }
 
-pub fn spawn_named_prop(new_entity: EntityBuilder, prop_template: super::structs::Prop) -> Option<Entity> {
+pub fn spawn_named_prop(new_entity: EntityBuilder, prop_template: raws::Prop) -> Option<Entity> {
     let mut eb = new_entity;
 
     // Hidden Trait
@@ -541,7 +535,7 @@ pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spa
     } else if raws.mob_index.contains_key(key) {
         return spawn_named_mob(raws, ecs, key, pos);
     } else if raws.prop_index.contains_key(key) {
-        let (eb, prop) = build_base_entity(raws, ecs, &raws.raws.props, &raws.prop_index, key, pos);
+        let (eb, prop) = spawn_base_entity(raws, ecs, &raws.raws.props, &raws.prop_index, key, pos);
         return spawn_named_prop(eb, prop);
     }
 
@@ -549,7 +543,7 @@ pub fn spawn_named_entity(raws: &RawMaster, ecs: &mut World, key: &str, pos: Spa
 }
 
 pub fn spawn_all_spells(ecs: &mut World) {
-    let raws = &crate::raws::RAWS.lock().unwrap();
+    let raws = &RAWS.lock().unwrap();
     for spell in raws.raws.spells.iter() {
         spawn_named_spell(raws, ecs, &spell.name);
     }
