@@ -5,6 +5,8 @@ use rltk::{Point, Rltk, RGB};
 
 use crate::map::tile_glyph;
 
+const SHOW_BOUNDARIES: bool = false;
+
 pub fn get_screen_bounds(ecs: &World, _ctx: &mut Rltk) -> (i32, i32, i32, i32) {
     let player_pos = ecs.fetch::<Point>();
     //let (x_chars, y_chars) = ctx.get_char_size();
@@ -20,8 +22,6 @@ pub fn get_screen_bounds(ecs: &World, _ctx: &mut Rltk) -> (i32, i32, i32, i32) {
 
     (min_x, max_x, min_y, max_y)
 }
-
-const SHOW_BOUNDARIES: bool = false;
 
 pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
     let map = ecs.fetch::<Map>();
