@@ -26,8 +26,7 @@ impl RoomDrawer {
 
     fn circle(&mut self, build_data: &mut BuilderMap, room: &Rect) {
         let radius = i32::min(room.x2 - room.x1, room.y2 - room.y1) as f32 / 2.0;
-        let center = room.center();
-        let center_pt = rltk::Point::new(center.0, center.1);
+        let center_pt = room.center();
 
         for y in room.y1..=room.y2 {
             for x in room.x1..=room.x2 {

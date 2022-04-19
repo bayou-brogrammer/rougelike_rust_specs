@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 mod logstore;
 use logstore::*;
-pub use logstore::{clear_log, clone_log, log_display, restore_log};
+pub use logstore::{clear_log, clone_log, print_log, restore_log};
 
 mod builder;
 pub use builder::*;

@@ -26,8 +26,8 @@ impl RoomExploder {
 
             if n_diggers > 0 {
                 for _i in 0..n_diggers {
-                    let mut drunk_x = start.0;
-                    let mut drunk_y = start.1;
+                    let mut drunk_x = start.x;
+                    let mut drunk_y = start.y;
 
                     let mut drunk_life = 20;
                     let mut did_something = false;

@@ -1,11 +1,8 @@
 use serde::{Deserialize, Serialize};
-use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
-use super::{Map, TileType};
-use crate::components::{OtherLevelPosition, Position, Viewshed};
+use super::*;
 use crate::map_builders::level_builder;
-use rltk::Point;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct MasterDungeonMap {

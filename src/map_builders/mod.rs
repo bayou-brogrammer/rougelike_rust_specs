@@ -1,5 +1,5 @@
 // Externals
-use specs::prelude::*;
+use super::*;
 
 mod common;
 use common::*;
@@ -11,8 +11,6 @@ use self::meta_map_builders::*;
 // Map Types
 mod builders;
 use self::builders::*;
-
-use super::{spawner, Map, Position, Rect, TileType, SHOW_MAPGEN_VISUALIZER};
 
 pub struct BuilderMap {
     pub spawn_list: Vec<(usize, String)>,

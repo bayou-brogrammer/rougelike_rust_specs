@@ -1,4 +1,4 @@
-use crate::map_builders::*;
+use super::*;
 
 pub mod room_based_spawner;
 pub mod room_based_stairs;

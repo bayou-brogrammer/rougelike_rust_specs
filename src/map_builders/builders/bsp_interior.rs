@@ -21,8 +21,13 @@ impl BspInteriorBuilder {
     fn build(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
         let mut rooms: Vec<Rect> = Vec::new();
         self.rects.clear();
-        self.rects
-            .push(Rect::new(1, 1, build_data.map.width - 2, build_data.map.height - 2)); // Start with a single map-sized rectangle
+        self.rects.push(Rect::with_size(
+            1,
+            1,
+            build_data.map.width - 2,
+            build_data.map.height - 2,
+        )); // Start with a single map-sized rectangle
+
         let first_room = self.rects[0];
         self.add_subrects(first_room, rng); // Divide the first room
 
@@ -73,24 +78,24 @@ impl BspInteriorBuilder {
 
         if split <= 2 {
             // Horizontal split
-            let h1 = Rect::new(rect.x1, rect.y1, half_width - 1, height);
+            let h1 = Rect::with_size(rect.x1, rect.y1, half_width - 1, height);
             self.rects.push(h1);
             if half_width > MIN_ROOM_SIZE {
                 self.add_subrects(h1, rng);
             }
-            let h2 = Rect::new(rect.x1 + half_width, rect.y1, half_width, height);
+            let h2 = Rect::with_size(rect.x1 + half_width, rect.y1, half_width, height);
             self.rects.push(h2);
             if half_width > MIN_ROOM_SIZE {
                 self.add_subrects(h2, rng);
             }
         } else {
             // Vertical split
-            let v1 = Rect::new(rect.x1, rect.y1, width, half_height - 1);
+            let v1 = Rect::with_size(rect.x1, rect.y1, width, half_height - 1);
             self.rects.push(v1);
             if half_height > MIN_ROOM_SIZE {
                 self.add_subrects(v1, rng);
             }
-            let v2 = Rect::new(rect.x1, rect.y1 + half_height, width, half_height);
+            let v2 = Rect::with_size(rect.x1, rect.y1 + half_height, width, half_height);
             self.rects.push(v2);
             if half_height > MIN_ROOM_SIZE {
                 self.add_subrects(v2, rng);

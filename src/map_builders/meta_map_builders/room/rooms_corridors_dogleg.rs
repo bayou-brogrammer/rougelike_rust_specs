@@ -1,5 +1,4 @@
-use super::{apply_horizontal_tunnel, apply_vertical_tunnel, BuilderMap, MetaMapBuilder, Rect};
-use rltk::RandomNumberGenerator;
+use super::*;
 
 pub struct DoglegCorridors {}
 
@@ -25,8 +24,8 @@ impl DoglegCorridors {
 
         for (i, room) in rooms.iter().enumerate() {
             if i > 0 {
-                let (new_x, new_y) = room.center();
-                let (prev_x, prev_y) = rooms[i as usize - 1].center();
+                let Point { x: new_x, y: new_y } = room.center();
+                let Point { x: prev_x, y: prev_y } = rooms[i as usize - 1].center();
 
                 if rng.range(0, 2) == 1 {
                     let mut c1 = apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, prev_y);

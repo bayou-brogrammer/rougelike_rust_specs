@@ -1,6 +1,4 @@
-use specs::prelude::*;
-
-use super::{Consumable, CursedItem, MagicItem, MagicItemClass, Name, ObfuscatedName, RGB};
+use super::*;
 
 pub fn get_item_color(ecs: &World, item: Entity) -> RGB {
     let dm = ecs.fetch::<crate::map::MasterDungeonMap>();

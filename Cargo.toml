@@ -16,3 +16,5 @@ serde_json = "^1.0.79"
 
 specs = {version = "^0.17.0", features = ["serde"]}
 specs-derive = "^0.4.1"
+
+extend = "^1.1.2"

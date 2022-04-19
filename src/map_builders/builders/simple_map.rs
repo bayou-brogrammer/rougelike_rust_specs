@@ -26,7 +26,7 @@ impl SimpleMapBuilder {
             let x = rng.roll_dice(1, build_data.map.width - w - 1) - 1;
             let y = rng.roll_dice(1, build_data.map.height - h - 1) - 1;
 
-            let new_room = Rect::new(x, y, w, h);
+            let new_room = Rect::with_size(x, y, w, h);
             let mut ok = true;
 
             for other_room in rooms.iter() {

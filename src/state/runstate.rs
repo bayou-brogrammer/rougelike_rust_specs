@@ -1,5 +1,5 @@
 use super::*;
-use crate::{camera, gui};
+use crate::gui;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -37,6 +37,9 @@ impl GameState for State {
             newrunstate = *run_state;
         }
 
+        ctx.set_active_console(1);
+        ctx.cls();
+        ctx.set_active_console(0);
         ctx.cls();
         particle_system::update_particles(&mut self.ecs, ctx);
 
@@ -44,7 +47,7 @@ impl GameState for State {
             RunState::MainMenu { .. } => {},
             RunState::GameOver { .. } => {},
             _ => {
-                camera::render_camera(&self.ecs, ctx);
+                map::camera::render_camera(&self.ecs, ctx);
                 gui::draw_ui(&self.ecs, ctx);
             },
         }
@@ -57,7 +60,7 @@ impl GameState for State {
                     ctx.cls();
 
                     if self.mapgen_index < self.mapgen_history.len() {
-                        camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
+                        map::camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
                     }
 
                     self.mapgen_timer += ctx.frame_time_ms;
@@ -111,6 +114,7 @@ impl GameState for State {
             },
             RunState::ShowInventory => {
                 let result = gui::show_inventory(self, ctx);
+
                 match result.0 {
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
                     gui::ItemMenuResult::NoResponse => {},
@@ -141,6 +145,7 @@ impl GameState for State {
             },
             RunState::ShowDropItem => {
                 let result = gui::drop_item_menu(self, ctx);
+
                 match result.0 {
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
                     gui::ItemMenuResult::NoResponse => {},
@@ -157,6 +162,7 @@ impl GameState for State {
             },
             RunState::ShowRemoveItem => {
                 let result = gui::remove_item_menu(self, ctx);
+
                 match result.0 {
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
                     gui::ItemMenuResult::NoResponse => {},
@@ -172,7 +178,7 @@ impl GameState for State {
                 }
             },
             RunState::ShowTargeting { range, item } => {
-                let result = gui::ranged_target(self, ctx, range);
+                let result = gui::ranged_target_menu(self, ctx, range);
 
                 match result.0 {
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
@@ -224,6 +230,7 @@ impl GameState for State {
             },
             RunState::ShowRemoveCurse => {
                 let result = gui::remove_curse_menu(self, ctx);
+
                 match result.0 {
                     gui::ItemMenuResult::NoResponse => {},
                     gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
@@ -277,6 +284,7 @@ impl GameState for State {
             },
             RunState::GameOver => {
                 let result = gui::game_over(ctx);
+
                 match result {
                     gui::GameOverResult::NoSelection => {},
                     gui::GameOverResult::QuitToMenu => {
@@ -353,5 +361,7 @@ impl GameState for State {
         }
 
         damage_system::delete_the_dead(&mut self.ecs);
+
+        rltk::render_draw_buffer(ctx).expect("Failed to render draw buffer")
     }
 }

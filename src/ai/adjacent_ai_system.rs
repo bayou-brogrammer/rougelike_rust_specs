@@ -37,16 +37,16 @@ impl<'a> System<'a> for AdjacentAI {
                 let h = map.height;
 
                 if let Some(size) = sizes.get(entity) {
-                    let mob_rect = Rect::new(pos.x, pos.y, size.x, size.y).get_all_tiles();
-                    let parent_rect = Rect::new(pos.x - 1, pos.y - 1, size.x + 2, size.y + 2);
+                    let mob_rect = Rect::with_size(pos.x, pos.y, size.x, size.y).point_set();
+                    let parent_rect = Rect::with_size(pos.x - 1, pos.y - 1, size.x + 2, size.y + 2).point_set();
 
                     parent_rect
-                        .get_all_tiles()
+                        // .get_all_tiles()
                         .iter()
                         .filter(|t| !mob_rect.contains(t))
                         .for_each(|t| {
-                            if t.0 > 0 && t.0 < w - 1 && t.1 > 0 && t.1 < h - 1 {
-                                let target_idx = map.xy_idx(t.0, t.1);
+                            if t.x > 0 && t.x < w - 1 && t.y > 0 && t.y < h - 1 {
+                                let target_idx = map.xy_idx(t.x, t.y);
                                 evaluate(target_idx, &factions, &my_faction.name, &mut reactions);
                             }
                         });

@@ -6,7 +6,6 @@ extern crate lazy_static;
 extern crate serde;
 
 pub mod ai;
-pub mod camera;
 pub mod effects;
 pub mod gamelog;
 pub mod gamesystem;
@@ -20,7 +19,6 @@ pub mod spawner;
 mod components;
 mod map_builders;
 mod random_table;
-mod rect;
 mod rex_assets;
 mod state;
 mod systems;
@@ -29,11 +27,11 @@ mod prelude;
 pub use prelude::*;
 
 fn main() -> rltk::BError {
-    use rltk::RltkBuilder;
-
     let mut context = RltkBuilder::simple(80, 60)
         .unwrap()
         .with_title("Roguelike Tutorial")
+        .with_font("vga8x16.png", 8, 16)
+        .with_sparse_console(80, 30, "vga8x16.png")
         .build()?;
 
     context.with_post_scanlines(true);
