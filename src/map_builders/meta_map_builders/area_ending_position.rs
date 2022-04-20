@@ -1,6 +1,5 @@
 use super::{BuilderMap, MetaMapBuilder, TileType};
 use crate::map;
-use rltk::RandomNumberGenerator;
 
 #[allow(dead_code)]
 pub enum XEnd {
@@ -22,16 +21,14 @@ pub struct AreaEndingPosition {
 }
 
 impl MetaMapBuilder for AreaEndingPosition {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.build(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.build(build_data); }
 }
 
 impl AreaEndingPosition {
     #[allow(dead_code)]
     pub fn new(x: XEnd, y: YEnd) -> Box<AreaEndingPosition> { Box::new(AreaEndingPosition { x, y }) }
 
-    fn build(&mut self, _rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn build(&mut self, build_data: &mut BuilderMap) {
         let seed_x = match self.x {
             XEnd::Left => 1,
             XEnd::Center => build_data.map.width / 2,

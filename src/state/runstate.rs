@@ -362,6 +362,9 @@ impl GameState for State {
 
         damage_system::delete_the_dead(&mut self.ecs);
 
-        rltk::render_draw_buffer(ctx).expect("Failed to render draw buffer")
+        rltk::render_draw_buffer(ctx).expect("Failed to render draw buffer");
+        if SHOW_FPS {
+            ctx.print(1, 59, &format!("FPS: {}", ctx.fps));
+        }
     }
 }

@@ -1,3 +1,4 @@
+use super::raws::structs::Reaction;
 use super::*;
 
 pub struct VisibleAI {}
@@ -15,7 +16,6 @@ impl<'a> System<'a> for VisibleAI {
         ReadStorage<'a, Viewshed>,
         WriteStorage<'a, Chasing>,
         ReadStorage<'a, SpecialAbilities>,
-        WriteExpect<'a, rltk::RandomNumberGenerator>,
         WriteStorage<'a, WantsToCastSpell>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, SpellTemplate>,
@@ -37,7 +37,6 @@ impl<'a> System<'a> for VisibleAI {
             viewsheds,
             mut chasing,
             abilities,
-            mut rng,
             mut casting,
             names,
             spells,
@@ -72,7 +71,7 @@ impl<'a> System<'a> for VisibleAI {
                                 for ability in abilities.abilities.iter() {
                                     if range >= ability.min_range
                                         && range <= ability.range
-                                        && rng.roll_dice(1, 100) <= (ability.chance * 100.0) as i32
+                                        && crate::rng::roll_dice(1, 100) <= (ability.chance * 100.0) as i32
                                     {
                                         casting
                                             .insert(

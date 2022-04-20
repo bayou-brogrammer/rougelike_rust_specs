@@ -8,15 +8,12 @@ mod solver;
 use solver::*;
 
 use super::{BuilderMap, Map, MetaMapBuilder, TileType};
-use rltk::RandomNumberGenerator;
 
 /// Provides a map builder using the Wave Function Collapse algorithm.
 pub struct WaveformCollapseBuilder {}
 
 impl MetaMapBuilder for WaveformCollapseBuilder {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.build(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.build(build_data); }
 }
 
 impl WaveformCollapseBuilder {
@@ -24,7 +21,7 @@ impl WaveformCollapseBuilder {
     #[allow(dead_code)]
     pub fn new() -> Box<WaveformCollapseBuilder> { Box::new(WaveformCollapseBuilder {}) }
 
-    fn build(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn build(&mut self, build_data: &mut BuilderMap) {
         const CHUNK_SIZE: i32 = 8;
         build_data.take_snapshot();
 
@@ -40,7 +37,7 @@ impl WaveformCollapseBuilder {
         );
         loop {
             let mut solver = Solver::new(constraints.clone(), CHUNK_SIZE, &build_data.map);
-            while !solver.iteration(&mut build_data.map, rng) {
+            while !solver.iteration(&mut build_data.map) {
                 build_data.take_snapshot();
             }
             build_data.take_snapshot();

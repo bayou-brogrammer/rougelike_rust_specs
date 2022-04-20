@@ -5,7 +5,6 @@
 extern crate lazy_static;
 extern crate serde;
 
-pub mod ai;
 pub mod effects;
 pub mod gamelog;
 pub mod gamesystem;
@@ -13,6 +12,7 @@ pub mod gui;
 pub mod map;
 pub mod player;
 pub mod raws;
+pub mod rng;
 pub mod spatial;
 pub mod spawner;
 
@@ -32,6 +32,7 @@ fn main() -> rltk::BError {
         .with_title("Roguelike Tutorial")
         .with_font("vga8x16.png", 8, 16)
         .with_sparse_console(80, 30, "vga8x16.png")
+        .with_vsync(false)
         .build()?;
 
     context.with_post_scanlines(true);
@@ -44,6 +45,7 @@ fn main() -> rltk::BError {
         mapgen_next_state: Some(RunState::MainMenu {
             menu_selection: gui::MainMenuSelection::NewGame,
         }),
+        dispatcher: crate::systems::build(),
     };
 
     gs.ecs.register::<AlwaysTargetsSelf>();
@@ -135,7 +137,6 @@ fn main() -> rltk::BError {
     gs.ecs.insert(map::MasterDungeonMap::new());
     gs.ecs.insert(Map::new(1, 64, 64, "New Map"));
     gs.ecs.insert(Point::new(0, 0));
-    gs.ecs.insert(rltk::RandomNumberGenerator::new());
     gs.ecs.insert(RunState::MapGeneration {});
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());

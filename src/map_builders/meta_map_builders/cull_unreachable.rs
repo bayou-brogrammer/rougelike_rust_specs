@@ -1,19 +1,16 @@
 use super::{BuilderMap, MetaMapBuilder, TileType};
-use rltk::RandomNumberGenerator;
 
 pub struct CullUnreachable {}
 
 impl MetaMapBuilder for CullUnreachable {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.build(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.build(build_data); }
 }
 
 impl CullUnreachable {
     #[allow(dead_code)]
     pub fn new() -> Box<CullUnreachable> { Box::new(CullUnreachable {}) }
 
-    fn build(&mut self, _rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn build(&mut self, build_data: &mut BuilderMap) {
         let starting_pos = build_data.starting_position.as_ref().unwrap().clone();
         let start_idx = build_data.map.xy_idx(starting_pos.x, starting_pos.y);
         build_data.map.populate_blocked();

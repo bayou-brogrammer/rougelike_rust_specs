@@ -4,16 +4,14 @@ pub struct DoglegCorridors {}
 
 impl MetaMapBuilder for DoglegCorridors {
     #[allow(dead_code)]
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.corridors(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.corridors(build_data); }
 }
 
 impl DoglegCorridors {
     #[allow(dead_code)]
     pub fn new() -> Box<DoglegCorridors> { Box::new(DoglegCorridors {}) }
 
-    fn corridors(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn corridors(&mut self, build_data: &mut BuilderMap) {
         let rooms: Vec<Rect> = if let Some(rooms_builder) = &build_data.rooms {
             rooms_builder.clone()
         } else {
@@ -27,7 +25,7 @@ impl DoglegCorridors {
                 let Point { x: new_x, y: new_y } = room.center();
                 let Point { x: prev_x, y: prev_y } = rooms[i as usize - 1].center();
 
-                if rng.range(0, 2) == 1 {
+                if crate::rng::range(0, 2) == 1 {
                     let mut c1 = apply_horizontal_tunnel(&mut build_data.map, prev_x, new_x, prev_y);
                     let mut c2 = apply_vertical_tunnel(&mut build_data.map, prev_y, new_y, new_x);
 

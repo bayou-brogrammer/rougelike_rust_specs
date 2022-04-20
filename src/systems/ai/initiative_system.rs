@@ -12,7 +12,6 @@ impl<'a> System<'a> for InitiativeSystem {
         ReadStorage<'a, Position>,
         WriteStorage<'a, MyTurn>,
         Entities<'a>,
-        WriteExpect<'a, rltk::RandomNumberGenerator>,
         ReadStorage<'a, Attributes>,
         WriteExpect<'a, RunState>,
         ReadExpect<'a, Entity>,
@@ -30,7 +29,6 @@ impl<'a> System<'a> for InitiativeSystem {
             positions,
             mut turns,
             entities,
-            mut rng,
             attributes,
             mut runstate,
             player,
@@ -60,7 +58,7 @@ impl<'a> System<'a> for InitiativeSystem {
                 turns.insert(entity, MyTurn {}).expect("Unable to insert turn");
 
                 // Re-roll
-                initiative.current = 6 + rng.roll_dice(1, 6);
+                initiative.current = 6 + crate::rng::roll_dice(1, 6);
 
                 // Give a bonus for quickness
                 if let Some(attr) = attributes.get(entity) {

@@ -5,12 +5,7 @@ use super::{
 
 use crate::map_builders::prefab_builder::prefab_sections::{DROW_ENTRY, UNDERGROUND_FORT};
 
-pub fn mushroom_entrance(
-    new_depth: i32,
-    _rng: &mut rltk::RandomNumberGenerator,
-    width: i32,
-    height: i32,
-) -> BuilderChain {
+pub fn mushroom_entrance(new_depth: i32, width: i32, height: i32) -> BuilderChain {
     let mut chain = BuilderChain::new(new_depth, width, height, "Into The Mushroom Grove");
     chain.start_with(CellularAutomataBuilder::new());
     chain.with(WaveformCollapseBuilder::new());
@@ -23,12 +18,7 @@ pub fn mushroom_entrance(
     chain
 }
 
-pub fn mushroom_builder(
-    new_depth: i32,
-    _rng: &mut rltk::RandomNumberGenerator,
-    width: i32,
-    height: i32,
-) -> BuilderChain {
+pub fn mushroom_builder(new_depth: i32, width: i32, height: i32) -> BuilderChain {
     let mut chain = BuilderChain::new(new_depth, width, height, "Into The Mushroom Grove");
 
     chain.start_with(CellularAutomataBuilder::new());
@@ -42,7 +32,7 @@ pub fn mushroom_builder(
     chain
 }
 
-pub fn mushroom_exit(new_depth: i32, _rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
+pub fn mushroom_exit(new_depth: i32, width: i32, height: i32) -> BuilderChain {
     let mut chain = BuilderChain::new(new_depth, width, height, "Into The Mushroom Grove");
 
     chain.start_with(CellularAutomataBuilder::new());

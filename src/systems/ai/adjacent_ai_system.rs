@@ -1,3 +1,4 @@
+use super::raws::structs::Reaction;
 use super::*;
 
 fn evaluate(idx: usize, factions: &ReadStorage<Faction>, my_faction: &str, reactions: &mut Vec<(Entity, Reaction)>) {

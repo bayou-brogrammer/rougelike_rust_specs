@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::systems::*;
 
 mod actions;
 pub use actions::*;
@@ -8,97 +9,19 @@ pub use runstate::*;
 
 pub struct State {
     pub ecs: World,
-    pub mapgen_next_state: Option<RunState>,
-    pub mapgen_history: Vec<Map>,
-    pub mapgen_index: usize,
-    pub mapgen_timer: f32,
+    pub(crate) mapgen_next_state: Option<RunState>,
+    pub(crate) mapgen_history: Vec<Map>,
+    pub(crate) mapgen_index: usize,
+    pub(crate) mapgen_timer: f32,
+    pub(crate) dispatcher: Box<dyn crate::systems::UnifiedDispatcher + 'static>,
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Running Systems
 ///////////////////////////////////////////////////////////////////////////
 impl State {
-    pub fn run_systems(&mut self) {
-        let mut mapindex = map_indexing_system::MapIndexingSystem {};
-        mapindex.run_now(&self.ecs);
-
-        let mut vis = visibility_system::VisibilitySystem {};
-        vis.run_now(&self.ecs);
-
-        let mut encumbrance = ai::EncumbranceSystem {};
-        encumbrance.run_now(&self.ecs);
-
-        let mut initiative = ai::InitiativeSystem {};
-        initiative.run_now(&self.ecs);
-
-        let mut turnstatus = ai::TurnStatusSystem {};
-        turnstatus.run_now(&self.ecs);
-
-        let mut quipper = ai::QuipSystem {};
-        quipper.run_now(&self.ecs);
-
-        let mut adjacent = ai::AdjacentAI {};
-        adjacent.run_now(&self.ecs);
-
-        let mut visible = ai::VisibleAI {};
-        visible.run_now(&self.ecs);
-
-        let mut approach = ai::ApproachAI {};
-        approach.run_now(&self.ecs);
-
-        let mut flee = ai::FleeAI {};
-        flee.run_now(&self.ecs);
-
-        let mut chase = ai::ChaseAI {};
-        chase.run_now(&self.ecs);
-
-        let mut defaultmove = ai::DefaultMoveAI {};
-        defaultmove.run_now(&self.ecs);
-
-        let mut moving = movement_system::MovementSystem {};
-        moving.run_now(&self.ecs);
-
-        let mut triggers = trigger_system::TriggerSystem {};
-        triggers.run_now(&self.ecs);
-
-        let mut melee = melee_combat_system::MeleeCombatSystem {};
-        melee.run_now(&self.ecs);
-
-        let mut ranged = ranged_combat_system::RangedCombatSystem {};
-        ranged.run_now(&self.ecs);
-
-        let mut pickup = inventory_system::ItemCollectionSystem {};
-        pickup.run_now(&self.ecs);
-
-        let mut itemequip = inventory_system::ItemEquipOnUse {};
-        itemequip.run_now(&self.ecs);
-
-        let mut item_use = inventory_system::ItemUseSystem {};
-        item_use.run_now(&self.ecs);
-
-        let mut spelluse = inventory_system::SpellUseSystem {};
-        spelluse.run_now(&self.ecs);
-
-        let mut item_id = inventory_system::ItemIdentificationSystem {};
-        item_id.run_now(&self.ecs);
-
-        let mut drop_items = inventory_system::ItemDropSystem {};
-        drop_items.run_now(&self.ecs);
-
-        let mut item_remove = inventory_system::ItemRemoveSystem {};
-        item_remove.run_now(&self.ecs);
-
-        let mut hunger = hunger_system::HungerSystem {};
-        hunger.run_now(&self.ecs);
-
-        run_effects_queue(&mut self.ecs);
-
-        let mut particles = particle_system::ParticleSpawnSystem {};
-        particles.run_now(&self.ecs);
-
-        let mut lighting = lighting_system::LightingSystem {};
-        lighting.run_now(&self.ecs);
-
+    fn run_systems(&mut self) {
+        self.dispatcher.run_now(&mut self.ecs);
         self.ecs.maintain();
     }
 }

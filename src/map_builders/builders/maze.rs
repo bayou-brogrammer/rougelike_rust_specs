@@ -1,13 +1,10 @@
 use super::{BuilderMap, InitialMapBuilder, Map, TileType};
-use rltk::RandomNumberGenerator;
 
 pub struct MazeBuilder {}
 
 impl InitialMapBuilder for MazeBuilder {
     #[allow(dead_code)]
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.build(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.build(build_data); }
 }
 
 impl MazeBuilder {
@@ -15,9 +12,9 @@ impl MazeBuilder {
     pub fn new() -> Box<MazeBuilder> { Box::new(MazeBuilder {}) }
 
     #[allow(clippy::map_entry)]
-    fn build(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn build(&mut self, build_data: &mut BuilderMap) {
         // Maze gen
-        let mut maze = Grid::new((build_data.map.width / 2) - 2, (build_data.map.height / 2) - 2, rng);
+        let mut maze = Grid::new((build_data.map.width / 2) - 2, (build_data.map.height / 2) - 2);
         maze.generate_maze(build_data);
     }
 }
@@ -67,24 +64,22 @@ impl Cell {
     }
 }
 
-struct Grid<'a> {
+struct Grid {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
     backtrace: Vec<usize>,
     current: usize,
-    rng: &'a mut RandomNumberGenerator,
 }
 
-impl<'a> Grid<'a> {
-    fn new(width: i32, height: i32, rng: &mut RandomNumberGenerator) -> Grid {
+impl Grid {
+    fn new(width: i32, height: i32) -> Grid {
         let mut grid = Grid {
             width,
             height,
             cells: Vec::new(),
             backtrace: Vec::new(),
             current: 0,
-            rng,
         };
 
         for row in 0..height {
@@ -132,7 +127,7 @@ impl<'a> Grid<'a> {
             if neighbors.len() == 1 {
                 return Some(neighbors[0]);
             } else {
-                return Some(neighbors[(self.rng.roll_dice(1, neighbors.len() as i32) - 1) as usize]);
+                return Some(neighbors[(crate::rng::roll_dice(1, neighbors.len() as i32) - 1) as usize]);
             }
         }
         None

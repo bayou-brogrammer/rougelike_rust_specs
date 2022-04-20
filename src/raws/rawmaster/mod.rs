@@ -126,7 +126,7 @@ fn find_slot_for_equippable_item(tag: &str, raws: &RawMaster) -> EquipmentSlot {
     panic!("Trying to equip {}, but it has no slot tag.", tag);
 }
 
-pub fn get_item_drop(raws: &RawMaster, rng: &mut rltk::RandomNumberGenerator, table: &str) -> Option<String> {
+pub fn get_item_drop(raws: &RawMaster, table: &str) -> Option<String> {
     if !raws.loot_index.contains_key(table) {
         return None;
     }
@@ -138,7 +138,7 @@ pub fn get_item_drop(raws: &RawMaster, rng: &mut rltk::RandomNumberGenerator, ta
         rt.add(item.name.clone(), item.weight);
     }
 
-    Some(rt.roll(rng))
+    Some(rt.roll())
 }
 
 pub fn get_vendor_items(categories: &[String], raws: &RawMaster) -> Vec<(String, f32)> {

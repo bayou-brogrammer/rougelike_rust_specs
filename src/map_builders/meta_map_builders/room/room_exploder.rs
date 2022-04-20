@@ -1,19 +1,16 @@
 use super::{paint, BuilderMap, MetaMapBuilder, Rect, Symmetry, TileType};
-use rltk::RandomNumberGenerator;
 
 pub struct RoomExploder {}
 
 impl MetaMapBuilder for RoomExploder {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
-        self.build(rng, build_data);
-    }
+    fn build_map(&mut self, build_data: &mut BuilderMap) { self.build(build_data); }
 }
 
 impl RoomExploder {
     #[allow(dead_code)]
     pub fn new() -> Box<RoomExploder> { Box::new(RoomExploder {}) }
 
-    fn build(&mut self, rng: &mut RandomNumberGenerator, build_data: &mut BuilderMap) {
+    fn build(&mut self, build_data: &mut BuilderMap) {
         let rooms: Vec<Rect> = if let Some(rooms_builder) = &build_data.rooms {
             rooms_builder.clone()
         } else {
@@ -22,7 +19,7 @@ impl RoomExploder {
 
         for room in rooms.iter() {
             let start = room.center();
-            let n_diggers = rng.roll_dice(1, 20) - 5;
+            let n_diggers = crate::rng::roll_dice(1, 20) - 5;
 
             if n_diggers > 0 {
                 for _i in 0..n_diggers {
@@ -41,7 +38,7 @@ impl RoomExploder {
                         paint(&mut build_data.map, Symmetry::None, 1, drunk_x, drunk_y);
                         build_data.map.tiles[drunk_idx] = TileType::DownStairs;
 
-                        let stagger_direction = rng.roll_dice(1, 4);
+                        let stagger_direction = crate::rng::roll_dice(1, 4);
 
                         #[rustfmt::skip]
                         match stagger_direction {

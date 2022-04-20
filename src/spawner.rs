@@ -94,13 +94,7 @@ const MAX_MONSTERS: i32 = 4;
 fn room_table(map_depth: i32) -> MasterTable { raws::get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth) }
 
 /// Fills a room with stuff!
-pub fn spawn_room(
-    map: &Map,
-    rng: &mut RandomNumberGenerator,
-    room: &Rect,
-    map_depth: i32,
-    spawn_list: &mut Vec<(usize, String)>,
-) {
+pub fn spawn_room(map: &Map, room: &Rect, map_depth: i32, spawn_list: &mut Vec<(usize, String)>) {
     let mut possible_targets: Vec<usize> = Vec::new();
     {
         // Borrow scope - to keep access to the map separated
@@ -114,17 +108,11 @@ pub fn spawn_room(
         }
     }
 
-    spawn_region(map, rng, &possible_targets, map_depth, spawn_list);
+    spawn_region(map, &possible_targets, map_depth, spawn_list);
 }
 
 /// Fills a region with stuff!
-pub fn spawn_region(
-    _map: &Map,
-    rng: &mut RandomNumberGenerator,
-    area: &[usize],
-    map_depth: i32,
-    spawn_list: &mut Vec<(usize, String)>,
-) {
+pub fn spawn_region(_map: &Map, area: &[usize], map_depth: i32, spawn_list: &mut Vec<(usize, String)>) {
     let spawn_table = room_table(map_depth);
     let mut spawn_points: HashMap<usize, String> = HashMap::new();
     let mut areas: Vec<usize> = Vec::from(area);
@@ -133,7 +121,7 @@ pub fn spawn_region(
     {
         let num_spawns = i32::min(
             areas.len() as i32,
-            rng.roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3,
+            crate::rng::roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3,
         );
         if num_spawns == 0 {
             return;
@@ -141,10 +129,10 @@ pub fn spawn_region(
 
         for _i in 0..num_spawns {
             let array_index =
-                if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32) - 1) as usize };
+                if areas.len() == 1 { 0usize } else { (crate::rng::roll_dice(1, areas.len() as i32) - 1) as usize };
 
             let map_idx = areas[array_index];
-            spawn_points.insert(map_idx, spawn_table.roll(rng));
+            spawn_points.insert(map_idx, spawn_table.roll());
             areas.remove(array_index);
         }
     }
