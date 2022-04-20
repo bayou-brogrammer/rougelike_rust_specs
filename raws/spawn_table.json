@@ -101,5 +101,29 @@
   { "name": "Breastplate", "weight": 7, "min_depth": 5, "max_depth": 7 },
   { "name": "War Axe", "weight": 7, "min_depth": 5, "max_depth": 7 },
   { "name": "Dwarf-Steel Shirt", "weight": 1, "min_depth": 5, "max_depth": 7 },
-  { "name": "Hand Crossbow", "weight": 2, "min_depth": 9, "max_depth": 11 }
+  { "name": "Hand Crossbow", "weight": 2, "min_depth": 9, "max_depth": 11 },
+  { "name": "Dark Elf", "weight": 10, "min_depth": 10, "max_depth": 11 },
+  { "name": "Arbat Dark Elf", "weight": 10, "min_depth": 10, "max_depth": 11 },
+  {
+    "name": "Arbat Dark Elf Leader",
+    "weight": 7,
+    "min_depth": 10,
+    "max_depth": 11
+  },
+  { "name": "Arbat Orc Slave", "weight": 14, "min_depth": 10, "max_depth": 11 },
+  { "name": "Barbo Dark Elf", "weight": 9, "min_depth": 10, "max_depth": 11 },
+  {
+    "name": "Barbo Goblin Archer",
+    "weight": 13,
+    "min_depth": 10,
+    "max_depth": 11
+  },
+  { "name": "Cirro Dark Elf", "weight": 7, "min_depth": 10, "max_depth": 11 },
+  {
+    "name": "Cirro Dark Priestess",
+    "weight": 6,
+    "min_depth": 10,
+    "max_depth": 11
+  },
+  { "name": "Cirro Spider", "weight": 10, "min_depth": 10, "max_depth": 11 }
 ]

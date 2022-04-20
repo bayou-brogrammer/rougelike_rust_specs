@@ -48,5 +48,32 @@
   {
     "name": "DarkElf",
     "responses": { "Default": "attack", "DarkElf": "ignore" }
+  },
+  {
+    "name": "DarkElfA",
+    "responses": {
+      "Default": "attack",
+      "DarkElfA": "ignore",
+      "DarkElfB": "attack",
+      "DarkElfC": "attack"
+    }
+  },
+  {
+    "name": "DarkElfB",
+    "responses": {
+      "Default": "attack",
+      "DarkElfB": "ignore",
+      "DarkElfA": "attack",
+      "DarkElfC": "attack"
+    }
+  },
+  {
+    "name": "DarkElfC",
+    "responses": {
+      "Default": "attack",
+      "DarkElfC": "ignore",
+      "DarkElfA": "attack",
+      "DarkElfB": "attack"
+    }
   }
 ]

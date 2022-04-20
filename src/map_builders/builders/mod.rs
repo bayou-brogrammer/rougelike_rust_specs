@@ -3,6 +3,7 @@ use crate::map_builders::*;
 mod bsp_dungeon;
 mod bsp_interior;
 mod cellular_automata;
+mod dark_elves;
 mod dla;
 mod drunkard;
 mod dwarf_fort;
@@ -28,6 +29,7 @@ pub use simple_map::SimpleMapBuilder;
 pub use voronoi::VoronoiCellBuilder;
 pub use waveform_collapse::WaveformCollapseBuilder;
 
+pub use dark_elves::*;
 pub use dwarf_fort::*;
 pub use forest::*;
 pub use limestone_cavern::*;
